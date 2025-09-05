@@ -21,20 +21,21 @@ internal class Chirp
             string msg = args[1];
             
             // STORE NEW MSG IN CSV FILE
-            StoreCheep(msg);
+            var record = StoreCheep(msg);
             // PRINT CONTENTS FROM CSV FILE
-            // PrintCheep();
+            UserInterface.PrintCheeps(record);
         }
 
         if (args[0] == "read")
         {
             // IF READ JUST PRINT FROM CSV FILE
-            // PrintCheep();
+            IEnumerable<Cheep> records = ReadCheep();
+            UserInterface.PrintCheeps(records);
         }
     }
     
     // APPEND CHIRP MESSAGES TO CSV FILE
-    private static void StoreCheep(string msg)
+    private static Cheep StoreCheep(string msg)
     {
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
@@ -49,13 +50,12 @@ internal class Chirp
         {
             var record = new Cheep
             {
-                Author = Environment.UserName,
-                Message = msg,
-                Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
+                Author = Environment.UserName, Message = msg, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
             };
-            
+
             csv.WriteRecord(record);
             writer.Write("\n");
+            return record;
         }
     }
 
