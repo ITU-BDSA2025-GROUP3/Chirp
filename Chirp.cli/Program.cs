@@ -23,13 +23,13 @@ internal class Chirp
             // STORE NEW MSG IN CSV FILE
             StoreCheep(msg);
             // PRINT CONTENTS FROM CSV FILE
-            PrintCheep();
+            // PrintCheep();
         }
 
         if (args[0] == "read")
         {
             // IF READ JUST PRINT FROM CSV FILE
-            PrintCheep();
+            // PrintCheep();
         }
     }
     
@@ -59,8 +59,9 @@ internal class Chirp
         }
     }
 
-    private static void PrintCheep()
+    private static List<Cheep> ReadCheep()
     {
+        List<Cheep> records = new List<Cheep>();
         using (var reader = new StreamReader(filePath))
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
@@ -69,9 +70,10 @@ internal class Chirp
             while (csv.Read())
             {
                 var record = csv.GetRecord<Cheep>();
-                Console.WriteLine($"{record.Author}, {record.Message}, {record.Timestamp}");
+                records.Add(record);
             }
         }
+        return records;
     }
 
     public record Cheep
