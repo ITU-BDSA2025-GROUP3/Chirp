@@ -1,6 +1,9 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using Microsoft.VisualBasic.FileIO;
+using System.Globalization;
+
+using CsvHelper;
+using CsvHelper.Configuration;
 
 internal class Chirp
 {
@@ -33,43 +36,45 @@ internal class Chirp
     // APPEND CHIRP MESSAGES TO CSV FILE
     private static void StoreCheep(string msg)
     {
-        // APPEND CHIRP MESSAGES TO CSV FILE
-        using(var sw = new StreamWriter(filePath, append: true))
+        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
-            var record = new ChirpMsg
+            // Don't write the header again.
+            HasHeaderRecord = false,
+            Delimiter = ",",
+        };
+        // APPEND CHIRP MESSAGES TO CSV FILE
+        using (var stream = File.Open(filePath, FileMode.Append))
+        using (var writer = new StreamWriter(stream))
+        using (var csv = new CsvWriter(writer, config))
+        {
+            var record = new Cheep
             {
                 Author = Environment.UserName,
                 Message = msg,
                 Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
             };
             
-            string line = $"{(record.Author)},\"{(record.Message)}\",{record.Timestamp}";
-            sw.WriteLine(line);
+            csv.WriteRecord(record);
+            writer.Write("\n");
         }
     }
 
     private static void PrintCheep()
     {
-        using (var parser = new TextFieldParser(filePath))
+        using (var reader = new StreamReader(filePath))
+        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
-            parser.SetDelimiters(","); // Fields are comma seperated
-            parser.HasFieldsEnclosedInQuotes = true; // Embedded commas: "Hi, this is a message" are treated as one field
-
-            // skip header so [author, message, Timestamp]
-            _ = parser.ReadFields(); // Read first field and discard w/ discard pattern (_=)
-            
-            while (!parser.EndOfData)
+            csv.Read();
+            csv.ReadHeader();
+            while (csv.Read())
             {
-                Console.WriteLine(parser.ReadToEnd());
-                // ONLY READ MESSAGE FIELD -->
-                // var fields = parser.ReadFields(); // [Author, Message, Timestamp]
-                // if (fields is { Length: > 1 }) // only proceed if there is a second column w/ message
-                //     Console.WriteLine(fields[1]);  // Message only 
+                var record = csv.GetRecord<Cheep>();
+                Console.WriteLine($"{record.Author}, {record.Message}, {record.Timestamp}");
             }
         }
     }
 
-    public record ChirpMsg
+    public record Cheep
     {
         public required string Author { get; set; }
         public required string Message { get; set; }
