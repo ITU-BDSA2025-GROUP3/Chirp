@@ -17,19 +17,8 @@ internal class Chirp
             }
             string msg = args[1];
             
-            // APPEND CHIRP MESSAGES TO CSV FILE
-            using(var sw = new StreamWriter(filePath, append: true))
-            {
-                var record = new ChripMsg
-                {
-                    Author = Environment.UserName,
-                    Message = msg,
-                    Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
-                };
-            
-                string line = $"{(record.Author)},\"{(record.Message)}\",{record.Timestamp}";
-                sw.WriteLine(line);
-            }
+            // STORE NEW MSG IN CSV FILE
+            StoreCheep(msg);
             // PRINT CONTENTS FROM CSV FILE
             PrintCheep();
         }
@@ -40,28 +29,47 @@ internal class Chirp
             PrintCheep();
         }
     }
-
-    public static void PrintCheep()
+    
+    // APPEND CHIRP MESSAGES TO CSV FILE
+    private static void StoreCheep(string msg)
     {
-        // READ ONLY MESSAGE COLUMN 
+        // APPEND CHIRP MESSAGES TO CSV FILE
+        using(var sw = new StreamWriter(filePath, append: true))
+        {
+            var record = new ChirpMsg
+            {
+                Author = Environment.UserName,
+                Message = msg,
+                Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
+            };
+            
+            string line = $"{(record.Author)},\"{(record.Message)}\",{record.Timestamp}";
+            sw.WriteLine(line);
+        }
+    }
+
+    private static void PrintCheep()
+    {
         using (var parser = new TextFieldParser(filePath))
         {
             parser.SetDelimiters(","); // Fields are comma seperated
             parser.HasFieldsEnclosedInQuotes = true; // Embedded commas: "Hi, this is a message" are treated as one field
 
-            // skip header
+            // skip header so [author, message, Timestamp]
             _ = parser.ReadFields(); // Read first field and discard w/ discard pattern (_=)
-
+            
             while (!parser.EndOfData)
             {
-                var fields = parser.ReadFields(); // [Author, Message, Timestamp]
-                if (fields is { Length: > 1 }) // only proceed if there is a second column w/ message
-                    Console.WriteLine(fields[1]);  // Message only 
+                Console.WriteLine(parser.ReadToEnd());
+                // ONLY READ MESSAGE FIELD -->
+                // var fields = parser.ReadFields(); // [Author, Message, Timestamp]
+                // if (fields is { Length: > 1 }) // only proceed if there is a second column w/ message
+                //     Console.WriteLine(fields[1]);  // Message only 
             }
         }
     }
 
-    public record ChripMsg
+    public record ChirpMsg
     {
         public required string Author { get; set; }
         public required string Message { get; set; }
