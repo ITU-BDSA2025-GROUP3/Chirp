@@ -5,11 +5,14 @@ using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 
+using SimpleDB;
+
 internal class Chirp
 {
-    static string filePath = "chirp_cli_db.csv";
+    private static IDatabaseRepository<Cheep> database = new CSVDatabase<Cheep>();
     public static void Main(string[] args)
     {
+        
         if (args[0] == "cheep")
         {
             // EXIT IF NO MSG AFTER '-- CHEEP'
@@ -21,59 +24,30 @@ internal class Chirp
             string msg = args[1];
             
             // STORE NEW MSG IN CSV FILE
-            var record = StoreCheep(msg);
-            // PRINT CONTENTS FROM CSV FILE
-            UserInterface.PrintCheeps(record);
+            var cheep = stringToCheep(msg);
+            database.Store(cheep);
+            
         }
 
         if (args[0] == "read")
         {
             // IF READ JUST PRINT FROM CSV FILE
-            IEnumerable<Cheep> records = ReadCheep();
-            UserInterface.PrintCheeps(records);
+            // PrintCheep();
+            UserInterface.PrintCheeps(database.Read());
+            
         }
     }
-    
-    // APPEND CHIRP MESSAGES TO CSV FILE
-    private static Cheep StoreCheep(string msg)
+
+    private static Cheep stringToCheep(string msg)
     {
-        var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+        var record = new Cheep
         {
-            // Don't write the header again.
-            HasHeaderRecord = false,
-            Delimiter = ",",
+            Author = Environment.UserName,
+            Message = msg,
+            Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
         };
-        // APPEND CHIRP MESSAGES TO CSV FILE
-        using (var stream = File.Open(filePath, FileMode.Append))
-        using (var writer = new StreamWriter(stream))
-        using (var csv = new CsvWriter(writer, config))
-        {
-            var record = new Cheep
-            {
-                Author = Environment.UserName, Message = msg, Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
-            };
 
-            csv.WriteRecord(record);
-            writer.Write("\n");
-            return record;
-        }
-    }
-
-    private static List<Cheep> ReadCheep()
-    {
-        List<Cheep> records = new List<Cheep>();
-        using (var reader = new StreamReader(filePath))
-        using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
-        {
-            csv.Read();
-            csv.ReadHeader();
-            while (csv.Read())
-            {
-                var record = csv.GetRecord<Cheep>();
-                records.Add(record);
-            }
-        }
-        return records;
+        return record;
     }
 
     public record Cheep
