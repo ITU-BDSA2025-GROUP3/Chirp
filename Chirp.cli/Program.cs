@@ -6,36 +6,48 @@ using CsvHelper;
 using CsvHelper.Configuration;
 
 using SimpleDB;
+using System.CommandLine;
+using System.CommandLine.Invocation;
+using System.IO;
 
-internal class Chirp
+class Chirp
 {
     private static IDatabaseRepository<Cheep> database = new CSVDatabase<Cheep>();
-    public static void Main(string[] args)
-    {
-        
-        if (args[0] == "cheep")
-        {
-            // EXIT IF NO MSG AFTER '-- CHEEP'
-            if (args.Length < 2)
-            {
-                Console.WriteLine("incorrect usage, write a message");
-                Environment.Exit(1);
-            }
-            string msg = args[1];
-            
-            // STORE NEW MSG IN CSV FILE
-            var cheep = stringToCheep(msg);
-            database.Store(cheep);
-            
-        }
 
-        if (args[0] == "read")
+    public static int Main(string[] args)
+    {
+        RootCommand rootCommand = new RootCommand("chirp");
+
+        //Create the read command
+        Command readCommand = new Command("read", "Read cheeps and display to terminal");
+        //optional argument of the number of cheeps to read TODO not yet implemented a limit
+        Argument<int> readLimit = new Argument<int>("limit")
         {
-            // IF READ JUST PRINT FROM CSV FILE
-            // PrintCheep();
-            UserInterface.PrintCheeps(database.Read());
-            
-        }
+            Description = "Limit on the number of latest cheeps to read",
+            DefaultValueFactory = parseResult => 5
+        };
+        readCommand.Arguments.Add(readLimit);
+        rootCommand.Subcommands.Add(readCommand);
+        readCommand.SetAction(parseResult =>
+        {
+            UserInterface.PrintCheeps(database.Read(parseResult.GetValue(readLimit)));
+        });
+        //Create the cheep command
+        Command cheepCommand = new Command("cheep", "Cheep a message");
+        Argument<string> cheepArgument = new Argument<string>("message") {Description = "The message to be cheeped"};
+        
+        cheepCommand.Arguments.Add(cheepArgument);
+        rootCommand.Subcommands.Add(cheepCommand);
+        
+        cheepCommand.SetAction(parseResult =>
+        {
+            Cheep cheep = stringToCheep(parseResult.GetValue(cheepArgument));
+            database.Store(cheep);
+            UserInterface.PrintCheeps(cheep);
+        });
+        
+
+        return rootCommand.Parse(args).Invoke();
     }
 
     private static Cheep stringToCheep(string msg)
