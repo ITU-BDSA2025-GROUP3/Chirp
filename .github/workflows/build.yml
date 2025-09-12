@@ -24,7 +24,7 @@ jobs:
 
     defaults:
        run:
-          working-directory: Chirp.CLI
+          working-directory: Chirp.cli
 
     steps:
     - uses: actions/checkout@v4
