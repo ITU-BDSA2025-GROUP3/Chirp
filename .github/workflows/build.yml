@@ -22,6 +22,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    defaults:
+       run:
+          working-directory: Chirp.CLI
+
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
