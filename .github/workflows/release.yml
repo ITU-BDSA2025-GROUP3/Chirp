@@ -70,11 +70,8 @@ jobs:
 
           dotnet publish "src/Chirp.cli/Chirp.cli.csproj" -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
 
-          if [ "${{ matrix.os }}" == "win-x64" || "${{ matrix.os }}" == "win-arm64" ]; then
-            7z a -tzip "${release_name}.zip" "./${release_name}/."
-          else
-            tar czvf "${release_name}.tar.gz" "$release_name"
-          fi
+          7z a "${release_name}.zip" "${release_name}/."
+          7z d "${release_name}.zip" "*.pdb"
 
           rm -r "$release_name"
 
