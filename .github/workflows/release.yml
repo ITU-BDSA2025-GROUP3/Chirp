@@ -1,0 +1,76 @@
+# This workflow will build a .NET project
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-net
+
+name: .NET
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+      
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.0.x
+        
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+  test:
+    name: Test
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: 9.0.x
+    - name: Test
+      run: dotnet test --no-build
+
+  release:
+    name: Release
+    needs: test
+
+    strategy:
+      matrix:
+        os: ['linux-arm64', 'linux-x64', 'osx-arm64', 'osx-x64', 'win-arm64', 'win-x64']
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Build, Publish and Package
+        shell: bash
+        run: |
+          release_name="Chirp-${{ github.ref_name }}-${{ matrix.os }}"
+
+          dotnet publish "src/Chirp.cli/Chirp.cli.csproj" -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
+
+          if [ "${{ matrix.os }}" == "win-x64" || "${{ matrix.os }}" == "win-arm64" ]; then
+            7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          else
+            tar czvf "${release_name}.tar.gz" "$release_name"
+          fi
+
+          rm -r "$release_name"
+
+      - name: Publish
+        uses: softprops/action-gh-release@v1
+        with:
+          files: "Chirp-*"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}      
+    
