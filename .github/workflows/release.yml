@@ -52,14 +52,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 9.0.x
+          
       - name: Build, Publish and Package
         shell: bash
         run: |
           release_name="Chirp-${{ github.ref_name }}-${{ matrix.os }}"
 
-          ls -R src/
-
-          dotnet publish src/Chirp.cli/Chirp.cli.csproj -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
+          dotnet publish "src/Chirp.cli/Chirp.cli.csproj" -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
 
           if [ "${{ matrix.os }}" == "win-x64" || "${{ matrix.os }}" == "win-arm64" ]; then
             7z a -tzip "${release_name}.zip" "./${release_name}/."
