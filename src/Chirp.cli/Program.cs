@@ -12,6 +12,8 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
     {
         var rootCommand = new RootCommand("chirp");
 
+        //hej
+        
         //Create the read command
         var readCommand = new Command("read", "Read cheeps and display to terminal");
         var readLimit = new Argument<int>("limit")
