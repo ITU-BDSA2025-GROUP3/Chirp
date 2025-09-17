@@ -12,7 +12,7 @@ using System.IO;
 
 class Chirp
 {
-    private static IDatabaseRepository<Cheep> database = new CSVDatabase<Cheep>();
+    private static IDatabaseRepository<Cheep> database = CSVDatabase<Cheep>.Instance;
 
     public static int Main(string[] args)
     {
