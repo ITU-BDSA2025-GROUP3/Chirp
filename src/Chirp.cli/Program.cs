@@ -17,8 +17,6 @@ class Chirp
     public static int Main(string[] args)
     {
         RootCommand rootCommand = new RootCommand("chirp");
-
-        //hej
         
         //Create the read command
         Command readCommand = new Command("read", "Read cheeps and display to terminal");
