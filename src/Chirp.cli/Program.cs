@@ -18,6 +18,8 @@ class Chirp
     {
         RootCommand rootCommand = new RootCommand("chirp");
 
+        //hej
+        
         //Create the read command
         Command readCommand = new Command("read", "Read cheeps and display to terminal");
         //optional argument of the number of cheeps to read TODO not yet implemented a limit
