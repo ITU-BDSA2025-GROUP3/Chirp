@@ -9,6 +9,21 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 {
     
     static string filePath = "chirp_cli_db.csv";
+    private static CSVDatabase<T> instance = null;
+
+    private CSVDatabase() { }
+    public static CSVDatabase<T> Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = new CSVDatabase<T>();
+            }
+            
+            return instance;
+        }
+    }
     
     public IEnumerable<T> Read(int? limit = null)
     {
