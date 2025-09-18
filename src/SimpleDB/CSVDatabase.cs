@@ -7,13 +7,17 @@ namespace SimpleDB;
 
 public sealed class CSVDatabase<T> : IDatabaseRepository<T> 
 {
+    private readonly string _filePath; // common naming convention, avoid using .this
     
-    static string filePath = "chirp_cli_db.csv";
+    public CSVDatabase(string? filePath = null)
+    {
+        _filePath = string.IsNullOrWhiteSpace(filePath) ? "chirp_cli_db.csv" : filePath;
+    }
     
     public IEnumerable<T> Read(int? limit = null)
     {
-        List<T> records = new List<T>();
-        using (var reader = new StreamReader(filePath))
+        var records = new List<T>();
+        using var reader = new StreamReader(_filePath);
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
             csv.Read();
@@ -22,6 +26,9 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
             {
                 var record = csv.GetRecord<T>();
                 records.Add(record);
+                
+                if (limit.HasValue && records.Count >= limit.Value)
+                    break;
             }
         }
         return records;
@@ -34,15 +41,18 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
             // Don't write the header again.
             HasHeaderRecord = false,
             Delimiter = ",",
+            NewLine = Environment.NewLine
         };
         // APPEND CHIRP MESSAGES TO CSV FILE
-        using (var stream = File.Open(filePath, FileMode.Append))
-        using (var writer = new StreamWriter(stream))
-        using (var csv = new CsvWriter(writer, config))
+        using var stream = File.Open(_filePath, FileMode.Append);
+        using var writer = new StreamWriter(stream);
+        using var csv = new CsvWriter(writer, config);
+        if (stream.Length == 0)
         {
-            csv.WriteRecord(record);
-            writer.Write("\n");
+            csv.WriteHeader<T>();
+            csv.NextRecord();
         }
+        csv.WriteRecord(record);
+        csv.NextRecord();
     }
-    
 }
