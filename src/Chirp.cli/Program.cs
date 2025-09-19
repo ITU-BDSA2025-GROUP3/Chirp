@@ -5,7 +5,7 @@ using System.CommandLine;
 
 class Chirp
 {
-    private static IDatabaseRepository<Cheep> database = new CSVDatabase<Cheep>();
+    private static IDatabaseRepository<Cheep> database = CSVDatabase<Cheep>.Instance;
 
     public static int Main(string[] args)
     {
@@ -13,7 +13,6 @@ class Chirp
 
         //Create the read command
         var readCommand = new Command("read", "Read cheeps and display to terminal");
-        //optional argument of the number of cheeps to read TODO not yet implemented a limit
         var readLimit = new Argument<int>("limit")
         {
             Description = "Limit on the number of latest cheeps to read",

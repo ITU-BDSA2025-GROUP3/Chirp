@@ -5,19 +5,47 @@ using CsvHelper.Configuration;
 
 namespace SimpleDB;
 
-public sealed class CSVDatabase<T> : IDatabaseRepository<T> 
+public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 {
-    private readonly string _filePath; // common naming convention, avoid using .this
-    
-    public CSVDatabase(string? filePath = null)
+    private static CSVDatabase<T>? s_instance;
+    private readonly object _gate = new();
+    private string _filePath; // common naming convention, avoid using .this
+
+    private CSVDatabase()
     {
-        _filePath = string.IsNullOrWhiteSpace(filePath) ? "chirp_cli_db.csv" : filePath;
+        _filePath = "chirp_cli_db.csv";
+    }
+    public static CSVDatabase<T> Instance
+    {
+        get
+        {
+            if (s_instance == null)
+            {
+                s_instance = new CSVDatabase<T>();
+            }
+            
+            return s_instance;
+        }
+    }
+    
+    public CSVDatabase<T> UseFile(string? filePath)
+    {
+        lock (_gate)
+        {
+            _filePath = string.IsNullOrWhiteSpace(filePath) ? "chirp_cli_db.csv" : filePath!;
+        }
+        return this;
     }
     
     public IEnumerable<T> Read(int? limit = null)
     {
+        string path;
+        lock (_gate)
+        {
+            path = _filePath;
+        }
         var records = new List<T>();
-        using var reader = new StreamReader(_filePath);
+        using var reader = new StreamReader(path);
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
             csv.Read();
@@ -36,6 +64,11 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 
     public void Store(T record)
     {
+        string path;
+        lock (_gate)
+        {
+            path = _filePath;
+        }
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             // Don't write the header again.
@@ -44,7 +77,7 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
             NewLine = Environment.NewLine
         };
         // APPEND CHIRP MESSAGES TO CSV FILE
-        using var stream = File.Open(_filePath, FileMode.Append);
+        using var stream = File.Open(path, FileMode.Append);
         using var writer = new StreamWriter(stream);
         using var csv = new CsvWriter(writer, config);
         if (stream.Length == 0)
@@ -54,5 +87,6 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
         }
         csv.WriteRecord(record);
         csv.NextRecord();
+        writer.Flush();
     }
 }

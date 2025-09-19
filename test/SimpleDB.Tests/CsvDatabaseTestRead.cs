@@ -20,7 +20,7 @@ public class CsvDatabaseTestRead
         var tempFilePath = Path.GetTempFileName();
         try
         {
-            var db = new CSVDatabase<TestCheepRecord>(tempFilePath);
+            var db =  CSVDatabase<TestCheepRecord>.Instance.UseFile(tempFilePath);
             db.Store(new TestCheepRecord { Author = "alice", Message = "first", Timestamp = 1 });
             db.Store(new TestCheepRecord { Author = "malice", Message = "second", Timestamp = 2 });
             var results = db.Read().ToList();
@@ -50,7 +50,7 @@ public class CsvDatabaseTestRead
                 csv.NextRecord();
             }
 
-            var db = new CSVDatabase<TestCheepRecord>(tempFilePath);
+            var db =  CSVDatabase<TestCheepRecord>.Instance.UseFile(tempFilePath);
             
             var results = db.Read().ToList();
             

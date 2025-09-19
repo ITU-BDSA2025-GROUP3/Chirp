@@ -25,7 +25,7 @@ public class CsvDatabaseTest
         var tempFilePath = Path.GetTempFileName();
         try
         {
-            var db = new CSVDatabase<TestCheepRecord>(tempFilePath);
+            var db =  CSVDatabase<TestCheepRecord>.Instance.UseFile(tempFilePath);
             db.Store(new TestCheepRecord { Author = "alice", Message = "first", Timestamp = 1 });
             db.Store(new TestCheepRecord { Author = "malice", Message = "second", Timestamp = 2 });
             
@@ -64,10 +64,10 @@ public class CsvDatabaseTest
         {
             // two seperate database instances, writing to same file
             // empty file, write header and row
-            var db1 = new CSVDatabase<TestCheepRecord>(tempFilePath);
+            var db1 =  CSVDatabase<TestCheepRecord>.Instance.UseFile(tempFilePath);
             db1.Store(new TestCheepRecord { Author = "alice", Message = "first", Timestamp = 1 });
             // non empty file, only write row
-            var db2 = new CSVDatabase<TestCheepRecord>(tempFilePath);
+            var db2 =  CSVDatabase<TestCheepRecord>.Instance.UseFile(tempFilePath);
             db2.Store(new TestCheepRecord { Author = "malice", Message = "second", Timestamp = 2 });
 
             var lines = File.ReadAllLines(tempFilePath);
