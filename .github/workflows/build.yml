@@ -9,13 +9,15 @@ on:
     - main
     - fix/*
     - feature/*
-    - relase/*
+    - release/*
+    - test/*
   pull_request:
     branches:
     - main
     - fix/*
     - feature/*
-    - relase/*
+    - release/*
+    - test/*
 
 jobs:
   build:
