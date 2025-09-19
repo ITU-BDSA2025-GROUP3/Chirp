@@ -5,30 +5,47 @@ using CsvHelper.Configuration;
 
 namespace SimpleDB;
 
-public sealed class CSVDatabase<T> : IDatabaseRepository<T> 
+public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 {
-    
-    static string filePath = "chirp_cli_db.csv";
-    private static CSVDatabase<T> instance = null;
+    private static CSVDatabase<T>? s_instance;
+    private readonly object _gate = new();
+    private string _filePath; // common naming convention, avoid using .this
 
-    private CSVDatabase() { }
+    private CSVDatabase()
+    {
+        _filePath = "chirp_cli_db.csv";
+    }
     public static CSVDatabase<T> Instance
     {
         get
         {
-            if (instance == null)
+            if (s_instance == null)
             {
-                instance = new CSVDatabase<T>();
+                s_instance = new CSVDatabase<T>();
             }
             
-            return instance;
+            return s_instance;
         }
+    }
+    
+    public CSVDatabase<T> UseFile(string? filePath)
+    {
+        lock (_gate)
+        {
+            _filePath = string.IsNullOrWhiteSpace(filePath) ? "chirp_cli_db.csv" : filePath!;
+        }
+        return this;
     }
     
     public IEnumerable<T> Read(int? limit = null)
     {
-        List<T> records = new List<T>();
-        using (var reader = new StreamReader(filePath))
+        string path;
+        lock (_gate)
+        {
+            path = _filePath;
+        }
+        var records = new List<T>();
+        using var reader = new StreamReader(path);
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
             csv.Read();
@@ -37,6 +54,9 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
             {
                 var record = csv.GetRecord<T>();
                 records.Add(record);
+                
+                if (limit.HasValue && records.Count >= limit.Value)
+                    break;
             }
         }
         return records;
@@ -44,20 +64,29 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 
     public void Store(T record)
     {
+        string path;
+        lock (_gate)
+        {
+            path = _filePath;
+        }
         var config = new CsvConfiguration(CultureInfo.InvariantCulture)
         {
             // Don't write the header again.
             HasHeaderRecord = false,
             Delimiter = ",",
+            NewLine = Environment.NewLine
         };
         // APPEND CHIRP MESSAGES TO CSV FILE
-        using (var stream = File.Open(filePath, FileMode.Append))
-        using (var writer = new StreamWriter(stream))
-        using (var csv = new CsvWriter(writer, config))
+        using var stream = File.Open(path, FileMode.Append);
+        using var writer = new StreamWriter(stream);
+        using var csv = new CsvWriter(writer, config);
+        if (stream.Length == 0)
         {
-            csv.WriteRecord(record);
-            writer.Write("\n");
+            csv.WriteHeader<T>();
+            csv.NextRecord();
         }
+        csv.WriteRecord(record);
+        csv.NextRecord();
+        writer.Flush();
     }
-    
 }
