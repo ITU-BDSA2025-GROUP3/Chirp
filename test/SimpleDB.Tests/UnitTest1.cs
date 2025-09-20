@@ -1,4 +1,4 @@
-﻿namespace SimpleDB.Tests;
+﻿namespace CSVDBService.Tests;
 
 public class UnitTest1
 {
