@@ -25,4 +25,9 @@ public static class UserInterface
     {
         Console.WriteLine($"{cheep.Author} @ {DateTimeOffset.FromUnixTimeSeconds(cheep.Timestamp).ToLocalTime()}: {cheep.Message}");
     }
+
+    internal static void debugPrint(string debug)
+    {
+        Console.WriteLine(debug);
+    }
 }

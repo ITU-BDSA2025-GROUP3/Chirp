@@ -1,14 +1,22 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SimpleDB;
 using System.CommandLine;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 class Chirp
 {
-    private static IDatabaseRepository<Cheep> database = CSVDatabase<Cheep>.Instance;
+    
 
     public static int Main(string[] args)
     {
+        //HTTP CLIENT SETUP
+        var baseURL = "http://localhost:5000";
+        using HttpClient client = new();
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        client.BaseAddress = new Uri(baseURL);
+        
         var rootCommand = new RootCommand("chirp");
 
         //hej
@@ -22,9 +30,17 @@ class Chirp
         };
         readCommand.Arguments.Add(readLimit);
         rootCommand.Subcommands.Add(readCommand);
-        readCommand.SetAction(parseResult =>
+        
+        //Runs an async operation awaiting the response of our /cheeps endpoint
+        readCommand.SetAction(async parseResult =>
         {
-            UserInterface.PrintCheeps(database.Read(parseResult.GetValue(readLimit)));
+            UserInterface.debugPrint("Requesting all cheeps from endpoint...");
+            var cheepRequest = await client.GetFromJsonAsync<IList<Cheep>>("/cheeps");
+            if (cheepRequest != null)
+            {
+                UserInterface.debugPrint("Found cheeps from endpoint!");
+                UserInterface.PrintCheeps(cheepRequest.ToList());   
+            }
         });
         //Create the cheep command
         var cheepCommand = new Command("cheep", "Cheep a message");
@@ -33,11 +49,19 @@ class Chirp
         cheepCommand.Arguments.Add(cheepArgument);
         rootCommand.Subcommands.Add(cheepCommand);
         
-        cheepCommand.SetAction(parseResult =>
+        cheepCommand.SetAction(async parseResult =>
         {
             var message = parseResult.GetValue(cheepArgument)!; // '!' used to assert non-null msg val
             Cheep cheep = stringToCheep(message);
-            database.Store(cheep);
+            
+            UserInterface.debugPrint("Sending over post request now!");
+            
+            //Send webrequest to store the cheep
+            var postCheep = await client.PostAsJsonAsync("/cheep", cheep);
+            
+            //Ensure we get a proper success code
+            postCheep.EnsureSuccessStatusCode();
+            UserInterface.debugPrint("Cheep successfully sent!");
             UserInterface.PrintCheeps(cheep);
         });
         
