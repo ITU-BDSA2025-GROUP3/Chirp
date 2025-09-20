@@ -1,16 +1,18 @@
 ﻿using System.Globalization;
-
+using Microsoft.AspNetCore.Builder;
 using CsvHelper;
 using CsvHelper.Configuration;
 
-namespace SimpleDB;
+using CSVDBService;
+
+namespace CSVDBService;
 
 public sealed class CSVDatabase<T> : IDatabaseRepository<T>
 {
     private static CSVDatabase<T>? s_instance;
     private readonly object _gate = new();
     private string _filePath; // common naming convention, avoid using .this
-
+    
     private CSVDatabase()
     {
         _filePath = "chirp_cli_db.csv";
@@ -39,6 +41,7 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
     
     public IEnumerable<T> Read(int? limit = null)
     {
+        //Refactor this entire thing to now just be reading from a webrequest
         string path;
         lock (_gate)
         {

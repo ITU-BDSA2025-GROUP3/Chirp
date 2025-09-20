@@ -2,10 +2,10 @@ using System.Globalization;
 
 using Xunit.Abstractions;
 
-namespace SimpleDB.Tests;
+namespace CSVDBService.Tests;
 
 using Xunit;
-using SimpleDB;
+using CSVDBService;
 using CsvHelper;
 
 public class CsvDatabaseTest
