@@ -1,12 +1,12 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Builds and deploys CSVDBService to Azure Web App
+name: ${{ github.actor }} is deploying ${{ github.ref_name }} to Azure!
 
 on:
-  pull_request:
-    branches:
-      - main
+  release:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
 
 jobs:

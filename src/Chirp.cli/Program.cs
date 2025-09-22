@@ -12,7 +12,7 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
     public static int Main(string[] args)
     {
         //HTTP CLIENT SETUP
-        var baseURL = "http://localhost:5000";
+        var baseURL = "https://bdsagroup03chirpremotedb.azurewebsites.net/";
         using HttpClient client = new();
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -35,11 +35,10 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
         //Runs an async operation awaiting the response of our /cheeps endpoint
         readCommand.SetAction(async parseResult =>
         {
-            UserInterface.debugPrint("Requesting all cheeps from endpoint...");
+            
             var cheepRequest = await client.GetFromJsonAsync<IList<Cheep>>("/cheeps");
             if (cheepRequest != null)
             {
-                UserInterface.debugPrint("Found cheeps from endpoint!");
                 UserInterface.PrintCheeps(cheepRequest.ToList());   
             }
         });
@@ -55,14 +54,12 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
             var message = parseResult.GetValue(cheepArgument)!; // '!' used to assert non-null msg val
             Cheep cheep = stringToCheep(message);
             
-            UserInterface.debugPrint("Sending over post request now!");
-            
             //Send webrequest to store the cheep
             var postCheep = await client.PostAsJsonAsync("/cheep", cheep);
             
             //Ensure we get a proper success code
             postCheep.EnsureSuccessStatusCode();
-            UserInterface.debugPrint("Cheep successfully sent!");
+            
             UserInterface.PrintCheeps(cheep);
         });
         
