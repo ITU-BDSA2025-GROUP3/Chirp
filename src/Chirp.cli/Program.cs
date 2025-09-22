@@ -2,12 +2,9 @@
 
 using SimpleDB;
 using System.CommandLine;
-using System.Runtime.CompilerServices;
 
-//Make class visible to test directory
-[assembly:InternalsVisibleTo("Chirp.Intergration.Tests")]
 
-class Chirp //Modifier should NOT be public, need proper internal visibility status!
+public class Chirp //Modifier should NOT be public, need proper internal visibility status!
 {
     private static IDatabaseRepository<Cheep> database = CSVDatabase<Cheep>.Instance;
 
