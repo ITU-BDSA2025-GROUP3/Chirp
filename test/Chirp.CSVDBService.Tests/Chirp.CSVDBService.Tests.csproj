@@ -5,7 +5,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>SimpleDB.Tests</RootNamespace>
+    <RootNamespace>CSVDBService.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

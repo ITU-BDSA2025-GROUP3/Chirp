@@ -17,7 +17,7 @@ public class Program
         });
         app.MapPost("/cheep", (Cheep userCheep) => database.Store(userCheep));
 
-        Console.WriteLine("Starting app!");
+        Console.WriteLine("Starting CSVDB service...!");
         app.Run();
         
     }

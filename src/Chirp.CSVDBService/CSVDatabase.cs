@@ -99,12 +99,5 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
         csv.NextRecord();
         writer.Flush();
     }
-
-    public void setFilePath(string filePath)
-    {
-        lock (_gate)
-            {
-            _filePath = filePath;
-            }
-    }
+    
 }
