@@ -41,7 +41,7 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
     
     public IEnumerable<T> Read(int? limit = null)
     {
-        //Refactor this entire thing to now just be reading from a webrequest
+        
         string path;
         lock (_gate)
         {

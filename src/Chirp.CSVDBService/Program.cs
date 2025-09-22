@@ -21,6 +21,11 @@ public class Program
         app.Run();
         
     }
+
+    public static CSVDatabase<Cheep> GetDatabase()
+    {
+        return database;
+    }
     
     public record Cheep
     {

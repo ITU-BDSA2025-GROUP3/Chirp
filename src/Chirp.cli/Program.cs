@@ -19,8 +19,6 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
         client.BaseAddress = new Uri(baseURL);
         
         var rootCommand = new RootCommand("chirp");
-
-        //hej
         
         //Create the read command
         var readCommand = new Command("read", "Read cheeps and display to terminal");
