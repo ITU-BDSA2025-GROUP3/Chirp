@@ -12,7 +12,7 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
     public static int Main(string[] args)
     {
         //HTTP CLIENT SETUP
-        var baseURL = "https://bdsagroup03chirpremotedb.azurewebsites.net/";
+        var baseURL = "https://bdsagroup03chirpremotedb-bgaghsguh8cdhdaq.swedencentral-01.azurewebsites.net/";
         using HttpClient client = new();
         client.DefaultRequestHeaders.Accept.Clear();
         client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));

@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
 name: AzureDeployment
-run-name: ${{ github.actor }} is deploying ${{ github.ref_name }} to Azure!
+run-name: ${{ github.actor }} is deploying to Azure!
 
 permissions:
   id-token: write
