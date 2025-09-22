@@ -45,6 +45,13 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
             path = _filePath;
         }
         var records = new List<T>();
+
+        //Check if the file even has any data, if not return nothing.
+        if (!File.Exists(path) || new FileInfo(path).Length == 0)
+        {
+            return records;
+        }
+        
         using var reader = new StreamReader(path);
         using (var csv = new CsvReader(reader, CultureInfo.InvariantCulture))
         {
@@ -88,5 +95,13 @@ public sealed class CSVDatabase<T> : IDatabaseRepository<T>
         csv.WriteRecord(record);
         csv.NextRecord();
         writer.Flush();
+    }
+
+    public void setFilePath(string filePath)
+    {
+        lock (_gate)
+            {
+            _filePath = filePath;
+            }
     }
 }

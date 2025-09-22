@@ -5,8 +5,6 @@ using Xunit;
 using SimpleDB;
 using static Chirp;
 
-namespace SimpleDB.Tests;
-
 public class CsvDatabaseIntegrationTests : IDisposable
 {
     private readonly string tempFilePath;
@@ -19,7 +17,8 @@ public class CsvDatabaseIntegrationTests : IDisposable
     [Fact]
     public void StoreAndReadCheep_ReturnsStoredCheep()
     {
-        var db = new CSVDatabase<Cheep>(tempFilePath);
+        var db = CSVDatabase<Cheep>.Instance;
+        db.setFilePath(tempFilePath);
         var cheep = new Cheep { Author = "testuser", Message = "test cheep", Timestamp = 1234567890 };
         
         db.Store(cheep);
@@ -33,9 +32,10 @@ public class CsvDatabaseIntegrationTests : IDisposable
     [Fact]
     public void ReadEmptyData_ReturnsEmptyCheep()
     {
-        var db = new CSVDatabase<Cheep>(tempFilePath);
+        var db = CSVDatabase<Cheep>.Instance;
+        db.setFilePath(tempFilePath);
 
-        var result = db.Read(1);
+        var result = db.Read(3);
 
         Assert.Empty(result);
     }
