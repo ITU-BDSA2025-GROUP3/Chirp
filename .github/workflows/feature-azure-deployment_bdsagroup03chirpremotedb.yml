@@ -6,6 +6,7 @@ run-name: ${{ github.actor }} is deploying ${{ github.ref_name }} to Azure!
 
 on:
   release:
+    types: [created]
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
   workflow_dispatch:
@@ -52,9 +53,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9FAA4167DCB34B67AF63F722A6659A0A }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_61C6A4918D1B4835A58AA1DF5DB329CE }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_0168F848F25340E29B44D883695B8095 }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          subscription-id: ${{ secrets.AZURE_TENANT_ID }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
