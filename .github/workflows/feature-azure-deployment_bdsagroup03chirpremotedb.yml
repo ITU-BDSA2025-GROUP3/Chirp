@@ -11,7 +11,7 @@ permissions:
 on:
   push:
     branches:
-      - feature/csvdb-to-webservice # Change this to your deployment branch if it's different
+      - main # Change this to your deployment branch if it's different
   workflow_dispatch:
 
 jobs:
