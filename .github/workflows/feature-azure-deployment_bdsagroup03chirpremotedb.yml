@@ -9,8 +9,9 @@ permissions:
   contents: read
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - feature/csvdb-to-webservice # Change this to your deployment branch if it's different
   workflow_dispatch:
 
 jobs:
