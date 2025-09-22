@@ -4,6 +4,10 @@
 name: AzureDeployment
 run-name: ${{ github.actor }} is deploying ${{ github.ref_name }} to Azure!
 
+permissions:
+  id-token: write
+  contents: read
+
 on:
   release:
     types: [created]
