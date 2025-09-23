@@ -5,11 +5,12 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <RootNamespace>CSVDBService.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
       <ProjectReference Include="..\..\src\Chirp.cli\Chirp.cli.csproj" />
-      <ProjectReference Include="..\..\src\SimpleDB\SimpleDB.csproj" />
+      <ProjectReference Include="..\..\src\Chirp.CSVDBService\Chirp.CSVDBService.csproj" />
   </ItemGroup>
 
   <ItemGroup>

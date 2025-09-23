@@ -1,48 +1,66 @@
-using System;
-using System.IO;
-using System.Linq;
-using Xunit;
-using SimpleDB;
+using Microsoft.AspNetCore.Mvc.Testing;
 using static Chirp;
 
-public class CsvDatabaseIntegrationTests : IDisposable
+namespace CSVDBService.Intergration.Tests;
+public class CsvDatabaseIntegrationTests : IClassFixture<WebApplicationFactory<Program>>
 {
-    private readonly string tempFilePath;
     
-    public CsvDatabaseIntegrationTests() 
-    {
-        tempFilePath = Path.GetTempFileName();
-    }
+    private readonly WebApplicationFactory<Program> _factory;
+    private readonly HttpClient _client;
 
-    [Fact]
-    public void StoreAndReadCheep_ReturnsStoredCheep()
+    public CsvDatabaseIntegrationTests(WebApplicationFactory<Program> factory)
     {
-        var db = CSVDatabase<Cheep>.Instance;
-        db.setFilePath(tempFilePath);
-        var cheep = new Cheep { Author = "testuser", Message = "test cheep", Timestamp = 1234567890 };
+        _client = factory.CreateClient();
+        _factory = factory;
+    }
+    
+    [Fact]
+    public async Task GetCheepsFromServerAndReadCheeps()
+    {
+
+        //Get request to server
+        var response = await _client.GetAsync("/cheeps");
         
-        db.Store(cheep);
-        var result = db.Read(1).First();
-
-        Assert.Equal(cheep.Author, result.Author);
-        Assert.Equal(cheep.Message, result.Message);
-        Assert.Equal(cheep.Timestamp, result.Timestamp);
+        //Ensure request code 200
+        response.EnsureSuccessStatusCode();
+        
+        //Get the content, read it into a string
+        var content = await response.Content.ReadAsStringAsync();
+        
+        //Convert the string from json to cheep objects (?)
+        var cheep = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Cheep>>(content);
+        
+        //Ensure the list is not null since the file should contain cheeps
+        Assert.NotNull(cheep);
     }
     
     [Fact]
-    public void ReadEmptyData_ReturnsEmptyCheep()
+    public async Task PostCheepToServerAndReadCheeps()
     {
-        var db = CSVDatabase<Cheep>.Instance;
-        db.setFilePath(tempFilePath);
-
-        var result = db.Read(3);
-
-        Assert.Empty(result);
+        var cheepToSend = new Cheep
+        {
+            Author = Environment.UserName,
+            Message = "Intergration test", //Can be converted into fuzzy test then ensure that the random string is actually outputted below
+            Timestamp = DateTimeOffset.Now.ToUnixTimeSeconds()
+        };
+        
+        var contentToSend = await _client.PostAsJsonAsync("/cheep", cheepToSend);
+        
+        contentToSend.EnsureSuccessStatusCode();
+        
+        var response = await _client.GetAsync("/cheeps");
+        
+        var content = await response.Content.ReadAsStringAsync();
+        var cheeps = Newtonsoft.Json.JsonConvert.DeserializeObject<List<Cheep>>(content);
+        
+        //Ensure the cheeps are not null
+        Assert.NotNull(cheeps);
+        
+        //Ensure we have the correct cheep returned to us
+        var lastCheep = cheeps.Last();
+        Assert.Equal("Intergration test", lastCheep.Message);
+        
+        
     }
-
-    public void Dispose()
-    {
-        if (File.Exists(tempFilePath))
-            File.Delete(tempFilePath);
-    }
+    
 }

@@ -2,7 +2,7 @@ using System.Globalization;
 
 using CsvHelper;
 
-namespace SimpleDB.Tests;
+namespace CSVDBService.Tests;
 
 public class CsvDatabaseTestRead
 {

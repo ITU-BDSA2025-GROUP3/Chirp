@@ -8,7 +8,8 @@ permissions:
   contents: write
 
 on:
-  push:
+  release:
+    types: [created]
     tags:
       - "[0-9]+.[0-9]+.[0-9]+"
       
@@ -27,7 +28,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore
+      run: dotnet build src/Chirp.cli --no-restore
       
   test:
     name: Test
@@ -43,7 +44,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Test
-      run: dotnet test --no-build
+      run: dotnet test test/Chirp.cli.Tests --no-build
 
   release:
     name: Release

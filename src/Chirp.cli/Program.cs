@@ -1,17 +1,25 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using SimpleDB;
 using System.CommandLine;
+using System.Net.Http.Headers;
+using System.Net.Http.Json;
 
 
 public class Chirp //Modifier should NOT be public, need proper internal visibility status!
 {
-    private static IDatabaseRepository<Cheep> database = CSVDatabase<Cheep>.Instance;
+    
 
     public static int Main(string[] args)
     {
+        //HTTP CLIENT SETUP
+        var baseURL = "https://bdsagroup03chirpremotedb-bgaghsguh8cdhdaq.swedencentral-01.azurewebsites.net/";
+        using HttpClient client = new();
+        client.DefaultRequestHeaders.Accept.Clear();
+        client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+        client.BaseAddress = new Uri(baseURL);
+        
         var rootCommand = new RootCommand("chirp");
-
+        
         //Create the read command
         var readCommand = new Command("read", "Read cheeps and display to terminal");
         var readLimit = new Argument<int>("limit")
@@ -21,9 +29,16 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
         };
         readCommand.Arguments.Add(readLimit);
         rootCommand.Subcommands.Add(readCommand);
-        readCommand.SetAction(parseResult =>
+        
+        //Runs an async operation awaiting the response of our /cheeps endpoint
+        readCommand.SetAction(async parseResult =>
         {
-            UserInterface.PrintCheeps(database.Read(parseResult.GetValue(readLimit)));
+            
+            var cheepRequest = await client.GetFromJsonAsync<IList<Cheep>>("/cheeps");
+            if (cheepRequest != null)
+            {
+                UserInterface.PrintCheeps(cheepRequest.ToList());   
+            }
         });
         //Create the cheep command
         var cheepCommand = new Command("cheep", "Cheep a message");
@@ -32,11 +47,17 @@ public class Chirp //Modifier should NOT be public, need proper internal visibil
         cheepCommand.Arguments.Add(cheepArgument);
         rootCommand.Subcommands.Add(cheepCommand);
         
-        cheepCommand.SetAction(parseResult =>
+        cheepCommand.SetAction(async parseResult =>
         {
             var message = parseResult.GetValue(cheepArgument)!; // '!' used to assert non-null msg val
             Cheep cheep = stringToCheep(message);
-            database.Store(cheep);
+            
+            //Send webrequest to store the cheep
+            var postCheep = await client.PostAsJsonAsync("/cheep", cheep);
+            
+            //Ensure we get a proper success code
+            postCheep.EnsureSuccessStatusCode();
+            
             UserInterface.PrintCheeps(cheep);
         });
         
