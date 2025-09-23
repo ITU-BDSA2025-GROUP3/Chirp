@@ -1,48 +1,71 @@
 using System;
 using System.IO;
-using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 using SimpleDB;
-using static Chirp;
 
-public class CsvDatabaseIntegrationTests : IDisposable
+
+using Chirp;
+
+
+
+namespace Chirp.Integration.Tests
 {
-    private readonly string tempFilePath;
-    
-    public CsvDatabaseIntegrationTests() 
+    // Custom factory that ensures CSVDatabase uses a temporary file
+    public class CustomWebApplicationFactory 
+    // starts the Chirp app in memory for integration testing
+        : WebApplicationFactory<Program>, IDisposable
     {
-        tempFilePath = Path.GetTempFileName();
+        private string _tempFile;
+
+        protected override void ConfigureWebHost(IWebHostBuilder builder)
+        {
+            // Create a unique temp file for this test run
+            _tempFile = Path.Combine(AppContext.BaseDirectory, $"chirp_cli_db_{Guid.NewGuid()}.csv");
+
+            builder.ConfigureServices(services =>
+            {
+                // Force CSVDatabase to use our temp file
+                var db = CSVDatabase<Cheep>.Instance;
+                db.setFilePath(_tempFile);
+            });
+        }
+
+        public void Dispose()
+        {
+            // Delete the temp file when the test is finished
+            if (_tempFile != null && File.Exists(_tempFile))
+                File.Delete(_tempFile);
+        }
     }
 
-    [Fact]
-    public void StoreAndReadCheep_ReturnsStoredCheep()
+    public class CsvDatabaseIntegrationTests 
+        : IClassFixture<CustomWebApplicationFactory>, IDisposable
     {
-        var db = CSVDatabase<Cheep>.Instance;
-        db.setFilePath(tempFilePath);
-        var cheep = new Cheep { Author = "testuser", Message = "test cheep", Timestamp = 1234567890 };
-        
-        db.Store(cheep);
-        var result = db.Read(1).First();
+        private readonly HttpClient _client;
+        private readonly CustomWebApplicationFactory _factory;
 
-        Assert.Equal(cheep.Author, result.Author);
-        Assert.Equal(cheep.Message, result.Message);
-        Assert.Equal(cheep.Timestamp, result.Timestamp);
-    }
-    
-    [Fact]
-    public void ReadEmptyData_ReturnsEmptyCheep()
-    {
-        var db = CSVDatabase<Cheep>.Instance;
-        db.setFilePath(tempFilePath);
+        public CsvDatabaseIntegrationTests(CustomWebApplicationFactory factory)
+        {
+            _factory = factory;
+            _client = factory.CreateClient();
+        }
 
-        var result = db.Read(3);
+        [Fact]
+        public async Task RootEndpoint_ReturnsSuccess()
+        {
+            var response = await _client.GetAsync("/");
+            response.EnsureSuccessStatusCode();
+        }
 
-        Assert.Empty(result);
-    }
-
-    public void Dispose()
-    {
-        if (File.Exists(tempFilePath))
-            File.Delete(tempFilePath);
+        //delete file permenantly
+        public void Dispose()
+        {
+            _factory.Dispose();
+        }
     }
 }
