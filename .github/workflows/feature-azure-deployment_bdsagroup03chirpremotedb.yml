@@ -9,9 +9,8 @@ permissions:
   contents: read
 
 on:
-  push:
-    branches:
-      - main # Change this to your deployment branch if it's different
+  merge_group: #When a pull request has been reviewed and has been added to merge queue deploy
+    types: [ checks_requested ]
   workflow_dispatch:
 
 jobs:
