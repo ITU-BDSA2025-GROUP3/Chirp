@@ -44,7 +44,8 @@ public class PublicModel : PageModel
             var command = new SqliteCommand(query, connection);
             command.Parameters.Add("@offset", SqliteType.Integer);
             command.Parameters["@offset"].Value = (pageQuery-1)*32; //todo make 32 a global constant
-            command.Parameters.AddWithValue("@limit", pageQuery);
+            command.Parameters.AddWithValue("@limit", 32);
+            command.Parameters.AddWithValue("@author",  "'%'");
             connection.Open();
             using var sqliteDataReader = command.ExecuteReader(); //executes the sql command and returns a reader to loop over
             Cheeps = new List<CheepViewModel>(); //reset stored cheeps
