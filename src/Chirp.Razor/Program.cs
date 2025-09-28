@@ -1,3 +1,12 @@
+using System.Reflection;
+
+using Microsoft.Extensions.FileProviders;
+
+// var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly());
+// using var reader = embeddedProvider.GetFileInfo("./data/schema.sql").CreateReadStream();
+// using var sr = new StreamReader(reader);
+// var query = sr.ReadToEnd();
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.

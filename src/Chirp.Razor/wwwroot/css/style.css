@@ -152,6 +152,12 @@ div.page ul.cheeps li small {
   color: #888;
 }
 
+div.page nav.pagination span.page-link.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: default;
+}
+
 div.page div.cheepbox {
   margin: 10px 0;
   padding: 5px;
