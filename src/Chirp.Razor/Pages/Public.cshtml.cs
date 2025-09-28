@@ -13,19 +13,20 @@ public class PublicModel : PageModel
     }
     
     [BindProperty(SupportsGet = true)]
-    public int CurrentPage { get; set; } = 1;
-    public int PageSize { get; set; } = 2;
-    public int Count { get; set; }
+    public int CurrentPage { get; set; } = 1; // starts at 1
+    public int PageSize { get; set; } = 2; // sets the amount of cheep records per page before page-break
+    public int Count { get; set; } // counts how many records there are in total
     
-    public int TotalPages => (int)Math.Ceiling(decimal.Divide(Count, PageSize));
+    // total pages needed based on amount of cheeps and cheeps per page
+    public int TotalPages => (int)Math.Ceiling(decimal.Divide(Count, PageSize)); 
 
     public List<CheepViewModel> Cheeps { get; set; }
     
     public void OnGet()
     {
         Count = _service.GetCount();
-        if (CurrentPage < 1) CurrentPage = 1;
-        if (TotalPages > 0 && CurrentPage > TotalPages) CurrentPage = TotalPages;
+        if (CurrentPage < 1) CurrentPage = 1; // guard clause to prevent negative page requests, defaults to page 1
+        if (TotalPages > 0 && CurrentPage > TotalPages) CurrentPage = TotalPages; // guard clause to prevent going over total pages, defaults to last page
         Cheeps = _service.GetPaginatedResult(CurrentPage, PageSize);
     }
 
