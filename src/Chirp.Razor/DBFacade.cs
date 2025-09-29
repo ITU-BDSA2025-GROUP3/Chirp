@@ -12,6 +12,35 @@ public class DBFacade
         // find db file path (for now fixed to /tmp/chirp.db) Data Source=/tmp/chirp.db"
         _connectionString = connectionString;
     }
+
+    
+    public int getTotalPagesFromAuthor(string author)
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+
+        // SQL query to join user and message
+        var sql = @"SELECT COUNT(*) as total_pages
+                    FROM message m
+                    JOIN user u
+                    WHERE m.author_id = u.user_id AND u.username LIKE @author";
+        using var command = new SqliteCommand(sql, connection);
+        command.Parameters.AddWithValue("@author", author);
+        
+        return Convert.ToInt32(command.ExecuteScalar());
+    }
+    public int GetTotalPages()
+    {
+        using var connection = new SqliteConnection(_connectionString);
+        connection.Open();
+
+        // SQL query to join user and message
+        var sql = @"SELECT COUNT(*) as total_pages FROM message";
+
+        using var command = new SqliteCommand(sql, connection);
+        
+        return Convert.ToInt32(command.ExecuteScalar());
+    }
     public List<CheepViewModel> GetAllCheeps(int page = 1)
     {
         var cheeps = new List<CheepViewModel>();
