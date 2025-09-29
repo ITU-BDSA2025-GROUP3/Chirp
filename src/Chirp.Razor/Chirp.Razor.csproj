@@ -7,15 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Include="..\..\..\..\..\Downloads\dump.sql">
-      <Link>Data\dump.sql</Link>
-    </Content>
-    <Content Include="..\..\..\..\..\Downloads\schema.sql">
-      <Link>Data\schema.sql</Link>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite" Version="9.0.9" />
   </ItemGroup>
 

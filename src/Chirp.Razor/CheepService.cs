@@ -14,21 +14,21 @@ public interface ICheepService
 public class CheepService : ICheepService
 {
     //Sets confirguable databse path
-    private readonly DBFacade _DBFacade;
+    private readonly DBFacade _dbFacade;
     public CheepService()
     {
         // get the databse path from a variable or our temp directory
         var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Path.GetTempPath(), "chirp.db");
-        _DBFacade = new DBFacade($"Data Source={dbPath}");
+        _dbFacade = new DBFacade($"Data Source={dbPath}");
     }
     
     public List<CheepViewModel> GetCheeps()
     {
-        return _DBFacade.GetAllCheeps();
+        return _dbFacade.GetAllCheeps();
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author)
     {
-        return _DBFacade.GetCheepsFromAuthor(author);
+        return _dbFacade.GetCheepsFromAuthor(author);
     }
 }
