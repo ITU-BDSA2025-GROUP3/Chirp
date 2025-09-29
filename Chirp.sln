@@ -10,6 +10,14 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.CSVDBService", "src\Chirp.CSVDBService\Chirp.CSVDBService.csproj", "{7D6AA609-F69D-46F4-8410-14CEF05BC5CA}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{0C88DD14-F956-CE84-757C-A364CCF449FC}"
+	ProjectSection(SolutionItems) = preProject
+		test\Chirp.Razor.Tests\Chirp.Razor.Tests.csproj = test\Chirp.Razor.Tests\Chirp.Razor.Tests.csproj
+		test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.dgspec.json = test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.dgspec.json
+		test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.g.props = test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.g.props
+		test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.g.targets = test\Chirp.Razor.Tests\obj\Chirp.Razor.Tests.csproj.nuget.g.targets
+		test\Chirp.Razor.Tests\obj\project.assets.json = test\Chirp.Razor.Tests\obj\project.assets.json
+		test\Chirp.Razor.Tests\obj\project.nuget.cache = test\Chirp.Razor.Tests\obj\project.nuget.cache
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.cli.Tests", "test\Chirp.cli.Tests\Chirp.cli.Tests.csproj", "{774ECC8C-9371-45CA-9BF3-79B0B108A8F6}"
 EndProject
@@ -18,6 +26,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Intergration.Tests", "test\Chirp.Intergration.Tests\Chirp.Intergration.Tests.csproj", "{1431E8A9-E20D-49A3-9AEC-C68FD8D9B497}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Razor", "src\Chirp.Razor\Chirp.Razor.csproj", "{E16D6192-B3EC-4C52-9F2C-0F5CE569FF88}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Chirp.Razor.Tests", "test\Chirp.Razor.Tests\Chirp.Razor.Tests.csproj", "{EEA21803-830F-44C8-90CF-F91984062211}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -101,6 +111,18 @@ Global
 		{E16D6192-B3EC-4C52-9F2C-0F5CE569FF88}.Release|x64.Build.0 = Release|Any CPU
 		{E16D6192-B3EC-4C52-9F2C-0F5CE569FF88}.Release|x86.ActiveCfg = Release|Any CPU
 		{E16D6192-B3EC-4C52-9F2C-0F5CE569FF88}.Release|x86.Build.0 = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|x64.Build.0 = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Debug|x86.Build.0 = Debug|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|x64.ActiveCfg = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|x64.Build.0 = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|x86.ActiveCfg = Release|Any CPU
+		{EEA21803-830F-44C8-90CF-F91984062211}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
