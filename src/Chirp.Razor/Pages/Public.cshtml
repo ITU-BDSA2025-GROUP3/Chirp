@@ -32,28 +32,28 @@
 
     @if (Model.TotalPages > 1)
     {
-    <nav class="pagination">
-        @if (Model.Page > 1)
-        {
-        <a class="page-link" href="?page=@(Model.Page - 1)"
-        >Previous
-        </a>
-        }
-        else
-        {
-        <span class="page-link disabled">Previous</span>
-        }
-        <span>Page @Model.Page of @Model.TotalPages</span>
-        @if (Model.Page < Model.TotalPages)
-        {
-        <a class="page-link" href="?page=@(Model.Page + 1)"
-        >Next
-        </a>
-        }
-        else
-        {
-        <span class="page-link disabled">Next</span>
-        }
-    </nav>
+        <nav class="pagination">
+            @if (Model.CurrentPage > 1)
+            {
+                <a class="page-link" href="?page=@(Model.CurrentPage - 1)">
+                    Previous
+                </a>
+            }
+            else
+            {
+                <span class="page-link disabled">Previous</span>
+            }
+            <span>Page @Model.CurrentPage of @Model.TotalPages</span>
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <a class="page-link" href="?page=@(Model.CurrentPage + 1)">
+                    Next
+                </a>
+            }
+            else
+            {
+                <span class="page-link disabled">Next</span>
+            }
+        </nav>
     }
 </div>

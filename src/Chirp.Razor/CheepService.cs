@@ -44,6 +44,6 @@ public class CheepService : ICheepService
 
     public int GetTotalPagesFromAuthor(string author)
     {
-        return _dbFacade.getTotalPagesFromAuthor(author);
+        return _dbFacade.GetTotalPagesFromAuthor(author);
     }
 }

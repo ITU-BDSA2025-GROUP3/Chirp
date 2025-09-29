@@ -14,20 +14,22 @@ public class DBFacade
     }
 
     
-    public int getTotalPagesFromAuthor(string author)
+    public int GetTotalPagesFromAuthor(string author)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
 
         // SQL query to join user and message
-        var sql = @"SELECT COUNT(*) as total_pages
-                    FROM message m
-                    JOIN user u
-                    WHERE m.author_id = u.user_id AND u.username LIKE @author";
+        var sql = @"SELECT COUNT(*)
+            FROM message m
+            JOIN user u ON u.user_id = m.author_id
+            WHERE u.username = @author;";
         using var command = new SqliteCommand(sql, connection);
         command.Parameters.AddWithValue("@author", author);
         
-        return Convert.ToInt32(command.ExecuteScalar());
+        int totalMessages = Convert.ToInt32(command.ExecuteScalar());
+        int totalPages = (totalMessages + PAGE_SIZE - 1) / PAGE_SIZE;
+        return totalPages;
     }
     public int GetTotalPages()
     {
@@ -39,7 +41,9 @@ public class DBFacade
 
         using var command = new SqliteCommand(sql, connection);
         
-        return Convert.ToInt32(command.ExecuteScalar());
+        int totalMessages = Convert.ToInt32(command.ExecuteScalar());
+        int totalPages = (totalMessages + PAGE_SIZE - 1) / PAGE_SIZE;
+        return totalPages;
     }
     public List<CheepViewModel> GetAllCheeps(int page = 1)
     {

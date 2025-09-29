@@ -6,10 +6,9 @@ namespace Chirp.Razor.Pages;
 public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
-    public List<CheepViewModel> Cheeps { get; set; }
-    public int TotalPages { get; private set; }
-
-    public int Page;
+    public required List<CheepViewModel> Cheeps { get; set; }
+    public int TotalAuthorPages { get; private set; }
+    public int CurrentPage;
     public UserTimelineModel(ICheepService service)
     {
         _service = service;
@@ -23,8 +22,8 @@ public class UserTimelineModel : PageModel
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             _service.CurrentPage = pageQuery;
             Cheeps = _service.GetCheepsFromAuthor(author);
-            TotalPages = _service.GetTotalPagesFromAuthor(author);
-            Page = pageQuery;
+            TotalAuthorPages = _service.GetTotalPagesFromAuthor(author);
+            CurrentPage = pageQuery;
         }    catch (FormatException e)
         {
             return BadRequest($"Invalid page query. Page query provided: {Request.Query["page"]}");
