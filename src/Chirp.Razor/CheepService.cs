@@ -1,3 +1,8 @@
+using Chirp.Razor;
+
+using Microsoft.Data.Sqlite;
+
+
 public record CheepViewModel(string Author, string Message, string Timestamp);
 
 public interface ICheepService
@@ -8,30 +13,22 @@ public interface ICheepService
 
 public class CheepService : ICheepService
 {
-    // These would normally be loaded from a database for example
-    private static readonly List<CheepViewModel> _cheeps = new()
-        {
-            new CheepViewModel("Helge", "Hello, BDSA students!", UnixTimeStampToDateTimeString(1690892208)),
-            new CheepViewModel("Adrian", "Hej, velkommen til kurset.", UnixTimeStampToDateTimeString(1690895308)),
-        };
-
+    //Sets confirguable databse path
+    private readonly DBFacade _dbFacade;
+    public CheepService(IConfiguration configuration)
+    {
+        // get the databse path from a variable or our temp directory
+        var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Directory.GetCurrentDirectory(), "chirp.db");
+        _dbFacade = new DBFacade($"Data Source={dbPath}");
+    }
+    
     public List<CheepViewModel> GetCheeps()
     {
-        return _cheeps;
+        return _dbFacade.GetAllCheeps();
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author)
     {
-        // filter by the provided author name
-        return _cheeps.Where(x => x.Author == author).ToList();
+        return _dbFacade.GetCheepsFromAuthor(author);
     }
-
-    private static string UnixTimeStampToDateTimeString(double unixTimeStamp)
-    {
-        // Unix timestamp is seconds past epoch
-        DateTime dateTime = new DateTime(1970, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc);
-        dateTime = dateTime.AddSeconds(unixTimeStamp);
-        return dateTime.ToString("MM/dd/yy H:mm:ss");
-    }
-
 }
