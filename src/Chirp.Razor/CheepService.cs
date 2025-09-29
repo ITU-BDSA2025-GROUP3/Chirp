@@ -18,10 +18,8 @@ public class CheepService : ICheepService
     public CheepService(IConfiguration configuration)
     {
         // get the databse path from a variable or our temp directory
-        var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Path.GetTempPath(), "chirp.db");
-        var absolutePath = Path.GetFullPath(dbPath);
-        Console.WriteLine($"[DB] Using: {absolutePath}  exists={File.Exists(absolutePath)}");
-        _dbFacade = new DBFacade($"Data Source={absolutePath}");
+        var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Directory.GetCurrentDirectory(), "chirp.db");
+        _dbFacade = new DBFacade($"Data Source={dbPath}");
     }
     
     public List<CheepViewModel> GetCheeps()
