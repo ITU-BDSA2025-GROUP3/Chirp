@@ -1,3 +1,7 @@
+using System.Reflection;
+
+using Microsoft.Extensions.FileProviders;
+
 namespace Chirp.Razor;
 using Microsoft.Data.Sqlite;
 
@@ -6,40 +10,51 @@ public class DBFacade
 {
     private readonly string _connectionString;
     private const int PAGE_SIZE = 32; // Fixed page size
+    private readonly string _queryPagesSql, _queryPagesFromAuthorSql, _queryTotalPagesSql, _queryTotalPagesFromAuthorSql;
 
     public DBFacade(string connectionString)
     {
-        // find db file path (for now fixed to /tmp/chirp.db) Data Source=/tmp/chirp.db"
+        // find db file path (for now fixed to /tmp/chirp.db) Data Source=/tmp/chirp.db
         _connectionString = connectionString;
+        //read embedded resources to form SQL queries as strings with parameter placeholders
+        _queryPagesSql = ReadEmbeddedResource("Data/SQLiteQueries/QueryPages.sql");
+        _queryPagesFromAuthorSql =  ReadEmbeddedResource("Data/SQLiteQueries/QueryPagesFromAuthor.sql");
+        _queryTotalPagesSql = ReadEmbeddedResource("Data/SQLiteQueries/QueryTotalPages.sql");
+        _queryTotalPagesFromAuthorSql = ReadEmbeddedResource("Data/SQLiteQueries/QueryTotalPagesFromAuthor.sql");
     }
 
+    private static string ReadEmbeddedResource(string filepath)
+    {
+        var embeddedProvider = new EmbeddedFileProvider(Assembly.GetExecutingAssembly());
+        if (!embeddedProvider.GetFileInfo(filepath).Exists)
+        {
+            throw new FileNotFoundException($"Embedded file {filepath} not found.");
+        }
+        
+        using var reader = embeddedProvider.GetFileInfo(filepath).CreateReadStream();
+        using var sr = new StreamReader(reader);
+        return sr.ReadToEnd();
+    }
     
     public int GetTotalPagesFromAuthor(string author)
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-
-        // SQL query to join user and message
-        var sql = @"SELECT COUNT(*)
-            FROM message m
-            JOIN user u ON u.user_id = m.author_id
-            WHERE u.username = @author;";
-        using var command = new SqliteCommand(sql, connection);
+        
+        using var command = new SqliteCommand(_queryTotalPagesFromAuthorSql, connection);
         command.Parameters.AddWithValue("@author", author);
         
         int totalMessages = Convert.ToInt32(command.ExecuteScalar());
         int totalPages = (totalMessages + PAGE_SIZE - 1) / PAGE_SIZE;
         return totalPages;
     }
+    
     public int GetTotalPages()
     {
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-
-        // SQL query to join user and message
-        var sql = @"SELECT COUNT(*) as total_pages FROM message";
-
-        using var command = new SqliteCommand(sql, connection);
+        
+        using var command = new SqliteCommand(_queryTotalPagesSql, connection);
         
         int totalMessages = Convert.ToInt32(command.ExecuteScalar());
         int totalPages = (totalMessages + PAGE_SIZE - 1) / PAGE_SIZE;
@@ -53,15 +68,8 @@ public class DBFacade
         //connection to sqlite database
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-
-        // SQL query to join user and message
-        var sql = @"SELECT u.username, m.text, m.pub_date
-                FROM message m
-                JOIN user u ON m.author_id = u.user_id
-                ORDER BY m.pub_date DESC
-                LIMIT @pageSize OFFSET @offset;";
-
-        using var command = new SqliteCommand(sql, connection);
+        
+        using var command = new SqliteCommand(_queryPagesSql, connection);
         command.Parameters.AddWithValue("@pageSize", PAGE_SIZE);
         command.Parameters.AddWithValue("@offset", offset);
         
@@ -88,16 +96,8 @@ public class DBFacade
         // open sqlite connection to the database file
         using var connection = new SqliteConnection(_connectionString);
         connection.Open();
-
-        // sql query: filter by given username
-        var sql = @"SELECT u.username, m.text, m.pub_date
-                    FROM message m
-                    JOIN user u ON m.author_id = u.user_id
-                    WHERE u.username = @username
-                    ORDER BY m.pub_date DESC
-                    LIMIT @pageSize OFFSET @offset;";
-
-        using var command = new SqliteCommand(sql, connection);
+        
+        using var command = new SqliteCommand(_queryPagesFromAuthorSql, connection);
         command.Parameters.AddWithValue("@username", author);
         command.Parameters.AddWithValue("@pageSize", PAGE_SIZE);
         command.Parameters.AddWithValue("@offset", offset);

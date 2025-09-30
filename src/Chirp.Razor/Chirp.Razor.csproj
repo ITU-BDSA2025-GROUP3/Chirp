@@ -15,4 +15,13 @@
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
+
+    <ItemGroup>
+        <EmbeddedResource Include="Data/**/*" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Utilities\" />
+    </ItemGroup>
+    
 </Project>
