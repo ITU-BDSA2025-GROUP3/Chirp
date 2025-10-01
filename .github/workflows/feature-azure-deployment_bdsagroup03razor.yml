@@ -7,7 +7,7 @@ run-name: ${{ github.actor }} is deploying to Azure!
 permissions:
   id-token: write
   contents: read
-
+#deployment test for push
 on:
   pull_request:
     types:
