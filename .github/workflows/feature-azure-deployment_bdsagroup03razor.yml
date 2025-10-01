@@ -23,7 +23,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    needs: if_merged
     permissions:
       contents: read #This is required for actions/checkout
 
