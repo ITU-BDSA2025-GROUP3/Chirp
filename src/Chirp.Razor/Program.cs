@@ -23,3 +23,5 @@ app.UseRouting();
 app.MapRazorPages();
 
 app.Run();
+
+public partial class Program { } //public partial allows for testing according to https://learn.microsoft.com/en-us/aspnet/core/test/integration-tests?view=aspnetcore-8.0&pivots=xunit
