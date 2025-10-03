@@ -29,21 +29,25 @@ public class CheepService : ICheepService
     
     public List<CheepViewModel> GetCheeps()
     {
-        return _chirpDbContext.GetAllCheeps(CurrentPage);
+        //return _chirpDbContext.GetAllCheeps(CurrentPage);
+        throw new NotImplementedException();
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author)
     {
-        return _chirpDbContext.GetCheepsFromAuthor(author, CurrentPage);
+        //return _chirpDbContext.GetCheepsFromAuthor(author, CurrentPage);
+        throw new NotImplementedException();
     }
 
     public int GetTotalPages()
     {
-        return _chirpDbContext.GetTotalPages();
+        //return _chirpDbContext.GetTotalPages();
+        throw new NotImplementedException();
     }
 
     public int GetTotalPagesFromAuthor(string author)
     {
-        return _chirpDbContext.GetTotalPagesFromAuthor(author);
+        //return _chirpDbContext.GetTotalPagesFromAuthor(author);
+        throw new NotImplementedException();
     }
 }
