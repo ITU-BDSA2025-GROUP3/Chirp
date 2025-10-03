@@ -16,16 +16,11 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="chirp.db">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <ItemGroup>
         <EmbeddedResource Include="Data/**/*" />
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Migrations\" />
       <Folder Include="Utilities\" />
     </ItemGroup>
     

@@ -17,33 +17,33 @@ public interface ICheepService
 public class CheepService : ICheepService
 {
     //Sets confirguable databse path
-    private readonly DBFacade _dbFacade;
+    private readonly ChirpDbContext _chirpDbContext;
     //Set or get the currentPage to be viewed
     public int CurrentPage { get; set; } = 1;
-    public CheepService(IConfiguration configuration)
+    /*public CheepService(IConfiguration configuration)
     {
         // get the databse path from a variable or our temp directory
         var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Directory.GetCurrentDirectory(), "chirp.db");
-        _dbFacade = new DBFacade($"Data Source={dbPath}");
-    }
+        _chirpDbContext = new ChirpDbContext($"Data Source={dbPath}");
+    }*/
     
     public List<CheepViewModel> GetCheeps()
     {
-        return _dbFacade.GetAllCheeps(CurrentPage);
+        return _chirpDbContext.GetAllCheeps(CurrentPage);
     }
 
     public List<CheepViewModel> GetCheepsFromAuthor(string author)
     {
-        return _dbFacade.GetCheepsFromAuthor(author, CurrentPage);
+        return _chirpDbContext.GetCheepsFromAuthor(author, CurrentPage);
     }
 
     public int GetTotalPages()
     {
-        return _dbFacade.GetTotalPages();
+        return _chirpDbContext.GetTotalPages();
     }
 
     public int GetTotalPagesFromAuthor(string author)
     {
-        return _dbFacade.GetTotalPagesFromAuthor(author);
+        return _chirpDbContext.GetTotalPagesFromAuthor(author);
     }
 }
