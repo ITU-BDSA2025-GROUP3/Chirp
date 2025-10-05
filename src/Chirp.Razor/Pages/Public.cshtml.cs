@@ -14,15 +14,16 @@ public class PublicModel : PageModel
         _service = service;
     }
 
-    public ActionResult OnGet()
+    public async Task<ActionResult> OnGetAsync()
     {
         try
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
+            
             _service.CurrentPage = pageQuery;
-            Cheeps = _service.GetCheeps();
-            TotalPages = _service.GetTotalPages();
+            Cheeps = await _service.GetCheeps();
+            TotalPages = await _service.GetTotalCheeps();
             CurrentPage = pageQuery;
         }
         catch (FormatException e)

@@ -14,15 +14,15 @@ public class UserTimelineModel : PageModel
         _service = service;
     }
 
-    public ActionResult OnGet(string author)
+    public async Task<ActionResult> OnGetAsync(string author)
     {
         try
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             _service.CurrentPage = pageQuery;
-            Cheeps = _service.GetCheepsFromAuthor(author);
-            TotalAuthorPages = _service.GetTotalPagesFromAuthor(author);
+            Cheeps = await _service.GetCheepsFromAuthor(author);
+            TotalAuthorPages = await _service.GetTotalCheepsFromAuthor(author);
             CurrentPage = pageQuery;
         }    catch (FormatException e)
         {

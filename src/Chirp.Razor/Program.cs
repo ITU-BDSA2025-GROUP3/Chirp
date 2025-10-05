@@ -1,4 +1,6 @@
 using Chirp.Razor;
+using Chirp.Razor.DomainModel;
+
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,12 +15,30 @@ builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 var app = builder.Build();
 
-// sanity check to see if there's any cheeps in DB
+// TEMPORARY: sanity check to see if there's any cheeps in DB, and seed some cheep msgs
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
     db.Database.EnsureCreated();
-    Console.WriteLine($"[DEBUG] Cheeps in DB: {db.Cheeps.Count()}");
+
+    if (!db.Authors.Any())
+    {
+        var alice = new Author { Name = "alice", Email = "alice@example.com" };
+        var bob   = new Author { Name = "bob",   Email = "bob@example.com" };
+        db.AddRange(alice, bob);
+        db.SaveChanges();
+
+        db.Cheeps.AddRange(
+            new Cheep { AuthorId = alice.AuthorId, Text = "hello chirp!",     TimeStamp = DateTime.UtcNow },
+            new Cheep { AuthorId = bob.AuthorId,   Text = "first cheep",   TimeStamp = DateTime.UtcNow.AddMinutes(-1) },
+            new Cheep { AuthorId = alice.AuthorId, Text = "nice day today!",  TimeStamp = DateTime.UtcNow.AddMinutes(-2) }
+        );
+        db.SaveChanges();
+
+        Console.WriteLine("[DEBUG] Seeded sample data.");
+    }
+
+    Console.WriteLine($"[DEBUG] Cheeps in DB after seed: {db.Cheeps.Count()}");
 }
 
 // Configure the HTTP request pipeline.

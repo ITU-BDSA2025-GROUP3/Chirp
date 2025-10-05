@@ -6,7 +6,7 @@ public interface ICheepRepository
 
     public Task<List<CheepDTO>> ReadCheeps(int page);
 
-    public Task<int> GetTotalPages();
+    public Task<int> GetTotalCheeps();
 
-    public Task<int> GetTotalPages(string authorName);
+    public Task<int> GetTotalCheeps(string authorName);
 }

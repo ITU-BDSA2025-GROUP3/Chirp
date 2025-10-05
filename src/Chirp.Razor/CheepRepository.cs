@@ -31,7 +31,7 @@ public class CheepRepository : ICheepRepository
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
                 where author.Name == authorName
                 orderby cheep.TimeStamp descending
-                select new { author.Name, cheep.Text, cheep.TimeStamp })
+                select new { author.Name, cheep.Text, TimeStamp = cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
             .Take(PAGE_SIZE) //limit equivalent
             .ToListAsync();
@@ -58,7 +58,7 @@ public class CheepRepository : ICheepRepository
                 from author in _dbContext.Authors
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
                 orderby cheep.TimeStamp descending
-                select new { author.Name, cheep.Text, cheep.TimeStamp })
+                select new { author.Name, cheep.Text, TimeStamp = cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
             .Take(PAGE_SIZE) //limit equivalent
             .ToListAsync();
@@ -71,12 +71,12 @@ public class CheepRepository : ICheepRepository
         }).ToList();
     }
 
-    public Task<int> GetTotalPages()
+    public Task<int> GetTotalCheeps()
     {
         return _dbContext.Cheeps.CountAsync();
     }
     
-    public Task<int> GetTotalPages(string authorName)
+    public Task<int> GetTotalCheeps(string authorName)
     {
         var query = (
             from author in _dbContext.Authors

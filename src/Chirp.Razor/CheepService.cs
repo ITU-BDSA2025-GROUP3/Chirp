@@ -8,10 +8,10 @@ using Microsoft.Data.Sqlite;
 public interface ICheepService
 {
     int CurrentPage { get; set; }
-    public List<CheepDTO> GetCheeps();
-    public List<CheepDTO> GetCheepsFromAuthor(string author);
-    public int GetTotalPages();
-    public int GetTotalPagesFromAuthor(string author);
+    public Task<List<CheepDTO>> GetCheeps();
+    public Task<List<CheepDTO>> GetCheepsFromAuthor(string author);
+    public Task<int> GetTotalCheeps();
+    public Task<int> GetTotalCheepsFromAuthor(string author);
 }
 
 public class CheepService : ICheepService
@@ -24,31 +24,28 @@ public class CheepService : ICheepService
     public int CurrentPage { get; set; } = 1;
     public CheepService(ICheepRepository cheepRepository)
     {
-        // get the databse path from a variable or our temp directory
-        // var dbPath = Environment.GetEnvironmentVariable("CHIRPDBPATH") ?? Path.Combine(Directory.GetCurrentDirectory(), "chirp.db");
-        // _chirpDbContext = new ChirpDbContext($"Data Source={dbPath}");
         _cheepRepository = cheepRepository;
     }
     
-    public List<CheepDTO> GetCheeps()
+    public async Task<List<CheepDTO>> GetCheeps()
     {
-        return _cheepRepository.ReadCheeps(CurrentPage).GetAwaiter().GetResult();
+        return await _cheepRepository.ReadCheeps(CurrentPage);
     }
 
-    public List<CheepDTO> GetCheepsFromAuthor(string author)
+    public async Task<List<CheepDTO>> GetCheepsFromAuthor(string author)
     {
-        return _cheepRepository.ReadCheeps(author, CurrentPage).GetAwaiter().GetResult();
+        return await _cheepRepository.ReadCheeps(author, CurrentPage);
     }
 
-    public int GetTotalPages()
+    public async Task<int> GetTotalCheeps()
     {
-        var total = _cheepRepository.GetTotalPages().GetAwaiter().GetResult();
-        return Math.Max(1, (int)Math.Ceiling(total / (double)PAGE_SIZE));
+        var total = await _cheepRepository.GetTotalCheeps();
+        return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
     
-    public int GetTotalPagesFromAuthor(string author)
+    public async Task<int> GetTotalCheepsFromAuthor(string author)
     {
-        var total = _cheepRepository.GetTotalPages(author).GetAwaiter().GetResult();
-        return Math.Max(1, (int)Math.Ceiling(total / (double)PAGE_SIZE));
+        var total = await _cheepRepository.GetTotalCheeps(author);
+        return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 }
