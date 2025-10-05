@@ -1,4 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Globalization;
+
+using Chirp.Razor.DomainModel;
+
+using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Razor;
 
@@ -6,7 +10,6 @@ public class CheepRepository : ICheepRepository
 {
     private const int PAGE_SIZE = 32;
     private readonly ChirpDbContext _dbContext;
-
     public CheepRepository(ChirpDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -22,16 +25,23 @@ public class CheepRepository : ICheepRepository
     public async Task<List<CheepDTO>> ReadCheeps(string authorName, int page)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
-        var query = (
+
+        var query = await (
                 from author in _dbContext.Authors
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-                orderby cheep.TimeStamp descending
                 where author.Name == authorName
-                select new { Name = author.Name, Text = cheep.Text })
+                orderby cheep.TimeStamp descending
+                select new { author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
-            .Take(PAGE_SIZE); //limit equivalent
+            .Take(PAGE_SIZE) //limit equivalent
+            .ToListAsync();
 
-        throw new NotImplementedException();
+        return query.Select(cheep => new CheepDTO
+        {
+            Author = cheep.Name,
+            Message = cheep.Text,
+            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
     }
 
     /// <summary>
@@ -43,16 +53,37 @@ public class CheepRepository : ICheepRepository
     public async Task<List<CheepDTO>> ReadCheeps(int page)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
-        var query = (
+        
+        var query = await (
                 from author in _dbContext.Authors
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
                 orderby cheep.TimeStamp descending
-                select new { Name = author.Name, Text = cheep.Text })
+                select new { author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
-            .Take(PAGE_SIZE); //limit equivalent
+            .Take(PAGE_SIZE) //limit equivalent
+            .ToListAsync();
+        
+        return query.Select(cheep => new CheepDTO
+        {
+            Author = cheep.Name,
+            Message = cheep.Text,
+            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
+    }
 
-        throw new NotImplementedException();
-
+    public Task<int> GetTotalPages()
+    {
+        return _dbContext.Cheeps.CountAsync();
+    }
+    
+    public Task<int> GetTotalPages(string authorName)
+    {
+        var query = (
+            from author in _dbContext.Authors
+            join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
+            where author.Name == authorName
+            select cheep.CheepId);
+        return query.CountAsync();
     }
 }
 
