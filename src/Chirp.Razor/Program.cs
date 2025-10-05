@@ -29,9 +29,9 @@ using (var scope = app.Services.CreateScope())
         db.SaveChanges();
 
         db.Cheeps.AddRange(
-            new Cheep { AuthorId = alice.AuthorId, Text = "hello chirp!",     TimeStamp = DateTime.UtcNow },
-            new Cheep { AuthorId = bob.AuthorId,   Text = "first cheep",   TimeStamp = DateTime.UtcNow.AddMinutes(-1) },
-            new Cheep { AuthorId = alice.AuthorId, Text = "nice day today!",  TimeStamp = DateTime.UtcNow.AddMinutes(-2) }
+            new Cheep { AuthorId = alice.AuthorId, Text = "hello chirp!", TimeStamp = DateTime.UtcNow },
+            new Cheep { AuthorId = bob.AuthorId,   Text = "first cheep", TimeStamp = DateTime.UtcNow.AddMinutes(-1) },
+            new Cheep { AuthorId = alice.AuthorId, Text = "nice day today!", TimeStamp = DateTime.UtcNow.AddMinutes(-2) }
         );
         db.SaveChanges();
 
