@@ -1,6 +1,4 @@
 using Chirp.Razor;
-using Chirp.Razor.DomainModel;
-
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +12,15 @@ builder.Services.AddScoped<ICheepRepository, CheepRepository>();
 
 
 var app = builder.Build();
+
+// sanity check to see if there's any cheeps in DB
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
+    db.Database.EnsureCreated();
+    DbInitializer.SeedDatabase(db);
+    Console.WriteLine($"[DEBUG] Cheeps in DB: {db.Cheeps.Count()}");
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
