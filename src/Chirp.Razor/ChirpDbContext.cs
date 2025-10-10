@@ -1,12 +1,8 @@
-using System.Reflection;
-
 using Chirp.Razor.DomainModel;
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.FileProviders;
 
 namespace Chirp.Razor;
-using Microsoft.Data.Sqlite;
 
 //Responsible for all database access
 public class ChirpDbContext : DbContext
@@ -19,9 +15,19 @@ public class ChirpDbContext : DbContext
     public ChirpDbContext(DbContextOptions<ChirpDbContext> options) : base(options)
     {
     }
-   
-    
-   
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Author>()
+            .HasIndex(c => c.Name)
+            .IsUnique();
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Author>()
+            .HasIndex(c => c.Email)
+            .IsUnique();    
+    }
+
     private static string UnixTimeStampToDateTimeString(long unixTimeStamp)
     {
         // convert unix timestamp to human readable date
