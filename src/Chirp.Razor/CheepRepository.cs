@@ -92,6 +92,7 @@ public class CheepRepository : ICheepRepository
         var cheep = new Cheep()
         {
             AuthorId = command.AuthorId,
+            Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
         };
@@ -111,14 +112,20 @@ public class CheepRepository : ICheepRepository
     public async Task CreateAuthor(string authorName, string authorEmail)
     {
         var nameNormalized = authorName.Trim().ToLowerInvariant();
-        var author = await _dbContext.Authors.FirstOrDefaultAsync(author => author.Name.ToLower() == nameNormalized);
+        var command = await _dbContext.Authors.FirstOrDefaultAsync(author => author.Name.ToLower() == nameNormalized);
 
-        if (author != null)
+        if (command != null)
         {
             throw new Exception("Author exists! logged in now as <user>");
         }
 
-        author = new Author { Name = authorName.Trim(), Email = authorEmail.Trim(), Cheeps = new List<Cheep>() };
+        var author = new Author
+        {
+            AuthorId = 0,
+            Name = authorName.Trim(), 
+            Email = authorEmail.Trim(), 
+            Cheeps = new List<Cheep>()
+        };
         _dbContext.Authors.Add(author);
         await _dbContext.SaveChangesAsync();
     }
