@@ -1,8 +1,11 @@
 ﻿using System.Globalization;
 
 using Chirp.Razor.DomainModel;
+using Chirp.Razor.Migrations;
 
 using Microsoft.EntityFrameworkCore;
+
+using Author = Chirp.Razor.DomainModel.Author;
 
 namespace Chirp.Razor;
 
@@ -93,10 +96,26 @@ public class CheepRepository : ICheepRepository
         }).ToList();
     }
 
-    public async Task CreateCheep(CheepDTO cheep) {
-         // var command = await ()
-    }
+    public async Task CreateCheep(CheepDTO newCheep, int authorId) {
+        var command = await (
+            from author in _dbContext.Authors
+            where author.AuthorId == authorId
+            select new {newCheep.Author, newCheep.Message, newCheep.TimeStamp}
+        ).FirstAsync();
 
+        if (command == null)
+        {
+            throw new Exception("Author does not exist! Create a new author.");
+        }
+        var parsed = DateTime.ParseExact(
+            newCheep.TimeStamp,
+            "yyyy-MM-dd HH:mm:ss",
+            CultureInfo.InvariantCulture,
+            DateTimeStyles.AssumeLocal 
+        );
+        _dbContext.Cheeps.Add(new Cheep() { Text = newCheep.Message, TimeStamp = parsed});
+        await _dbContext.SaveChangesAsync();
+    }
 
     public async Task CreateAuthor(string authorName, string authorEmail)
     {

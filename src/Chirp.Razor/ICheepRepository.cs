@@ -8,7 +8,7 @@ public interface ICheepRepository
 
     public Task<List<CheepDTO>> ReadCheeps(int page);
     
-    public Task CreateCheep(CheepDTO cheep);
+    public Task CreateCheep(CheepDTO newCheep, int authorId);
 
     public Task CreateAuthor(string authorName, string authorEmail);
     
