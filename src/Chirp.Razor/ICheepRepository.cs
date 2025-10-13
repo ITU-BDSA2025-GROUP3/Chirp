@@ -1,4 +1,6 @@
-﻿namespace Chirp.Razor;
+﻿using Chirp.Razor.DomainModel;
+
+namespace Chirp.Razor;
 
 public interface ICheepRepository
 {
@@ -9,4 +11,7 @@ public interface ICheepRepository
     public Task<int> GetTotalCheeps();
 
     public Task<int> GetTotalCheeps(string authorName);
+    
+    public Task AddCheep(Cheep cheep);
+    
 }
