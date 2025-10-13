@@ -20,9 +20,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-====================
-Third party licenses
-====================
+========= **Third party licenses** =========
 
 - This project depends on Microsoft.EntityFrameworkCore, Microsoft.Data.Sqlite, ASP.NET Core and .NET 9.0.9, each licensed under the MIT license. A copy of the
 license can be found under the licenses folder.
