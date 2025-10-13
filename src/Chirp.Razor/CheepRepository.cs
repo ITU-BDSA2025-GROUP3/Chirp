@@ -74,45 +74,53 @@ public class CheepRepository : ICheepRepository
         }).ToList();
     }
 
-    public async Task CreateCheep(CheepDTO newCheep, int authorId) {
-        var command = await (
-            from author in _dbContext.Authors
-            where author.AuthorId == authorId
-            select new {newCheep.Author, newCheep.Message, newCheep.TimeStamp}
-        ).FirstAsync();
-
+    /// <summary>
+    /// creates new cheep messages, checks if user is logged in, identified by unique email
+    /// </summary>
+    /// <param name="newCheep">new instance of the DTO</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"> Is thrown if the user does not exist as an author in the database,
+    /// in the future will be redirected to loggin/create-user page
+    /// </exception>
+    public async Task CreateCheep(CheepDTO newCheep) {
+        var command = await _dbContext.Authors.SingleOrDefaultAsync(a => a.Name == newCheep.Author);
         if (command == null)
         {
-            throw new Exception("Author does not exist! Create a new author.");
+            throw new Exception("Author does not exist! Create a new author before you can write cheeps to timeline.");
         }
-        var parsed = DateTime.ParseExact(
-            newCheep.TimeStamp,
-            "yyyy-MM-dd HH:mm:ss",
-            CultureInfo.InvariantCulture,
-            DateTimeStyles.AssumeLocal 
-        );
-        _dbContext.Cheeps.Add(new Cheep() { Text = newCheep.Message, TimeStamp = parsed});
+        
+        var cheep = new Cheep()
+        {
+            AuthorId = command.AuthorId,
+            Text = newCheep.Message, 
+            TimeStamp = DateTime.UtcNow,
+        };
+        _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
     }
 
+    /// <summary>
+    /// creates new author, checks if the author already exists in the database, if not then create new author
+    /// </summary>
+    /// <param name="authorName">Name of the author, checks database existence on this param as it is unique</param>
+    /// <param name="authorEmail">Email of the author</param>
+    /// <returns></returns>
+    /// <exception cref="Exception"> Is thrown if the user already exists as an author in the database,
+    /// in the future will be redirected to loggin page or automagically log in user. 
+    /// </exception>
     public async Task CreateAuthor(string authorName, string authorEmail)
     {
-        var command = await (
-            from author in _dbContext.Authors
-            where author.Name == authorName && author.Email == authorEmail
-            select new {author.AuthorId, author.Name, author.Email}
-        ).FirstAsync();
+        var nameNormalized = authorName.Trim().ToLowerInvariant();
+        var author = await _dbContext.Authors.FirstOrDefaultAsync(author => author.Name.ToLower() == nameNormalized);
 
-        if (command == null)
+        if (author != null)
         {
-            _dbContext.Authors.Add(new Author(){Name = authorName, Email = authorEmail, Cheeps = new List<Cheep>()});
-            await _dbContext.SaveChangesAsync();
+            throw new Exception("Author exists! logged in now as <user>");
         }
 
-        if (command != null)
-        {
-            throw new Exception("Author already exists!");
-        }
+        author = new Author { Name = authorName.Trim(), Email = authorEmail.Trim(), Cheeps = new List<Cheep>() };
+        _dbContext.Authors.Add(author);
+        await _dbContext.SaveChangesAsync();
     }
 
     public Task<int> GetTotalCheeps()
