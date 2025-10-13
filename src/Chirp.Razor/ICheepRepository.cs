@@ -2,9 +2,7 @@
 
 public interface ICheepRepository
 {
-    public Task<List<CheepDTO>> ReadCheepsName(string authorName, int page);
-    
-    public Task<List<CheepDTO>> ReadCheepsEmail(string authorEmail, int page);
+    public Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page);
 
     public Task<List<CheepDTO>> ReadCheeps(int page);
     
@@ -14,5 +12,5 @@ public interface ICheepRepository
     
     public Task<int> GetTotalCheeps();
 
-    public Task<int> GetTotalCheeps(string authorName);
+    public Task<int> GetTotalAuthorCheeps(string authorName);
 }

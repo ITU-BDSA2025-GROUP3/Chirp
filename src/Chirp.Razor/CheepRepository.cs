@@ -19,20 +19,20 @@ public class CheepRepository : ICheepRepository
     }
 
     /// <summary>
-    /// Returns cheeps on a specified page, from a specified author.
+    /// Returns cheeps on a specified page, from a specified author, matched by author name.
     /// </summary>
     /// <param name="authorName">Name of the author as it appears in their cheeps</param>
     /// <param name="page">The page to return cheeps from</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<CheepDTO>> ReadCheepsName(string authorName, int page)
+    public async Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
 
         var query = await (
                 from author in _dbContext.Authors
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-                where author.Name == authorName
+                where author.Name == authorName || author.Email == authorName
                 orderby cheep.TimeStamp descending
                 select new { author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
@@ -47,28 +47,6 @@ public class CheepRepository : ICheepRepository
         }).ToList();
     }
     
-    public async Task<List<CheepDTO>> ReadCheepsEmail(string authorEmail, int page)
-    {
-        if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
-
-        var query = await (
-                from author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-                where author.Email == authorEmail
-                orderby cheep.TimeStamp descending
-                select new { author.Name, cheep.Text, cheep.TimeStamp })
-            .Skip((page - 1) * PAGE_SIZE) // offset equivalent
-            .Take(PAGE_SIZE) //limit equivalent
-            .ToListAsync();
-
-        return query.Select(cheep => new CheepDTO
-        {
-            Author = cheep.Name,
-            Message = cheep.Text,
-            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
-        }).ToList();
-    }
-
     /// <summary>
     /// Returns cheeps on a specified page.
     /// </summary>
@@ -142,12 +120,12 @@ public class CheepRepository : ICheepRepository
         return _dbContext.Cheeps.CountAsync();
     }
     
-    public Task<int> GetTotalCheeps(string authorName)
+    public Task<int> GetTotalAuthorCheeps(string authorName)
     {
         var query = (
             from author in _dbContext.Authors
             join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-            where author.Name == authorName
+            where author.Name == authorName || author.Email == authorName
             select cheep.CheepId);
         return query.CountAsync();
     }
