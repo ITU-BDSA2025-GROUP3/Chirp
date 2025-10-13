@@ -22,7 +22,7 @@ public class CheepRepository : ICheepRepository
     /// <param name="page">The page to return cheeps from</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<CheepDTO>> ReadCheeps(string authorName, int page)
+    public async Task<List<CheepDTO>> ReadCheepsName(string authorName, int page)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
 
@@ -30,6 +30,28 @@ public class CheepRepository : ICheepRepository
                 from author in _dbContext.Authors
                 join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
                 where author.Name == authorName
+                orderby cheep.TimeStamp descending
+                select new { author.Name, cheep.Text, cheep.TimeStamp })
+            .Skip((page - 1) * PAGE_SIZE) // offset equivalent
+            .Take(PAGE_SIZE) //limit equivalent
+            .ToListAsync();
+
+        return query.Select(cheep => new CheepDTO
+        {
+            Author = cheep.Name,
+            Message = cheep.Text,
+            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
+    }
+    
+    public async Task<List<CheepDTO>> ReadCheepsEmail(string authorEmail, int page)
+    {
+        if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
+
+        var query = await (
+                from author in _dbContext.Authors
+                join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
+                where author.Email == authorEmail
                 orderby cheep.TimeStamp descending
                 select new { author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
@@ -69,6 +91,31 @@ public class CheepRepository : ICheepRepository
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
         }).ToList();
+    }
+
+    public async Task CreateCheep(CheepDTO cheep) {
+         // var command = await ()
+    }
+
+
+    public async Task CreateAuthor(string authorName, string authorEmail)
+    {
+        var command = await (
+            from author in _dbContext.Authors
+            where author.Name == authorName && author.Email == authorEmail
+            select new {author.AuthorId, author.Name, author.Email}
+        ).FirstAsync();
+
+        if (command == null)
+        {
+            _dbContext.Authors.Add(new Author(){Name = authorName, Email = authorEmail, Cheeps = new List<Cheep>()});
+            await _dbContext.SaveChangesAsync();
+        }
+
+        if (command != null)
+        {
+            throw new Exception("Author already exists!");
+        }
     }
 
     public Task<int> GetTotalCheeps()

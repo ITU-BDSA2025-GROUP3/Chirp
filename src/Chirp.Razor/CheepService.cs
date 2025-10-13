@@ -10,6 +10,7 @@ public interface ICheepService
     int CurrentPage { get; set; }
     public Task<List<CheepDTO>> GetCheeps();
     public Task<List<CheepDTO>> GetCheepsFromAuthor(string author);
+    public Task<List<CheepDTO>> GetCheepsFromAuthorEmail(string authorEmail);
     public Task<int> GetTotalCheeps();
     public Task<int> GetTotalCheepsFromAuthor(string author);
 }
@@ -34,7 +35,12 @@ public class CheepService : ICheepService
 
     public async Task<List<CheepDTO>> GetCheepsFromAuthor(string author)
     {
-        return await _cheepRepository.ReadCheeps(author, CurrentPage);
+        return await _cheepRepository.ReadCheepsName(author, CurrentPage);
+    }
+    
+    public async Task<List<CheepDTO>> GetCheepsFromAuthorEmail(string authorEmail)
+    {
+        return await _cheepRepository.ReadCheepsEmail(authorEmail, CurrentPage);
     }
 
     public async Task<int> GetTotalCheeps()

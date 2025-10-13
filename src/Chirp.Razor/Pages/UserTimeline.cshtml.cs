@@ -6,7 +6,8 @@ namespace Chirp.Razor.Pages;
 public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _service;
-    public required List<CheepDTO> Cheeps { get; set; }
+    public required List<CheepDTO> CheepsName { get; set; }
+    public required List<CheepDTO> CheepsEmail { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
     public UserTimelineModel(ICheepService service)
@@ -21,7 +22,8 @@ public class UserTimelineModel : PageModel
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetCheepsFromAuthor(author);
+            CheepsName = await _service.GetCheepsFromAuthor(author);
+            CheepsEmail = await _service.GetCheepsFromAuthorEmail(author);
             TotalAuthorPages = await _service.GetTotalCheepsFromAuthor(author);
             CurrentPage = pageQuery;
         }    catch (FormatException e)
