@@ -21,20 +21,20 @@ public class CheepRepository : ICheepRepository
     /// <summary>
     /// Returns cheeps on a specified page, from a specified author, matched by author name.
     /// </summary>
-    /// <param name="authorName">Name of the author as it appears in their cheeps</param>
+    /// <param name="author">either Name or Email of the author as it appears in their cheeps</param>
     /// <param name="page">The page to return cheeps from</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page)
+    public async Task<List<CheepDTO>> ReadAuthorCheeps(string author, int page)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
 
         var query = await (
-                from author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-                where author.Name == authorName || author.Email == authorName
+                from Author in _dbContext.Authors
+                join cheep in _dbContext.Cheeps on Author.AuthorId equals cheep.AuthorId
+                where Author.Name == author || Author.Email == author
                 orderby cheep.TimeStamp descending
-                select new { author.Name, cheep.Text, cheep.TimeStamp })
+                select new { Author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
             .Take(PAGE_SIZE) //limit equivalent
             .ToListAsync();
