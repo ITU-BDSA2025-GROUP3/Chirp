@@ -1,9 +1,15 @@
-﻿namespace Chirp.Razor.DomainModel;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Chirp.Razor.DomainModel;
 
 public class Author
 {
-    public int AuthorId { get; set; }
-    public string Name { get; set; }
-    public string Email { get; set; }
-    public ICollection<Cheep> Cheeps { get; set; }
+    public required int AuthorId { get; set; }
+    
+    [Required]
+    public required string Name { get; set; }
+    
+    [Required]
+    public required string Email { get; set; }
+    public required ICollection<Cheep> Cheeps { get; set; } =  new List<Cheep>();
 }
