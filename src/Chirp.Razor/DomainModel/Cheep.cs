@@ -7,11 +7,16 @@ public class Cheep
     public int CheepId { get; set; }
     
     [Required]
-    [StringLength(500)]
+    [StringLength(160)]
     public required string Text { get; set; }
-    public DateTime TimeStamp { get; set; }
-    public int AuthorId { get; set; }
-    public Author Author { get; set; }
+    
+    [Required]
+    public required DateTime TimeStamp { get; set; }
+    
+    [Required]
+    public required int AuthorId { get; set; }
+    [Required]
+    public required Author Author { get; set; }
     
     
 }
