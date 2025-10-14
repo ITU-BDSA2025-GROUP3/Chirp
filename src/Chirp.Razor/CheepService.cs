@@ -9,9 +9,9 @@ public interface ICheepService
 {
     int CurrentPage { get; set; }
     public Task<List<CheepDTO>> GetCheeps();
-    public Task<List<CheepDTO>> GetCheepsFromAuthor(string author);
+    public Task<List<CheepDTO>> GetAuthorCheeps(string author);
     public Task<int> GetTotalCheeps();
-    public Task<int> GetTotalCheepsFromAuthor(string author);
+    public Task<int> GetTotalAuthorCheeps(string author);
 }
 
 public class CheepService : ICheepService
@@ -32,20 +32,20 @@ public class CheepService : ICheepService
         return await _cheepRepository.ReadCheeps(CurrentPage);
     }
 
-    public async Task<List<CheepDTO>> GetCheepsFromAuthor(string author)
+    public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
     {
-        return await _cheepRepository.ReadCheeps(author, CurrentPage);
+        return await _cheepRepository.ReadAuthorCheeps(author, CurrentPage);
     }
-
+    
     public async Task<int> GetTotalCheeps()
     {
         var total = await _cheepRepository.GetTotalCheeps();
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
     
-    public async Task<int> GetTotalCheepsFromAuthor(string author)
+    public async Task<int> GetTotalAuthorCheeps(string author)
     {
-        var total = await _cheepRepository.GetTotalCheeps(author);
+        var total = await _cheepRepository.GetTotalAuthorCheeps(author);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 }

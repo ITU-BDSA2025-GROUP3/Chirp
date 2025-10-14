@@ -2,7 +2,7 @@
 
 public class CheepDTO
 {
-    public required string Author { get; set; }
-    public required string Message { get; set; }
-    public required string TimeStamp { get; set; }
+    public string Author { get; set; } = null!;
+    public string Message { get; set; } = null!;
+    public string TimeStamp { get; set; } = null!;
 }

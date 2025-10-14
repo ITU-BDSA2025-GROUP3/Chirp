@@ -21,8 +21,8 @@ public class UserTimelineModel : PageModel
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetCheepsFromAuthor(author);
-            TotalAuthorPages = await _service.GetTotalCheepsFromAuthor(author);
+            Cheeps = await _service.GetAuthorCheeps(author);
+            TotalAuthorPages = await _service.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException e)
         {
