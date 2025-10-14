@@ -1,9 +1,7 @@
 # Chirp
 A twitter clone for the course Analysis, Design and Software Architecture (Autumn 2025) at IT University of Copenhagen
 
-==================== 
-**Legal**
-====================
+============ **Legal** ============
 
 This project called Chirp by ITU-BDSA2025-GROUP3 is a university project for the
 course
