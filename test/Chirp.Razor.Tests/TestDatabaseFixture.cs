@@ -1,36 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Data.Common;
+
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Razor.Tests;
 
 
 //Code from: https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database
-public class TestDatabaseFixture : IClassFixture<TestDatabaseFixture>
+public class TestDatabaseFixture : IAsyncLifetime
 {
-    private const string ConnectionString = "Data Source=test.db";
-
-    private static readonly object _lock = new();
-    private static bool _databaseInitialized;
+    private static DbConnection? Connection;
+    private static DbContextOptions<ChirpDbContext>? Options;
 
     public TestDatabaseFixture()
     {
-        lock (_lock)
-        {
-            if (!_databaseInitialized)
-            {
-                using (var context = CreateContext())
-                {
-                    context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated();
-                }
+    }
+    
+    public async Task InitializeAsync()
+    {
+        //Open up the connection to the database
+        Connection = new SqliteConnection("DataSource=:memory:");
+        await Connection.OpenAsync();
+        //Set up the options to the database
+        Options = new DbContextOptionsBuilder<ChirpDbContext>()
+            .UseSqlite(Connection)
+            .Options;
+    }
 
-                _databaseInitialized = true;
-            }
+    public async Task DisposeAsync()
+    {
+        if (Connection != null)
+        {
+            await Connection.DisposeAsync();
         }
     }
     
     public ChirpDbContext CreateContext()
-        => new ChirpDbContext(
-            new DbContextOptionsBuilder<ChirpDbContext>()
-                .UseSqlite(ConnectionString)
-                .Options);
+    {
+        if (Options == null)
+        {
+            //Options should NEVER be null
+            throw new NullReferenceException($"{nameof(Options)} is null.");
+        } 
+        
+        return new ChirpDbContext(Options);
+    }
 }
