@@ -19,7 +19,7 @@ public class TestDatabaseFixture : IAsyncLifetime
     public async Task InitializeAsync()
     {
         //Open up the connection to the database
-        Connection = new SqliteConnection("Filename=:memory:");
+        Connection = new SqliteConnection("DataSource=:memory:");
         await Connection.OpenAsync();
         //Set up the options to the database
         Options = new DbContextOptionsBuilder<ChirpDbContext>()
