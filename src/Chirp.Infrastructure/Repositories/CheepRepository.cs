@@ -1,13 +1,13 @@
 ﻿using System.Globalization;
 
-using Chirp.Web.DomainModel;
-using Chirp.Web.Migrations;
+using Chirp.Core.DomainModel;
+using Chirp.Infrastructure.Database;
 
 using Microsoft.EntityFrameworkCore;
 
-using Author = Chirp.Web.DomainModel.Author;
+using Author = Chirp.Core.DomainModel.Author;
 
-namespace Chirp.Web;
+namespace Chirp.Infrastructure.Repositories;
 
 public class CheepRepository : ICheepRepository
 {

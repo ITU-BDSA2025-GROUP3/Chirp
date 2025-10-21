@@ -1,19 +1,15 @@
-using Chirp.Web.DomainModel;
+using Chirp.Core.DomainModel;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chirp.Web;
+namespace Chirp.Infrastructure.Database;
 
 //Responsible for all database access
-public class ChirpDbContext : DbContext
+public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : DbContext(options)
 {
     private readonly string _connectionString;
     private const int PAGE_SIZE = 32; // Fixed page size
     public DbSet<Cheep> Cheeps { get; set; }
     public DbSet<Author> Authors { get; set; }
-    
-    public ChirpDbContext(DbContextOptions<ChirpDbContext> options) : base(options)
-    {
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

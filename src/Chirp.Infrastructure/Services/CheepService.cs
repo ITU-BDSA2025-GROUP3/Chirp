@@ -1,4 +1,6 @@
-namespace Chirp.Web;
+using Chirp.Infrastructure.Repositories;
+
+namespace Chirp.Infrastructure.Services;
 
 public interface ICheepService
 {

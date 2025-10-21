@@ -1,8 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using Chirp.Web;
+
+using Microsoft.AspNetCore.Mvc.Testing;
 
 using Xunit.Abstractions;
 
-namespace Chirp.Web.Tests;
+namespace Chirp.Tests;
 
 public class TestAPI : IClassFixture<RazorPageWebAppFactory<Program>>
 {

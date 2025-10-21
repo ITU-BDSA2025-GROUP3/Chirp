@@ -1,9 +1,11 @@
 ﻿using System.Data.Common;
 
+using Chirp.Infrastructure.Database;
+
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
-namespace Chirp.Web.Tests;
+namespace Chirp.Tests;
 
 
 //Code from: https://learn.microsoft.com/en-us/ef/core/testing/testing-with-the-database

@@ -1,4 +1,4 @@
-﻿namespace Chirp.Web;
+﻿namespace Chirp.Infrastructure.Repositories;
 
 public interface ICheepRepository
 {

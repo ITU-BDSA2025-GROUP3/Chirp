@@ -15,12 +15,13 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
     </ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Include="Data/**/*" />
-    </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Migrations\" />
+        <ProjectReference Include="..\..\src\Chirp.Infrastructure\Chirp.Infrastructure.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+        <EmbeddedResource Include="Data/**/*" />
     </ItemGroup>
     
 </Project>

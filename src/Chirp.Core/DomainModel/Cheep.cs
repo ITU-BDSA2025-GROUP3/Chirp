@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Chirp.Web.DomainModel;
+namespace Chirp.Core.DomainModel;
 
 public class Cheep
 {

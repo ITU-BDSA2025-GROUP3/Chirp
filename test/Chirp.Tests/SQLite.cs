@@ -1,6 +1,7 @@
-﻿using Chirp.Web.DomainModel;
+﻿using Chirp.Core.DomainModel;
+using Chirp.Infrastructure.Database;
 
-namespace Chirp.Web.Tests;
+namespace Chirp.Tests;
 
 public class SQLite : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
 {

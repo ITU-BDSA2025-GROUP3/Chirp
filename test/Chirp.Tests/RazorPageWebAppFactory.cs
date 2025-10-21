@@ -1,11 +1,13 @@
 ﻿using System.Data.Common;
 
+using Chirp.Infrastructure.Database;
+
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 
-namespace Chirp.Web.Tests;
+namespace Chirp.Tests;
 
 
 //Sources: 

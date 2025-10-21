@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace Chirp.Web.Migrations
+namespace Chirp.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class UniqueAuthorNamesAndEmails : Migration

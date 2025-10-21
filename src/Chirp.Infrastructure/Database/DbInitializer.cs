@@ -1,6 +1,6 @@
-﻿using Chirp.Web.DomainModel;
+﻿using Chirp.Core.DomainModel;
 
-namespace Chirp.Web;
+namespace Chirp.Infrastructure.Database;
 
 public static class DbInitializer
 {
