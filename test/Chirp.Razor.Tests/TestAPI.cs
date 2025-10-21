@@ -1,19 +1,18 @@
 ﻿using Microsoft.AspNetCore.Mvc.Testing;
 
-using Xunit;
 using Xunit.Abstractions;
 
-public class TestAPI : IClassFixture<WebApplicationFactory<Program>>
+namespace Chirp.Razor.Tests;
+
+public class TestAPI : IClassFixture<RazorPageWebAppFactory<Program>>
 {
-    private readonly WebApplicationFactory<Program> _fixture;
     private readonly ITestOutputHelper _testOutputHelper;
     private readonly HttpClient _client;
 
-    public TestAPI(WebApplicationFactory<Program> fixture, ITestOutputHelper testOutputHelper)
+    public TestAPI(RazorPageWebAppFactory<Program> fixture, ITestOutputHelper testOutputHelper)
     {
-        _fixture = fixture;
         _testOutputHelper = testOutputHelper;
-        _client = _fixture.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = true, HandleCookies = true });
+        _client = fixture.CreateClient(new WebApplicationFactoryClientOptions { AllowAutoRedirect = true, HandleCookies = true });
     }
 
     [Theory]
