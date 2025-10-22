@@ -36,7 +36,7 @@ jobs:
           dotnet-version: '9.x'
 
       - name: Build with dotnet
-        run: dotnet build src/Chirp.Razor --configuration Release
+        run: dotnet build --configuration Release
 
       - name: dotnet publish
         run: dotnet publish src/Chirp.Razor -c Release -o ${{env.DOTNET_ROOT}}/myapp
