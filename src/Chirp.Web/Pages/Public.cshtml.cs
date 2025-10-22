@@ -28,7 +28,7 @@ public class PublicModel : PageModel
             TotalPages = await _service.GetTotalCheeps();
             CurrentPage = pageQuery;
         }
-        catch (FormatException e)
+        catch (FormatException)
         {
             return BadRequest($"Invalid page query. Page query provided: {Request.Query["page"]}");
         }

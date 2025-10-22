@@ -27,7 +27,7 @@ public class UserTimelineModel : PageModel
             Cheeps = await _service.GetAuthorCheeps(author);
             TotalAuthorPages = await _service.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
-        }    catch (FormatException e)
+        }    catch (FormatException)
         {
             return BadRequest($"Invalid page query. Page query provided: {Request.Query["page"]}");
         }
