@@ -1,9 +1,9 @@
-using System.Globalization;
+//using System.Globalization; Overflødig
 
-using Chirp.Razor;
+//using Chirp.Razor; Byttet ud med namespace
 
-using Microsoft.Data.Sqlite;
-
+//using Microsoft.Data.Sqlite; Overflødig
+namespace Chirp.Razor;
 
 public interface ICheepService
 {

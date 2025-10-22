@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 
 using Chirp.Razor.DomainModel;
-using Chirp.Razor.Migrations;
+//using Chirp.Razor.Migrations; Overflødig 
 
 using Microsoft.EntityFrameworkCore;
 
