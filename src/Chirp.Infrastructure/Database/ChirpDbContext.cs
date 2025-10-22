@@ -6,8 +6,8 @@ namespace Chirp.Infrastructure.Database;
 //Responsible for all database access
 public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : DbContext(options)
 {
-    private readonly string _connectionString;
-    private const int PAGE_SIZE = 32; // Fixed page size
+    //private readonly string _connectionString; not in use?
+    //private const int PAGE_SIZE = 32; // Fixed page size not in use?
     public DbSet<Cheep> Cheeps { get; set; }
     public DbSet<Author> Authors { get; set; }
 
@@ -23,12 +23,13 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : DbContex
             .IsUnique();    
     }
 
-    private static string UnixTimeStampToDateTimeString(long unixTimeStamp)
+    // method not in use??
+    /*private static string UnixTimeStampToDateTimeString(long unixTimeStamp)
     {
-        // convert unix timestamp to human readable date
+        // convert unix timestamp to human-readable date
         return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp)
             .ToLocalTime()
             .ToString("MM/dd/yy H:mm:ss");
-    }
+    }*/
 
 }
