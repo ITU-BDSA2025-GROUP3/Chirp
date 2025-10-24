@@ -81,5 +81,7 @@ public class CheepServiceTests
         var repository = new FakeCheepRepository(-10);
         var service = new CheepService(repository);
         
+        var pages = await service.GetTotalCheeps();
+        
     }
 }
