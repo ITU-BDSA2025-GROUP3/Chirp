@@ -28,7 +28,7 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build src/Chirp.Razor --no-restore
+      run: dotnet build --no-restore
       
   test:
     name: Test
@@ -44,7 +44,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Test
-      run: dotnet test test/Chirp.Razor.Tests --no-build
+      run: dotnet test --no-build
 
   release:
     name: Release
@@ -69,7 +69,7 @@ jobs:
         run: |
           release_name="Chirp-${{ github.ref_name }}-${{ matrix.os }}"
 
-          dotnet publish "src/Chirp.Razor/Chirp.Razor.csproj" -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
+          dotnet publish -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
 
           7z a "${release_name}.zip" "${release_name}/."
           7z d "${release_name}.zip" "*.pdb"
