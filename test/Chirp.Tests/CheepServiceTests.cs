@@ -1,4 +1,8 @@
-namespace Chirp.Razor.Tests;
+using Chirp.Infrastructure;
+using Chirp.Infrastructure.Repositories;
+using Chirp.Infrastructure.Services;
+
+namespace Chirp.Tests;
 
 public class CheepServiceTests
 {
