@@ -144,5 +144,16 @@ public class CheepRepository : ICheepRepository
             select cheep.CheepId);
         return query.CountAsync();
     }
+    
+    /// <summary>
+    /// Adds a new cheep to the database.
+    /// </summary>
+    /// <param name="cheep">The cheep to be added</param>
+    public async Task AddCheep(Cheep cheep)
+    {
+        _dbContext.Cheeps.Add(cheep);
+        await _dbContext.SaveChangesAsync();
+    }
+
 }
 

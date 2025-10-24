@@ -1,3 +1,4 @@
+using Chirp.Core.DomainModel;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
@@ -74,5 +75,10 @@ public class CheepServiceTests
 
         public Task<int> GetTotalAuthorCheeps(string authorName) =>
             Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
+
+        public Task AddCheep(Cheep cheep)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

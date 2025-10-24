@@ -1,4 +1,6 @@
-﻿namespace Chirp.Infrastructure.Repositories;
+﻿using Chirp.Core.DomainModel;
+
+namespace Chirp.Infrastructure.Repositories;
 
 public interface ICheepRepository
 {
@@ -13,4 +15,6 @@ public interface ICheepRepository
     public Task<int> GetTotalCheeps();
 
     public Task<int> GetTotalAuthorCheeps(string authorName);
+    
+    public Task AddCheep(Cheep cheep);
 }
