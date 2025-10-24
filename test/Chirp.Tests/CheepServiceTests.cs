@@ -76,7 +76,8 @@ public class CheepServiceTests
             Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
     }
 
-    public async Task GetTotalCheeps_ReturnsOne_WhenRepositoryReturnsNegative()
+    // Unit test for CheepService.GetTotalCheeps().
+    public async Task GetTotalCheeps_ReturnsNegative()
     {
         var repository = new FakeCheepRepository(-10);
         var service = new CheepService(repository);
