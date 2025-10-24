@@ -95,5 +95,7 @@ public class CheepServiceTests
         var service = new CheepService(repository);
         
         var pages = await service.GetTotalCheeps(authorName ?? "");
+        
+        Assert.Equal(1, pages);
     }
 }
