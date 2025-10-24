@@ -19,17 +19,10 @@
         <Using Include="Xunit" />
     </ItemGroup>
 
-
     <ItemGroup>
         <ProjectReference Include="..\..\src\Chirp.Web\Chirp.Web.csproj" />
         <ProjectReference Include="..\..\src\Chirp.Infrastructure\Chirp.Infrastructure.csproj" />
         <ProjectReference Include="..\..\src\Chirp.Core\Chirp.Core.csproj" />
-    </ItemGroup>
-
-
-    <ItemGroup>
-      <Folder Include="UnitTests\" />
-      <Folder Include="Utilities\" />
     </ItemGroup>
 
 </Project>
