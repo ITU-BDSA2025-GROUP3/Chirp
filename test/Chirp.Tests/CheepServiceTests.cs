@@ -83,5 +83,7 @@ public class CheepServiceTests
         
         var pages = await service.GetTotalCheeps();
         
+        Assert.Equal(1, pages);
+        
     }
 }
