@@ -75,4 +75,9 @@ public class CheepServiceTests
         public Task<int> GetTotalAuthorCheeps(string authorName) =>
             Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
     }
+
+    public async Task GetTotalCheeps_ReturnsOne_WhenRepositoryReturnsNegative()
+    {
+        
+    }
 }
