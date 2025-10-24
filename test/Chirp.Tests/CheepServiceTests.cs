@@ -89,18 +89,18 @@ public class CheepServiceTests
         
     }
 
-  
-  
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
     public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
     {
         var repository = new FakeCheepRepository(0);
         var service = new CheepService(repository);
-        
+
         var pages = await service.GetTotalAuthorCheeps(authorName ?? "");
 
-
-
-        
         Assert.Equal(1, pages);
     }
+
 }
