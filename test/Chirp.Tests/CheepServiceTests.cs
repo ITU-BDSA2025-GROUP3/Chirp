@@ -78,6 +78,8 @@ public class CheepServiceTests
 
     public async Task GetTotalCheeps_ReturnsOne_WhenRepositoryReturnsNegative()
     {
+        var repository = new FakeCheepRepository(-10);
+        var service = new CheepService(repository);
         
     }
 }
