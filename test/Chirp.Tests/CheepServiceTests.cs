@@ -88,4 +88,9 @@ public class CheepServiceTests
         Assert.Equal(1, pages);
         
     }
+
+    public async Task GetTotalCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
+    {
+        
+    }
 }
