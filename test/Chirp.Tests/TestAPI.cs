@@ -51,7 +51,7 @@ public class TestAPI : IClassFixture<RazorPageWebAppFactory<Program>>
     [InlineData("Adrian", "?page=1", "Hej, velkommen til kurset.")]
     public async Task Test_Get_UserTimeline(string author, string query, string message)
     {
-        var response = await _client.GetAsync($"/{author}/");
+        var response = await _client.GetAsync($"/{author}/{query}");
         response.EnsureSuccessStatusCode();
         var content = await response.Content.ReadAsStringAsync();
         Assert.Contains("<ul id=\"messagelist\" class=\"cheeps\">", content);
