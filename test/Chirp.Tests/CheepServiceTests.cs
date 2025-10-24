@@ -77,6 +77,7 @@ public class CheepServiceTests
     }
 
     // Unit test for CheepService.GetTotalCheeps().
+    [Fact]
     public async Task GetTotalCheeps_ReturnsNegative()
     {
         var repository = new FakeCheepRepository(-10);
