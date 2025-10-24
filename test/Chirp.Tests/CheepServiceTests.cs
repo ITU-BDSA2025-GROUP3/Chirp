@@ -91,12 +91,14 @@ public class CheepServiceTests
 
   
   
-    public async Task GetTotalCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string authorName)
+    public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
     {
         var repository = new FakeCheepRepository(0);
         var service = new CheepService(repository);
         
         var pages = await service.GetTotalAuthorCheeps(authorName ?? "");
+
+
 
         
         Assert.Equal(1, pages);
