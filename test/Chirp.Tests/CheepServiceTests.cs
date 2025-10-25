@@ -35,8 +35,8 @@ public class CheepServiceTests
     [InlineData("charlie", -5, 1)]
     public async Task GetTotalAuthorCheeps_ReturnsExpectedPageCount(string author, int totalCheeps, int expectedPages)
     {
-        var repository = new FakeCheepRepository(0, new Dictionary<string, int> { { author, totalCheeps } });
-        var service = new CheepService(repository);
+        var repository = new FakeAuthorRepository(new Dictionary<string, int> { { author, totalCheeps } });
+        var service = new AuthorService(repository);
 
         var pages = await service.GetTotalAuthorCheeps(author);
 
@@ -46,35 +46,43 @@ public class CheepServiceTests
     [Fact]
     public async Task GetTotalAuthorCheeps_ReturnsOneWhenAuthorMissing()
     {
-        var service = new CheepService(new FakeCheepRepository(0));
+        var service = new AuthorService(new FakeAuthorRepository());
         var pages = await service.GetTotalAuthorCheeps(" ");
         Assert.Equal(1, pages);
     }
 
-
-    private sealed class FakeCheepRepository : ICheepRepository
+    
+    private sealed class FakeAuthorRepository : IAuthorRepository
     {
-        private readonly int _totalCheeps;
         private readonly Dictionary<string, int> _authorTotals;
 
-        public FakeCheepRepository(int totalCheeps, Dictionary<string, int>? authorTotals = null)
+        public FakeAuthorRepository(Dictionary<string, int>? authorTotals = null)
         {
-            _totalCheeps = totalCheeps;
             _authorTotals = authorTotals ?? new Dictionary<string, int>();
         }
 
         public Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page) => throw new NotSupportedException();
 
+        public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
+
+        public Task<int> GetTotalAuthorCheeps(string authorName) =>
+            Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
+    }
+    
+    private sealed class FakeCheepRepository : ICheepRepository
+    {
+        private readonly int _totalCheeps;
+
+        public FakeCheepRepository(int totalCheeps)
+        {
+            _totalCheeps = totalCheeps;
+        }
+
         public Task<List<CheepDTO>> ReadCheeps(int page) => throw new NotSupportedException();
 
         public Task CreateCheep(CheepDTO newCheep) => throw new NotSupportedException();
 
-        public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
-
         public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
-
-        public Task<int> GetTotalAuthorCheeps(string authorName) =>
-            Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
 
         public Task AddCheep(Cheep cheep)
         {
