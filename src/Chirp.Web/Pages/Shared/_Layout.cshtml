@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using Author = Chirp.Core.DomainModel.Author
+@inject SignInManager<Author> SignInManager
+@inject UserManager<Author> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <title>@ViewData["Title"]</title>

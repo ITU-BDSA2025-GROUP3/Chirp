@@ -31,7 +31,7 @@ public class CheepRepository : ICheepRepository
 
         var query = await (
                 from Author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on Author.AuthorId equals cheep.AuthorId
+                join cheep in _dbContext.Cheeps on Author.Id equals cheep.AuthorId
                 where Author.Name == author || Author.Email == author
                 orderby cheep.TimeStamp descending
                 select new { Author.Name, cheep.Text, cheep.TimeStamp })
@@ -59,7 +59,7 @@ public class CheepRepository : ICheepRepository
         
         var query = await (
                 from author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
+                join cheep in _dbContext.Cheeps on author.Id equals cheep.AuthorId
                 orderby cheep.TimeStamp descending
                 select new { author.Name, cheep.Text, cheep.TimeStamp })
             .Skip((page - 1) * PAGE_SIZE) // offset equivalent
@@ -91,7 +91,7 @@ public class CheepRepository : ICheepRepository
         
         var cheep = new Cheep()
         {
-            AuthorId = command.AuthorId,
+            AuthorId = command.Id,
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
@@ -121,7 +121,7 @@ public class CheepRepository : ICheepRepository
 
         var author = new Author
         {
-            AuthorId = 0,
+            Id = "0",
             Name = authorName.Trim(), 
             Email = authorEmail.Trim(), 
             Cheeps = new List<Cheep>()
@@ -139,7 +139,7 @@ public class CheepRepository : ICheepRepository
     {
         var query = (
             from author in _dbContext.Authors
-            join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
+            join cheep in _dbContext.Cheeps on author.Id equals cheep.AuthorId
             where author.Name == authorName || author.Email == authorName
             select cheep.CheepId);
         return query.CountAsync();

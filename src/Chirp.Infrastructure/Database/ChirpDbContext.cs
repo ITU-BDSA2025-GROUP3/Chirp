@@ -18,8 +18,7 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
     {
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Author>()
-            .HasIndex(c => c.Name)
-            .IsUnique();
+            .HasIndex(c => c.Name);
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Author>()
             .HasIndex(c => c.Email)
