@@ -1,8 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+using Microsoft.AspNetCore.Identity;
+
 namespace Chirp.Core.DomainModel;
 
-public class Author
+public class Author : IdentityUser<int>
 {
     public required int AuthorId { get; set; }
     
