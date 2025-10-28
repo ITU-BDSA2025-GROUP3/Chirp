@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Chirp.Infrastructure.Database;
 
 //Responsible for all database access
-public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<Author, IdentityRole<int>, int>(options)
+public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<Author>(options)
 {
     //private readonly string _connectionString; not in use?
     //private const int PAGE_SIZE = 32; // Fixed page size not in use?
