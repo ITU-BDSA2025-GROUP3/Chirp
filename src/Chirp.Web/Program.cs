@@ -7,6 +7,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using Chirp.Infrastructure;
 
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 
 var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -14,6 +16,26 @@ builder.Services.AddDbContext<ChirpDbContext>(options => options.UseSqlite(conne
 builder.Services.AddDefaultIdentity<Author>(options =>
         options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ChirpDbContext>();
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.SlidingExpiration = true;
+});
+
+builder.Services.AddAuthentication(options =>
+    { })
+    .AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["authentication:github:clientId"] ?? string.Empty;
+        options.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? string.Empty;
+        options.CallbackPath = "/signin-github";
+    });
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -39,7 +61,6 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
