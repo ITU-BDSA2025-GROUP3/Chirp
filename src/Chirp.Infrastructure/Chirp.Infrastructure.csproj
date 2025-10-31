@@ -15,7 +15,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.9" />
     </ItemGroup>
 
-
     <ItemGroup>
         <ProjectReference Include="..\..\src\Chirp.Core\Chirp.Core.csproj" />
     </ItemGroup>
