@@ -1,3 +1,4 @@
+using System.Globalization;
 using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.Infrastructure.Services;
@@ -6,9 +7,7 @@ public interface ICheepService
 {
     int CurrentPage { get; set; }
     public Task<List<CheepDTO>> GetCheeps();
-    public Task<List<CheepDTO>> GetAuthorCheeps(string author);
     public Task<int> GetTotalCheeps();
-    public Task<int> GetTotalAuthorCheeps(string author);
 }
 
 public class CheepService : ICheepService
@@ -26,23 +25,21 @@ public class CheepService : ICheepService
     
     public async Task<List<CheepDTO>> GetCheeps()
     {
-        return await _cheepRepository.ReadCheeps(CurrentPage);
-    }
-
-    public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
-    {
-        return await _cheepRepository.ReadAuthorCheeps(author, CurrentPage);
+        var cheeps = await _cheepRepository.ReadCheeps(CurrentPage);
+        var cheepDTOs = cheeps.Select(cheep => new CheepDTO
+        {
+            Author = cheep.Author.Name,
+            Message = cheep.Text,
+            TimeStamp = new DateTimeOffset(cheep.TimeStamp)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
+        return cheepDTOs;
     }
     
     public async Task<int> GetTotalCheeps()
     {
         var total = await _cheepRepository.GetTotalCheeps();
-        return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
-    }
-    
-    public async Task<int> GetTotalAuthorCheeps(string author)
-    {
-        var total = await _cheepRepository.GetTotalAuthorCheeps(author);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 }

@@ -8,11 +8,11 @@ namespace Chirp.Web.Pages;
 
 public class UserTimelineModel : PageModel
 {
-    private readonly ICheepService _service;
+    private readonly IAuthorService _service;
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
-    public UserTimelineModel(ICheepService service)
+    public UserTimelineModel(IAuthorService service)
     {
         _service = service;
     }
