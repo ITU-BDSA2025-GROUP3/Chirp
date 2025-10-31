@@ -1,5 +1,6 @@
 using Chirp.Core.DomainModel;
 using Chirp.Infrastructure;
+using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
 
@@ -99,4 +100,33 @@ public class CheepServiceTests
             throw new NotImplementedException();
         }
     }
+
+    // Unit test for CheepService.GetTotalCheeps().
+    [Fact]
+    public async Task GetTotalCheeps_ReturnsNegative()
+    {
+        var repository = new FakeCheepRepository(-10);
+        var service = new CheepService(repository);
+        
+        var pages = await service.GetTotalCheeps();
+        
+        Assert.Equal(1, pages);
+        
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
+    {
+        var repository = new FakeCheepRepository(0);
+        var service = new CheepService(repository);
+
+        var pages = await service.GetTotalAuthorCheeps(authorName ?? "");
+
+        Assert.Equal(1, pages);
+    }
+
+   
 }
