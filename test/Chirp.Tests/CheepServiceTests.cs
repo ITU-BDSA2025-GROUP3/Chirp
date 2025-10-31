@@ -1,4 +1,6 @@
+using Chirp.Core;
 using Chirp.Core.DomainModel;
+using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;

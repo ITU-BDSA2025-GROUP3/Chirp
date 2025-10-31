@@ -1,4 +1,4 @@
-﻿namespace Chirp.Infrastructure;
+﻿namespace Chirp.Core;
 
 public class CheepDTO
 {

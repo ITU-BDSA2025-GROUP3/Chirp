@@ -1,4 +1,4 @@
-namespace Chirp.Infrastructure.Repositories;
+namespace Chirp.Core.RepositoryInterfaces;
 
 public interface IAuthorRepository
 {

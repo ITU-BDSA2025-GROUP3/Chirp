@@ -1,4 +1,6 @@
-﻿using Chirp.Infrastructure;
+﻿using Chirp.Core;
+using Chirp.Core.ServiceInterfaces;
+using Chirp.Infrastructure;
 using Chirp.Infrastructure.Services;
 
 using Microsoft.AspNetCore.Mvc;
@@ -6,16 +8,11 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel : PageModel
+public class UserTimelineModel(IAuthorService service) : PageModel
 {
-    private readonly IAuthorService _service;
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
-    public UserTimelineModel(IAuthorService service)
-    {
-        _service = service;
-    }
 
     public async Task<ActionResult> OnGetAsync(string author)
     {
@@ -23,9 +20,9 @@ public class UserTimelineModel : PageModel
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetAuthorCheeps(author);
-            TotalAuthorPages = await _service.GetTotalAuthorCheeps(author);
+            service.CurrentPage = pageQuery;
+            Cheeps = await service.GetAuthorCheeps(author);
+            TotalAuthorPages = await service.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {
