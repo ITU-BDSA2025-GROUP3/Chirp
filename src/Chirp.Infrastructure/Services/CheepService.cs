@@ -1,3 +1,4 @@
+using System.Globalization;
 using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.Infrastructure.Services;
@@ -24,7 +25,16 @@ public class CheepService : ICheepService
     
     public async Task<List<CheepDTO>> GetCheeps()
     {
-        return await _cheepRepository.ReadCheeps(CurrentPage);
+        var cheeps = await _cheepRepository.ReadCheeps(CurrentPage);
+        var cheepDTOs = cheeps.Select(cheep => new CheepDTO
+        {
+            Author = cheep.Author.Name,
+            Message = cheep.Text,
+            TimeStamp = new DateTimeOffset(cheep.TimeStamp)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
+        return cheepDTOs;
     }
     
     public async Task<int> GetTotalCheeps()

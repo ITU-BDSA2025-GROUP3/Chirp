@@ -1,11 +1,7 @@
-﻿using System.Globalization;
-
-using Chirp.Core.DomainModel;
+﻿using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Database;
 
 using Microsoft.EntityFrameworkCore;
-
-using Author = Chirp.Core.DomainModel.Author;
 
 namespace Chirp.Infrastructure.Repositories;
 
@@ -17,34 +13,49 @@ public class CheepRepository : ICheepRepository
     {
         _dbContext = dbContext;
     }
-    
+
+    public async Task<List<Cheep>> ReadCheeps(int page)
+    {
+        var query = await _dbContext.Cheeps
+            .Include(cheep => cheep.Author)
+            .OrderByDescending(cheep => cheep.TimeStamp)
+            .Skip((page - 1) * PAGE_SIZE)
+            .Take(PAGE_SIZE)
+            .ToListAsync();
+        return query;
+    }
+
+
     /// <summary>
     /// Returns cheeps on a specified page.
     /// </summary>
     /// <param name="page">The page to return cheeps from</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<CheepDTO>> ReadCheeps(int page)
+    public async Task<List<Cheep>> ReadCheepsFrom(int page, int authorId)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
         
-        var query = await (
-                from author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-                orderby cheep.TimeStamp descending
-                select new { author.Name, cheep.Text, cheep.TimeStamp })
-            .Skip((page - 1) * PAGE_SIZE) // offset equivalent
-            .Take(PAGE_SIZE) //limit equivalent
+        var query = await _dbContext.Cheeps
+            .Where(cheep => cheep.AuthorId == authorId)
+            .Include(cheep => cheep.Author)
+            .OrderByDescending(cheep => cheep.TimeStamp)
+            .Skip((page - 1) * PAGE_SIZE)
+            .Take(PAGE_SIZE)
             .ToListAsync();
-        
-        return query.Select(cheep => new CheepDTO
-        {
-            Author = cheep.Name,
-            Message = cheep.Text,
-            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
-        }).ToList();
+        return query;
     }
 
+    public Task<int> GetTotalCheeps()
+    {
+        return _dbContext.Cheeps.CountAsync();
+    }
+    
+    public Task<int> GetTotalCheepsFor(int authorId)
+    {
+        return _dbContext.Cheeps.CountAsync(cheep => cheep.AuthorId == authorId);
+    }
+    
     /// <summary>
     /// creates new cheep messages, checks if user is logged in, identified by unique email
     /// </summary>
@@ -69,11 +80,6 @@ public class CheepRepository : ICheepRepository
         };
         _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
-    }
-
-    public Task<int> GetTotalCheeps()
-    {
-        return _dbContext.Cheeps.CountAsync();
     }
     
     /// <summary>

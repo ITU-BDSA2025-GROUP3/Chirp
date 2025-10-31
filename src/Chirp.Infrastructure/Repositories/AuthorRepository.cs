@@ -1,5 +1,3 @@
-using System.Globalization;
-
 using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Database;
 
@@ -11,40 +9,20 @@ namespace Chirp.Infrastructure.Repositories;
 
 public class AuthorRepository : IAuthorRepository
 {
-    private const int PAGE_SIZE = 32;
     private readonly ChirpDbContext _dbContext;
     public AuthorRepository(ChirpDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    /// <summary>
-    /// Returns cheeps on a specified page, from a specified author, matched by author name.
-    /// </summary>
-    /// <param name="author">either Name or Email of the author as it appears in their cheeps</param>
-    /// <param name="page">The page to return cheeps from</param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<CheepDTO>> ReadAuthorCheeps(string author, int page)
+    public async Task<int> GetAuthorIdFrom(string authorNameOrEmail)
     {
-        if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
-
-        var query = await (
-                from Author in _dbContext.Authors
-                join cheep in _dbContext.Cheeps on Author.AuthorId equals cheep.AuthorId
-                where Author.Name == author || Author.Email == author
-                orderby cheep.TimeStamp descending
-                select new { Author.Name, cheep.Text, cheep.TimeStamp })
-            .Skip((page - 1) * PAGE_SIZE) // offset equivalent
-            .Take(PAGE_SIZE) //limit equivalent
-            .ToListAsync();
-
-        return query.Select(cheep => new CheepDTO
-        {
-            Author = cheep.Name,
-            Message = cheep.Text,
-            TimeStamp = new DateTimeOffset(cheep.TimeStamp).ToLocalTime().ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
-        }).ToList();
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
+        var query = await _dbContext.Authors
+            .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author.AuthorId)
+            .FirstOrDefaultAsync();
+        return query;
     }
 
     /// <summary>
@@ -75,21 +53,6 @@ public class AuthorRepository : IAuthorRepository
         };
         _dbContext.Authors.Add(author);
         await _dbContext.SaveChangesAsync();
-    }
-
-    public Task<int> GetTotalCheeps()
-    {
-        return _dbContext.Cheeps.CountAsync();
-    }
-    
-    public Task<int> GetTotalAuthorCheeps(string authorName)
-    {
-        var query = (
-            from author in _dbContext.Authors
-            join cheep in _dbContext.Cheeps on author.AuthorId equals cheep.AuthorId
-            where author.Name == authorName || author.Email == authorName
-            select cheep.CheepId);
-        return query.CountAsync();
     }
 }
 
