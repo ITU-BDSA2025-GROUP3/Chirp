@@ -101,7 +101,11 @@ public class CheepServiceTests
     [InlineData("   ")]
     public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
     {
-      
+        // Arrange
+        var repository = new FakeCheepRepository(0, null);
+        var service = new CheepService(repository);
+
+       
     }
 
 
