@@ -1,16 +1,14 @@
-﻿namespace Chirp.Infrastructure.Repositories;
+﻿using Chirp.Core.DomainModel;
+
+namespace Chirp.Infrastructure.Repositories;
 
 public interface ICheepRepository
 {
-    public Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page);
-
-    public Task<List<CheepDTO>> ReadCheeps(int page);
-    
-
-    public Task CreateCheep(CheepDTO newCheep);
-    public Task CreateAuthor(string authorName, string authorEmail);
-    
+    public Task<List<Cheep>> ReadCheeps(int page);
+    public Task<List<Cheep>> ReadCheepsFrom(int page, int authorId);
     public Task<int> GetTotalCheeps();
-
-    public Task<int> GetTotalAuthorCheeps(string authorName);
+    public Task<int> GetTotalCheepsFor(int authorId);
+    
+    public Task CreateCheep(CheepDTO newCheep);
+    public Task AddCheep(Cheep cheep);
 }

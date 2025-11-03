@@ -69,7 +69,7 @@ jobs:
         run: |
           release_name="Chirp-${{ github.ref_name }}-${{ matrix.os }}"
 
-          dotnet publish -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
+          dotnet publish "src/Chirp.Web" -r "${{ matrix.os }}" -o "${release_name}" --sc false -p:PublishSingleFile=True
 
           7z a "${release_name}.zip" "${release_name}/."
           7z d "${release_name}.zip" "*.pdb"

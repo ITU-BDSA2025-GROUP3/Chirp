@@ -1,3 +1,4 @@
+using Chirp.Core.DomainModel;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
@@ -18,7 +19,7 @@ public class CheepServiceTests
     [InlineData(1025, 33)]
     public async Task GetTotalCheeps_ReturnsExpectedPageCount(int totalCheeps, int expectedPages)
     {
-        var repository = new FakeCheepRepository(totalCheeps);
+        var repository = new FakeCheepRepository(totalCheeps, new Dictionary<int, int>());
         var service = new CheepService(repository);
 
         var pages = await service.GetTotalCheeps();
@@ -35,8 +36,12 @@ public class CheepServiceTests
     [InlineData("charlie", -5, 1)]
     public async Task GetTotalAuthorCheeps_ReturnsExpectedPageCount(string author, int totalCheeps, int expectedPages)
     {
-        var repository = new FakeCheepRepository(0, new Dictionary<string, int> { { author, totalCheeps } });
-        var service = new CheepService(repository);
+        var authorIds = new Dictionary<string, int> { { author, 42 } };
+        var authorCheepTotals = new Dictionary<int, int> { { 42, totalCheeps } };
+
+        var authorRepository = new FakeAuthorRepository(authorIds);
+        var cheepRepository = new FakeCheepRepository(totalCheeps, authorCheepTotals);
+        var service = new AuthorService(authorRepository, cheepRepository);
 
         var pages = await service.GetTotalAuthorCheeps(author);
 
@@ -46,35 +51,54 @@ public class CheepServiceTests
     [Fact]
     public async Task GetTotalAuthorCheeps_ReturnsOneWhenAuthorMissing()
     {
-        var service = new CheepService(new FakeCheepRepository(0));
+        var service = new AuthorService(new FakeAuthorRepository(), new FakeCheepRepository(0,new Dictionary<int, int>()));
         var pages = await service.GetTotalAuthorCheeps(" ");
         Assert.Equal(1, pages);
     }
 
+    
+    private sealed class FakeAuthorRepository : IAuthorRepository
+    {
+        private readonly Dictionary<string, int> _authorIds;
+    
+        public FakeAuthorRepository(Dictionary<string, int>? authorIds = null)
+        {
+            _authorIds = authorIds ?? new Dictionary<string, int>();
+        }
 
+        public Task<int> GetAuthorIdFrom(string authorNameOrEmail)
+        {
+            if (string.IsNullOrWhiteSpace(authorNameOrEmail))
+            {
+                return Task.FromResult<int>(0);
+            }
+            var key = authorNameOrEmail.Trim();
+            return Task.FromResult(_authorIds.TryGetValue(key, out var id) ? id : 0);
+        }
+
+        public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
+    }
+    
     private sealed class FakeCheepRepository : ICheepRepository
     {
         private readonly int _totalCheeps;
-        private readonly Dictionary<string, int> _authorTotals;
+        private readonly Dictionary<int, int> _authorTotals;
 
-        public FakeCheepRepository(int totalCheeps, Dictionary<string, int>? authorTotals = null)
+        public FakeCheepRepository(int totalCheeps, Dictionary<int, int>? authorTotals)
         {
             _totalCheeps = totalCheeps;
-            _authorTotals = authorTotals ?? new Dictionary<string, int>();
+            _authorTotals = authorTotals ?? new Dictionary<int, int>();
         }
 
-        public Task<List<CheepDTO>> ReadAuthorCheeps(string authorName, int page) => throw new NotSupportedException();
-
-        public Task<List<CheepDTO>> ReadCheeps(int page) => throw new NotSupportedException();
-
-        public Task CreateCheep(CheepDTO newCheep) => throw new NotSupportedException();
-
-        public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
-
+        public Task<List<Cheep>> ReadCheeps(int page) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadCheepsFrom(int page, int authorId) => Task.FromResult(new List<Cheep>());
         public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
-
-        public Task<int> GetTotalAuthorCheeps(string authorName) =>
-            Task.FromResult(_authorTotals.TryGetValue(authorName, out var total) ? total : 0);
+        public Task<int> GetTotalCheepsFor(int authorId) => Task.FromResult(_authorTotals.TryGetValue(authorId, out var total) ? total : 0);
+        public Task CreateCheep(CheepDTO newCheep) => throw new NotSupportedException();
+        public Task AddCheep(Cheep cheep)
+        {
+            throw new NotImplementedException();
+        }
     }
 
     // Unit test for CheepService.GetTotalCheeps().
