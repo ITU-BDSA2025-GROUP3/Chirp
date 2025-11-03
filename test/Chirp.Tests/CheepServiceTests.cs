@@ -93,6 +93,18 @@ public class CheepServiceTests
     }
 
 
+    
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("   ")]
+    public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
+    {
+      
+    }
+
+
 
    
 }
