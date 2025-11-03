@@ -18,17 +18,17 @@ public class PublicModel : PageModel
     
     [BindProperty]
     public required string Message { get; set; }
-    public required string Author { get; set; }
     public async Task<ActionResult> OnPostAsync()
     {
+        
         // TODO replace hardcoded author string with user identity
-        // Author = User.Identity.Name;
-        Author = "Helge";
+        // var author = User.Identity.Name;
+        var author = "Helge";
         if (!ModelState.IsValid)
         {
             return Page();
         }
-        await _service.AddNewCheep(Author, Message);
+        await _service.AddNewCheep(author, Message);
         return RedirectToPage();
     }
 

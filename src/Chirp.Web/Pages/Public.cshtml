@@ -12,13 +12,12 @@
     @if (!User.Identity.IsAuthenticated)
     {
         <div class="cheepbox">
-            <h3>What's on your mind?</h3>
+            <h3>What's on your mind @(User.Identity.Name)?</h3>
             <form method="post">
                 <input required style="float: left" type="text" asp-for="Message">
                 <input type="submit">
             </form>
         </div>
-        @* @await Html.PartialAsync("_SubmitMessage", Model.SubmitMessage) *@
     }
 
     @if (Model.Cheeps.Any())

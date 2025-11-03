@@ -1,6 +1,5 @@
 ﻿using Chirp.Infrastructure;
 using Chirp.Infrastructure.Services;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -21,17 +20,16 @@ public class UserTimelineModel : PageModel
     
     [BindProperty]
     public required string Message { get; set; }
-    public required string Author { get; set; }  
     public async Task<ActionResult> OnPostAsync()
     {
         // TODO replace hardcoded author string with user identity
-        // Author = User.Identity.Name;
-        Author = "Helge";
+        // var author = User.Identity.Name;
+        var author = "Helge";
         if (!ModelState.IsValid)
         {
             return Page();
         }
-        await _cheepService.AddNewCheep(Author, Message);
+        await _cheepService.AddNewCheep(author, Message);
         return RedirectToPage();
     }
 
