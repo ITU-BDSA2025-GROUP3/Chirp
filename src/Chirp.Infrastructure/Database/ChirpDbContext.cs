@@ -1,10 +1,12 @@
 using Chirp.Core.DomainModel;
+
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Infrastructure.Database;
 
 //Responsible for all database access
-public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : DbContext(options)
+public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
     //private readonly string _connectionString; not in use?
     //private const int PAGE_SIZE = 32; // Fixed page size not in use?

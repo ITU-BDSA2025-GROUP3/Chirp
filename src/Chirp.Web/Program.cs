@@ -1,12 +1,42 @@
+using Chirp.Infrastructure;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 string? connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<ChirpDbContext>(options => options.UseSqlite(connectionString));
+
+/*
+IDENTITY CONFIGURATIONS
+*/
+
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
+        options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ChirpDbContext>();
+
+builder.Services.AddAuthentication(options =>
+        { })
+    .AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["authentication:github:clientId"] ?? string.Empty;
+        options.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? string.Empty;
+        options.CallbackPath = "/signin-github";
+    });
+
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    // Cookie settings
+    options.Cookie.HttpOnly = true;
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+
+    options.LoginPath = "/Identity/Account/Login";
+    options.AccessDeniedPath = "/Identity/Account/AccessDenied";
+    options.SlidingExpiration = true;
+});
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -27,6 +57,8 @@ using (var scope = app.Services.CreateScope())
     Console.WriteLine($"[DEBUG] Cheeps in DB: {db.Cheeps.Count()}");
 }
 
+
+
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
@@ -39,6 +71,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapRazorPages();
 
