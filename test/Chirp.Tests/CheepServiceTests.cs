@@ -83,6 +83,11 @@ public class CheepServiceTests
     {
         // Arrange
         var repository = new FakeCheepRepository(-10); 
+        var service = new CheepService(repository);
+
+        // Act
+        var pages = await service.GetTotalCheeps();
+
       
     }
 
