@@ -70,7 +70,6 @@ public class CheepRepository : ICheepRepository
         {
             throw new Exception("Author does not exist! Create a new author before you can write cheeps to timeline.");
         }
-        
         var cheep = new Cheep()
         {
             AuthorId = command.AuthorId,
@@ -91,6 +90,5 @@ public class CheepRepository : ICheepRepository
         _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
     }
-
 }
 

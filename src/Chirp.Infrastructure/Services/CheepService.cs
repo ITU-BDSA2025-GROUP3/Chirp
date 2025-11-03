@@ -1,4 +1,6 @@
 using System.Globalization;
+
+using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.Infrastructure.Services;
@@ -8,6 +10,7 @@ public interface ICheepService
     int CurrentPage { get; set; }
     public Task<List<CheepDTO>> GetCheeps();
     public Task<int> GetTotalCheeps();
+    public Task AddNewCheep(string authorname, string message);
 }
 
 public class CheepService : ICheepService
@@ -16,11 +19,13 @@ public class CheepService : ICheepService
     //Sets confirguable databse path
     // private readonly ChirpDbContext _chirpDbContext;
     private readonly ICheepRepository _cheepRepository;
+    private readonly IAuthorRepository _authorRepository;
     //Set or get the currentPage to be viewed
     public int CurrentPage { get; set; } = 1;
-    public CheepService(ICheepRepository cheepRepository)
+    public CheepService(ICheepRepository cheepRepository, IAuthorRepository authorRepository)
     {
         _cheepRepository = cheepRepository;
+        _authorRepository = authorRepository;
     }
     
     public async Task<List<CheepDTO>> GetCheeps()
@@ -41,5 +46,18 @@ public class CheepService : ICheepService
     {
         var total = await _cheepRepository.GetTotalCheeps();
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
+    }
+
+    public async Task AddNewCheep(String authorname, string message)
+    {
+        var cheepDTOs = new CheepDTO
+        {
+            Author = authorname,
+            Message = message,
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        };
+        await _cheepRepository.CreateCheep(cheepDTOs);
     }
 }

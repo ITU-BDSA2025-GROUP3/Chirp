@@ -1,5 +1,6 @@
 ﻿@page "/"
 @model Chirp.Web.Pages.PublicModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
     ViewData["Title"] = "Chirp!";
     Layout = "Shared/_Layout";
@@ -7,6 +8,18 @@
 
 <div>
     <h2> Public Timeline </h2>
+    @* TODO remove ! from user identity verification *@
+    @if (!User.Identity.IsAuthenticated)
+    {
+        <div class="cheepbox">
+            <h3>What's on your mind?</h3>
+            <form method="post">
+                <input required style="float: left" type="text" asp-for="Message">
+                <input type="submit">
+            </form>
+        </div>
+        @* @await Html.PartialAsync("_SubmitMessage", Model.SubmitMessage) *@
+    }
 
     @if (Model.Cheeps.Any())
     {

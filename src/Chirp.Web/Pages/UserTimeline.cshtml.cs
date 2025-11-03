@@ -8,13 +8,31 @@ namespace Chirp.Web.Pages;
 
 public class UserTimelineModel : PageModel
 {
-    private readonly IAuthorService _service;
+    private readonly IAuthorService _authorService;
+    private readonly ICheepService _cheepService;
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
-    public UserTimelineModel(IAuthorService service)
+    public UserTimelineModel(IAuthorService authorService, ICheepService cheepService)
     {
-        _service = service;
+        _authorService = authorService;
+        _cheepService = cheepService;
+    }
+    
+    [BindProperty]
+    public string Message { get; set; }
+    public string Author { get; set; }  
+    public async Task<ActionResult> OnPostAsync()
+    {
+        // TODO replace hardcoded author string with user identity
+        // Author = User.Identity.Name;
+        Author = "Helge";
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+        await _cheepService.AddNewCheep(Author, Message);
+        return RedirectToPage();
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -23,9 +41,9 @@ public class UserTimelineModel : PageModel
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetAuthorCheeps(author);
-            TotalAuthorPages = await _service.GetTotalAuthorCheeps(author);
+            _authorService.CurrentPage = pageQuery;
+            Cheeps = await _authorService.GetAuthorCheeps(author);
+            TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {

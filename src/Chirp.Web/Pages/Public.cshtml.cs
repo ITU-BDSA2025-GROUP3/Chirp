@@ -1,4 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
+
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Services;
@@ -8,12 +11,28 @@ namespace Chirp.Web.Pages;
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
-    public required List<CheepDTO> Cheeps { get; set; }
-    public int TotalPages { get; private set; }
-    public int CurrentPage;
     public PublicModel(ICheepService service)
     {
         _service = service;
+    }
+    public required List<CheepDTO> Cheeps { get; set; }
+    public int TotalPages { get; private set; }
+    public int CurrentPage;
+    
+    [BindProperty]
+    public string Message { get; set; }
+    public string Author { get; set; }
+    public async Task<ActionResult> OnPostAsync()
+    {
+        // TODO replace hardcoded author string with user identity
+        // Author = User.Identity.Name;
+        Author = "Helge";
+        if (!ModelState.IsValid)
+        {
+            return Page();
+        }
+        await _service.AddNewCheep(Author, Message);
+        return RedirectToPage();
     }
 
     public async Task<ActionResult> OnGetAsync()
