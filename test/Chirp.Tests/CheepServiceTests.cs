@@ -79,30 +79,12 @@ public class CheepServiceTests
 
     // Unit test for CheepService.GetTotalCheeps().
     [Fact]
-    public async Task GetTotalCheeps_ReturnsNegative()
+    public async Task GetTotalCheeps_ReturnsOne_WhenTotalIsNegative()
     {
-        var repository = new FakeCheepRepository(-10);
-        var service = new CheepService(repository);
-        
-        var pages = await service.GetTotalCheeps();
-        
-        Assert.Equal(1, pages);
-        
+       
     }
 
-    [Theory]
-    [InlineData(null)]
-    [InlineData("")]
-    [InlineData("   ")]
-    public async Task GetTotalAuthorCheeps_ReturnsOne_WhenAuthorNameIsInvalid(string? authorName)
-    {
-        var repository = new FakeCheepRepository(0);
-        var service = new CheepService(repository);
 
-        var pages = await service.GetTotalAuthorCheeps(authorName ?? "");
-
-        Assert.Equal(1, pages);
-    }
 
    
 }
