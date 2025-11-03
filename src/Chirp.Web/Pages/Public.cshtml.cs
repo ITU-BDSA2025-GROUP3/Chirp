@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.Security.Claims;
-
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Services;
@@ -20,8 +17,8 @@ public class PublicModel : PageModel
     public int CurrentPage;
     
     [BindProperty]
-    public string Message { get; set; }
-    public string Author { get; set; }
+    public required string Message { get; set; }
+    public required string Author { get; set; }
     public async Task<ActionResult> OnPostAsync()
     {
         // TODO replace hardcoded author string with user identity

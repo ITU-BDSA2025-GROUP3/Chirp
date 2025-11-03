@@ -1,6 +1,4 @@
 using System.Globalization;
-
-using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Repositories;
 
 namespace Chirp.Infrastructure.Services;
@@ -19,13 +17,11 @@ public class CheepService : ICheepService
     //Sets confirguable databse path
     // private readonly ChirpDbContext _chirpDbContext;
     private readonly ICheepRepository _cheepRepository;
-    private readonly IAuthorRepository _authorRepository;
     //Set or get the currentPage to be viewed
     public int CurrentPage { get; set; } = 1;
-    public CheepService(ICheepRepository cheepRepository, IAuthorRepository authorRepository)
+    public CheepService(ICheepRepository cheepRepository)
     {
         _cheepRepository = cheepRepository;
-        _authorRepository = authorRepository;
     }
     
     public async Task<List<CheepDTO>> GetCheeps()

@@ -20,8 +20,8 @@ public class UserTimelineModel : PageModel
     }
     
     [BindProperty]
-    public string Message { get; set; }
-    public string Author { get; set; }  
+    public required string Message { get; set; }
+    public required string Author { get; set; }  
     public async Task<ActionResult> OnPostAsync()
     {
         // TODO replace hardcoded author string with user identity

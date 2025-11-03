@@ -5,7 +5,7 @@ using Chirp.Infrastructure.Services;
 
 using Microsoft.AspNetCore.Mvc;
 
-namespace Chirp.Web.Pages;
+namespace Chirp.Web.Pages.Shared;
 
 public class _SubmitMessage : PageModel
 {
@@ -16,8 +16,8 @@ public class _SubmitMessage : PageModel
     [Required]
     [StringLength(160, ErrorMessage = "Maximum length is {1}")]
     [Display(Name = "Message Text")]
-    public string Message { get; set; }
-    public string Author { get; set; }
+    public required string Message { get; set; }
+    public required string Author { get; set; }
 
     public _SubmitMessage(ICheepService service)
     {
