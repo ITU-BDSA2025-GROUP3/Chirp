@@ -81,7 +81,9 @@ public class CheepServiceTests
     [Fact]
     public async Task GetTotalCheeps_ReturnsOne_WhenTotalIsNegative()
     {
-       
+        // Arrange
+        var repository = new FakeCheepRepository(-10); 
+      
     }
 
 
