@@ -88,7 +88,8 @@ public class CheepServiceTests
         // Act
         var pages = await service.GetTotalCheeps();
 
-      
+        // Assert
+        Assert.Equal(1, pages);
     }
 
 
