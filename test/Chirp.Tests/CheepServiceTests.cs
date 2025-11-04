@@ -116,4 +116,20 @@ public class CheepServiceTests
         Assert.Equal(expectedPages, result);
         
     }
+    
+    [Theory]
+    [InlineData(-1)]
+    public async Task GetTotalCheeps_ReturnsAtLeastOne_WhenRepositoryGivesInvalidTotal(int invalidTotal)
+    {
+      
+        var repository = new FakeCheepRepository(invalidTotal, new Dictionary<int, int>());
+        var service = new CheepService(repository);
+
+       
+        var result = await service.GetTotalCheeps();
+
+      
+        Assert.Equal(1, result);
+    }
+
 }
