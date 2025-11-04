@@ -99,4 +99,15 @@ public class CheepServiceTests
             throw new NotImplementedException();
         }
     }
+    
+    [InlineData(65, 3)]
+    public async Task GetTotalCheeps_ReturnsNumberOfPages(int totalCheeps, int expectedPages)
+    {
+        
+        var fakeRepository = new FakeCheepRepository(totalCheeps, new Dictionary<int, int>());
+        var service = new CheepService(fakeRepository);
+
+        
+        
+    }
 }
