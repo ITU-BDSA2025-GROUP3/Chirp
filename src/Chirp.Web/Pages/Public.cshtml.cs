@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
@@ -17,7 +18,9 @@ public class PublicModel : PageModel
     public int CurrentPage;
     
     [BindProperty]
-    public required string Message { get; set; }
+    [Required(ErrorMessage = "Please enter a Cheep!")]
+    [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
+    public string Message { get; set; } = string.Empty;
     public async Task<ActionResult> OnPostAsync()
     {
         

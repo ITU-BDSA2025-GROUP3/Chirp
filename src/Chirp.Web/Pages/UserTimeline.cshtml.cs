@@ -2,6 +2,7 @@
 using Chirp.Infrastructure.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
@@ -19,7 +20,9 @@ public class UserTimelineModel : PageModel
     }
     
     [BindProperty]
-    public required string Message { get; set; }
+    [Required(ErrorMessage = "Please enter a Cheep!")]
+    [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
+    public string Message { get; set; } = string.Empty;
     public async Task<ActionResult> OnPostAsync()
     {
         // TODO replace hardcoded author string with user identity
