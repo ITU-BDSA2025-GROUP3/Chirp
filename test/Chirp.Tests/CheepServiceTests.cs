@@ -89,8 +89,8 @@ public class CheepServiceTests
             _authorTotals = authorTotals ?? new Dictionary<int, int>();
         }
 
-        public Task<List<Cheep>> ReadCheeps(int page) => Task.FromResult(new List<Cheep>());
-        public Task<List<Cheep>> ReadCheepsFrom(int page, int authorId) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadCheeps(int page, int pageSize) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId) => Task.FromResult(new List<Cheep>());
         public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
         public Task<int> GetTotalCheepsFor(int authorId) => Task.FromResult(_authorTotals.TryGetValue(authorId, out var total) ? total : 0);
         public Task CreateCheep(CheepDTO newCheep) => throw new NotSupportedException();

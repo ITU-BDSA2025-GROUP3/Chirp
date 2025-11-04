@@ -25,7 +25,7 @@ public class CheepService : ICheepService
     
     public async Task<List<CheepDTO>> GetCheeps()
     {
-        var cheeps = await _cheepRepository.ReadCheeps(CurrentPage);
+        var cheeps = await _cheepRepository.ReadCheeps(CurrentPage, PAGE_SIZE);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             Author = cheep.Author.Name,

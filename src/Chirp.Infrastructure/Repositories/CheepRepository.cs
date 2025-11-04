@@ -7,20 +7,19 @@ namespace Chirp.Infrastructure.Repositories;
 
 public class CheepRepository : ICheepRepository
 {
-    private const int PAGE_SIZE = 32;
     private readonly ChirpDbContext _dbContext;
     public CheepRepository(ChirpDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<List<Cheep>> ReadCheeps(int page)
+    public async Task<List<Cheep>> ReadCheeps(int page, int pageSize)
     {
         var query = await _dbContext.Cheeps
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
-            .Skip((page - 1) * PAGE_SIZE)
-            .Take(PAGE_SIZE)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
         return query;
     }
@@ -30,9 +29,11 @@ public class CheepRepository : ICheepRepository
     /// Returns cheeps on a specified page.
     /// </summary>
     /// <param name="page">The page to return cheeps from</param>
+    /// <param name="pageSize"></param>
+    /// <param name="authorId"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<Cheep>> ReadCheepsFrom(int page, int authorId)
+    public async Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
         
@@ -40,8 +41,8 @@ public class CheepRepository : ICheepRepository
             .Where(cheep => cheep.AuthorId == authorId)
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
-            .Skip((page - 1) * PAGE_SIZE)
-            .Take(PAGE_SIZE)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
         return query;
     }
