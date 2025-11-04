@@ -120,7 +120,7 @@ public class CheepServiceTests
     [Theory]
     [InlineData(-10)]
     [InlineData(-1)]
-    public async Task GetTotalCheeps_ReturnsAtLeastOne_WhenRepositoryGivesInvalidTotal(int invalidTotal)
+    public async Task GetTotalCheeps_ReturnsAtLeastOne_GivesInvalidTotal(int invalidTotal)
     {
       
         var repository = new FakeCheepRepository(invalidTotal, new Dictionary<int, int>());
@@ -132,5 +132,27 @@ public class CheepServiceTests
       
         Assert.Equal(1, result);
     }
+    
+    [Theory]
+    [InlineData("alice", 31, 1)]   
+    [InlineData("bob", 32, 1)]     
+   
+    public async Task GetTotalAuthorCheeps_ReturnsCorrectPageCount(string author, int totalCheeps, int expectedPages)
+    {
+     
+        var authorIds = new Dictionary<string, int> { { author, 10 } };
+        var authorTotals = new Dictionary<int, int> { { 10, totalCheeps } };
+
+        var authorRepo = new FakeAuthorRepository(authorIds);
+        var cheepRepo = new FakeCheepRepository(totalCheeps, authorTotals);
+        var service = new AuthorService(authorRepo, cheepRepo);
+
+       
+        var result = await service.GetTotalAuthorCheeps(author);
+
+     
+        Assert.Equal(expectedPages, result);
+    }
+
 
 }
