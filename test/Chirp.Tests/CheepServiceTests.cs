@@ -99,7 +99,10 @@ public class CheepServiceTests
             throw new NotImplementedException();
         }
     }
-    
+    [Theory]
+    [InlineData(32, 1)]
+    [InlineData(33, 2)]
+    [InlineData(64, 2)]
     [InlineData(65, 3)]
     public async Task GetTotalCheeps_ReturnsNumberOfPages(int totalCheeps, int expectedPages)
     {
