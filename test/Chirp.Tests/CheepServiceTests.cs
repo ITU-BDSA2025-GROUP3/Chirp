@@ -136,7 +136,9 @@ public class CheepServiceTests
     [Theory]
     [InlineData("alice", 31, 1)]   
     [InlineData("bob", 32, 1)]     
-   
+    [InlineData("bob", 33, 2)]     
+    [InlineData("charlie", 64, 2)] 
+    [InlineData("charlie", 65, 3)] 
     public async Task GetTotalAuthorCheeps_ReturnsCorrectPageCount(string author, int totalCheeps, int expectedPages)
     {
      
