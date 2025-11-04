@@ -118,6 +118,7 @@ public class CheepServiceTests
     }
     
     [Theory]
+    [InlineData(-10)]
     [InlineData(-1)]
     public async Task GetTotalCheeps_ReturnsAtLeastOne_WhenRepositoryGivesInvalidTotal(int invalidTotal)
     {
