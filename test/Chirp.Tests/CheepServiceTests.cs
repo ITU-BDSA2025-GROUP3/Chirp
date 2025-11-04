@@ -107,7 +107,10 @@ public class CheepServiceTests
         var fakeRepository = new FakeCheepRepository(totalCheeps, new Dictionary<int, int>());
         var service = new CheepService(fakeRepository);
 
+        var result = await service.GetTotalCheeps();
+
         
+        Assert.Equal(expectedPages, result);
         
     }
 }
