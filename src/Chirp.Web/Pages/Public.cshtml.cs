@@ -23,16 +23,23 @@ public class PublicModel : PageModel
     public string Message { get; set; } = string.Empty;
     public async Task<ActionResult> OnPostAsync()
     {
-        
         // TODO replace hardcoded author string with user identity
         // var author = User.Identity.Name;
         var author = "Helge";
         if (!ModelState.IsValid)
         {
+            await LoadCheeps();
             return Page();
         }
         await _service.AddNewCheep(author, Message);
         return RedirectToPage();
+    }
+    private async Task LoadCheeps()
+    {
+        _service.CurrentPage = 1;
+        Cheeps = await _service.GetCheeps();
+        TotalPages = await _service.GetTotalCheeps();
+        CurrentPage = _service.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync()

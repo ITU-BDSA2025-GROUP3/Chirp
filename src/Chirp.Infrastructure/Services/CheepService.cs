@@ -44,11 +44,11 @@ public class CheepService : ICheepService
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
-    public async Task AddNewCheep(String authorname, string message)
+    public async Task AddNewCheep(String author, string message)
     {
         var cheepDTOs = new CheepDTO
         {
-            Author = authorname,
+            Author = author,
             Message = message,
             TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()

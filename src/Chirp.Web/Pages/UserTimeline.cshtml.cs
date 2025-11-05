@@ -30,10 +30,19 @@ public class UserTimelineModel : PageModel
         var author = "Helge";
         if (!ModelState.IsValid)
         {
+            await LoadAuthorCheeps(author);
             return Page();
         }
         await _cheepService.AddNewCheep(author, Message);
         return RedirectToPage();
+    }
+    
+    private async Task LoadAuthorCheeps(string author)
+    {
+        _authorService.CurrentPage = 1;
+        Cheeps = await _authorService.GetAuthorCheeps(author);
+        TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
+        CurrentPage = _authorService.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync(string author)

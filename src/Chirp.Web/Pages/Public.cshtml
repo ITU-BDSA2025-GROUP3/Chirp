@@ -14,9 +14,9 @@
         <div class="cheepbox">
             <h3>What's on your mind @(User.Identity.Name)?</h3>
             <form method="post">
-                <input required style="float: left" type="text" asp-for="Message" maxlength="160">
-                <span asp-validation-for="Message" class="text-danger"></span>
+                <input style="float: left" type="text" asp-for="Message">
                 <input type="submit">
+                <span asp-validation-for="Message" style="color: red; display: inline-flex"></span>
             </form>
         </div>
     }
@@ -70,7 +70,3 @@
         </nav>
     }
 </div>
-
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-}
