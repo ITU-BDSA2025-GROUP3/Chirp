@@ -28,7 +28,10 @@ jobs:
       run: dotnet restore
       
     - name: Build
-      run: dotnet build --no-restore
+      run: |
+          export Authentication__Github__ClientId="${{ secrets.AUTHENTICATION_GITHUB_CLIENTID }}"
+          export Authentication__Github__ClientSecret="${{ secrets.AUTHENTICATION_GITHUB_CLIENTSECRET }}"
+          dotnet build --no-restore
       
   test:
     name: Test
@@ -44,10 +47,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Test
-      run: | 
-            export Authentication__Github__ClientId="${{ secrets.AUTHENTICATION_GITHUB_CLIENTID }}"
-            export Authentication__Github__ClientSecret="${{ secrets.AUTHENTICATION_GITHUB_CLIENTSECRET }}"
-            dotnet test --no-build
+      run: dotnet test --no-build
 
   release:
     name: Release
