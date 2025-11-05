@@ -1,14 +1,10 @@
 using System.Globalization;
-using Chirp.Infrastructure.Repositories;
+
+using Chirp.Core;
+using Chirp.Core.RepositoryInterfaces;
+using Chirp.Core.ServiceInterfaces;
 
 namespace Chirp.Infrastructure.Services;
-
-public interface IAuthorService
-{
-    int CurrentPage { get; set; }
-    public Task<List<CheepDTO>> GetAuthorCheeps(string author);
-    public Task<int> GetTotalAuthorCheeps(string author);
-}
 
 public class AuthorService : IAuthorService
 {
