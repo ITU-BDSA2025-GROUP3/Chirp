@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel(IAuthorService service) : PageModel
+public class UserTimelineModel(IAuthorService cheepService, ICheepService authorService) : PageModel
 {
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
@@ -19,23 +19,22 @@ public class UserTimelineModel(IAuthorService service) : PageModel
     public async Task<ActionResult> OnPostAsync()
     {
         // TODO replace hardcoded author string with user identity
-        // var author = User.Identity.Name;
-        var author = "Helge";
+        var author = User.Identity!.Name;
         if (!ModelState.IsValid)
         {
-            await LoadAuthorCheeps(author);
+            await LoadAuthorCheeps(author!);
             return Page();
         }
-        await _cheepService.AddNewCheep(author, Message);
+        await authorService.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     
     private async Task LoadAuthorCheeps(string author)
     {
-        service.CurrentPage = 1;
-        Cheeps = await service.GetAuthorCheeps(author);
-        TotalAuthorPages = await service.GetTotalAuthorCheeps(author);
-        CurrentPage = service.CurrentPage;
+        cheepService.CurrentPage = 1;
+        Cheeps = await cheepService.GetAuthorCheeps(author);
+        TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
+        CurrentPage = cheepService.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -44,9 +43,9 @@ public class UserTimelineModel(IAuthorService service) : PageModel
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            service.CurrentPage = pageQuery;
-            Cheeps = await service.GetAuthorCheeps(author);
-            TotalAuthorPages = await service.GetTotalAuthorCheeps(author);
+            cheepService.CurrentPage = pageQuery;
+            Cheeps = await cheepService.GetAuthorCheeps(author);
+            TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {

@@ -37,14 +37,6 @@ public class AuthorRepository : IAuthorRepository
     /// </exception>
     public async Task CreateAuthor(string authorName, string authorEmail)
     {
-        var nameNormalized = authorName.Trim().ToLowerInvariant();
-        var command = await _dbContext.Authors.FirstOrDefaultAsync(author => author.Name.ToLower() == nameNormalized);
-
-        if (command != null)
-        {
-            throw new Exception("Author exists! logged in now as <user>");
-        }
-
         var author = new Author
         {
             AuthorId = 0,

@@ -69,7 +69,7 @@ public class CheepRepository : ICheepRepository
     /// </exception>
     public async Task CreateCheep(CheepDTO newCheep)
     {
-        var command = await _dbContext.Authors.SingleOrDefaultAsync(a => a.Name == newCheep.Author);
+        var command = await _dbContext.Authors.SingleOrDefaultAsync(a => a.Email == newCheep.Author);
         if (command == null)
         {
             throw new Exception("Author does not exist! Create a new author before you can write cheeps to timeline.");

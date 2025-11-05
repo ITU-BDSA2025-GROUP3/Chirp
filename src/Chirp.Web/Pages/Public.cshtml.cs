@@ -1,10 +1,7 @@
 ﻿using Chirp.Core;
 using Chirp.Core.ServiceInterfaces;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Chirp.Infrastructure;
-using Chirp.Infrastructure.Services;
 using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
@@ -26,15 +23,13 @@ public class PublicModel : PageModel
     public string Message { get; set; } = string.Empty;
     public async Task<ActionResult> OnPostAsync()
     {
-        // TODO replace hardcoded author string with user identity
-        // var author = User.Identity.Name;
-        var author = "Helge";
+        var author = User.Identity!.Name;
         if (!ModelState.IsValid)
         {
             await LoadCheeps();
             return Page();
         }
-        await _service.AddNewCheep(author, Message);
+        await _service.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     private async Task LoadCheeps()
