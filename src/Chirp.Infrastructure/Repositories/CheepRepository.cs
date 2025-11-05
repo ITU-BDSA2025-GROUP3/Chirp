@@ -80,15 +80,5 @@ public class CheepRepository : ICheepRepository
         _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
     }
-    
-    /// <summary>
-    /// Adds a new cheep to the database.
-    /// </summary>
-    /// <param name="cheep">The cheep to be added</param>
-    public async Task AddCheep(Cheep cheep)
-    {
-        _dbContext.Cheeps.Add(cheep);
-        await _dbContext.SaveChangesAsync();
-    }
 }
 
