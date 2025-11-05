@@ -24,6 +24,41 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         context.Database.EnsureCreatedAsync(); 
         return context;
     }
+
+    private static void SeedDatabase(ChirpDbContext context)
+    {
+
+        //create a dictionary of how many cheeps to create for each author - ease of access
+        var cheepsPerAuthor = new Dictionary<String, int>
+        {
+            { "Alice", 10 }, { "Bob", 5 }, { "Charlie", 2 }, { "David", 0 }
+        };
+
+        List<Author> authorList = [];
+        List<Cheep> cheepList = [];
+        var authorIdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
+        var timestampCounter = 0;
+        foreach (var name in cheepsPerAuthor)
+        {
+            var author = new Author { AuthorId = authorIdCounter++, Name = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>() };
+            authorList.Add(author);
+            for (int i = 0; i < name.Value; i++)
+            {
+                var cheep = new Cheep
+                {
+                    Text = "test",
+                    TimeStamp = new DateTime(timestampCounter++),
+                    AuthorId = author.AuthorId,
+                    Author = author
+                };
+                author.Cheeps.Add(cheep);
+                cheepList.Add(cheep);
+            }
+        }
+        context.Cheeps.AddRange(cheepList);
+        context.Authors.AddRange(authorList);
+        context.SaveChanges();
+    }
     
     [Theory]
     [InlineData(1, 32, 32)]
@@ -65,5 +100,28 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         
         //assert
         Assert.Equal(cheep2, cheeps[0]); //the newest cheep must be the first in the list
+    }
+
+    [Theory]
+    [InlineData(1, 32, 17)]
+    [InlineData(1,15, 15 )]
+    [InlineData(2, 32, 0)]
+    [InlineData(1, 5, 5)]
+    [InlineData(2, 5, 5)]
+    [InlineData(3, 5, 5)]
+    [InlineData(4, 5, 2)]
+    [InlineData(5, 5, 0)]
+    public void ReadCheepsFromPageTest2(int page, int pageSize, int expected)
+    {
+        //arrange
+        using var context = CreateFakeChirpDbContext();
+        SeedDatabase(context); //using the mocked data of 17 cheeps and 4 authors
+        var repo = new CheepRepository(context);
+        
+        //act
+        var cheeps = repo.ReadCheeps(page, pageSize).Result;
+        
+        //assert
+        Assert.Equal(expected, cheeps.Count);
     }
 }
