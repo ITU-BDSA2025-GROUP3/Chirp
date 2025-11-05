@@ -1,3 +1,5 @@
+using Chirp.Core.RepositoryInterfaces;
+using Chirp.Core.ServiceInterfaces;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;

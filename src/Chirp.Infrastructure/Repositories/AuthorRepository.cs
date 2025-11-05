@@ -1,4 +1,5 @@
 using Chirp.Core.DomainModel;
+using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Database;
 
 using Microsoft.EntityFrameworkCore;
