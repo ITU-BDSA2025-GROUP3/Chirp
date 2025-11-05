@@ -1,16 +1,10 @@
 using System.Globalization;
-using Chirp.Infrastructure.Repositories;
+
+using Chirp.Core;
+using Chirp.Core.RepositoryInterfaces;
+using Chirp.Core.ServiceInterfaces;
 
 namespace Chirp.Infrastructure.Services;
-
-public interface ICheepService
-{
-    int CurrentPage { get; set; }
-    public Task<List<CheepDTO>> GetCheeps();
-    public Task<int> GetTotalCheeps();
-    public Task AddNewCheep(string authorname, string message);
-}
-
 public class CheepService : ICheepService
 {
     private const int PAGE_SIZE = 32;

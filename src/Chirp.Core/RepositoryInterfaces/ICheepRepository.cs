@@ -1,6 +1,6 @@
 ﻿using Chirp.Core.DomainModel;
 
-namespace Chirp.Infrastructure.Repositories;
+namespace Chirp.Core.RepositoryInterfaces;
 
 public interface ICheepRepository
 {

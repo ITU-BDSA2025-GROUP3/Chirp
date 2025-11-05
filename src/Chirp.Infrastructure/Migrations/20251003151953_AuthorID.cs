@@ -4,6 +4,15 @@
 
 namespace Chirp.Infrastructure.Migrations
 {
+    
+    /*
+     *
+     * THIS FILE HAS BEEN MANUALLY ALTERED. Since SQL is case-insensitive you previously got a "table already exists"
+     * due to this migration being focused on changing small letters to big letters. This patch is now implemented directly
+     * in the initialDBSchema instead, making this migration practically useless.
+     * 
+     */
+    
     /// <inheritdoc />
     public partial class AuthorID : Migration
     {
@@ -11,29 +20,16 @@ namespace Chirp.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_cheeps_authors_AuthorId",
-                table: "cheeps");
+                name: "FK_Cheeps_Authors_AuthorId",
+                table: "Cheeps");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_cheeps",
-                table: "cheeps");
+                name: "PK_Cheeps",
+                table: "Cheeps");
 
             migrationBuilder.DropPrimaryKey(
-                name: "PK_authors",
-                table: "authors");
-
-            migrationBuilder.RenameTable(
-                name: "cheeps",
-                newName: "Cheeps");
-
-            migrationBuilder.RenameTable(
-                name: "authors",
-                newName: "Authors");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_cheeps_AuthorId",
-                table: "Cheeps",
-                newName: "IX_Cheeps_AuthorId");
+                name: "PK_Authors",
+                table: "Authors");
 
             migrationBuilder.AddPrimaryKey(
                 name: "PK_Cheeps",
@@ -69,34 +65,21 @@ namespace Chirp.Infrastructure.Migrations
                 name: "PK_Authors",
                 table: "Authors");
 
-            migrationBuilder.RenameTable(
-                name: "Cheeps",
-                newName: "cheeps");
-
-            migrationBuilder.RenameTable(
-                name: "Authors",
-                newName: "authors");
-
-            migrationBuilder.RenameIndex(
-                name: "IX_Cheeps_AuthorId",
-                table: "cheeps",
-                newName: "IX_cheeps_AuthorId");
-
             migrationBuilder.AddPrimaryKey(
-                name: "PK_cheeps",
-                table: "cheeps",
+                name: "PK_Cheeps",
+                table: "Cheeps",
                 column: "CheepId");
 
             migrationBuilder.AddPrimaryKey(
-                name: "PK_authors",
-                table: "authors",
+                name: "PK_Authors",
+                table: "Authors",
                 column: "AuthorId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_cheeps_authors_AuthorId",
-                table: "cheeps",
+                name: "FK_Cheeps_Authors_AuthorId",
+                table: "Cheeps",
                 column: "AuthorId",
-                principalTable: "authors",
+                principalTable: "Authors",
                 principalColumn: "AuthorId",
                 onDelete: ReferentialAction.Cascade);
         }

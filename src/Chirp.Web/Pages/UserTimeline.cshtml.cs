@@ -1,23 +1,16 @@
-﻿using Chirp.Infrastructure;
-using Chirp.Infrastructure.Services;
+﻿using Chirp.Core;
+using Chirp.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel : PageModel
+public class UserTimelineModel(IAuthorService service) : PageModel
 {
-    private readonly IAuthorService _authorService;
-    private readonly ICheepService _cheepService;
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
-    public UserTimelineModel(IAuthorService authorService, ICheepService cheepService)
-    {
-        _authorService = authorService;
-        _cheepService = cheepService;
-    }
     
     [BindProperty]
     [Required(ErrorMessage = "Please enter a Cheep!")]
@@ -39,10 +32,10 @@ public class UserTimelineModel : PageModel
     
     private async Task LoadAuthorCheeps(string author)
     {
-        _authorService.CurrentPage = 1;
-        Cheeps = await _authorService.GetAuthorCheeps(author);
-        TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
-        CurrentPage = _authorService.CurrentPage;
+        service.CurrentPage = 1;
+        Cheeps = await service.GetAuthorCheeps(author);
+        TotalAuthorPages = await service.GetTotalAuthorCheeps(author);
+        CurrentPage = service.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -51,9 +44,9 @@ public class UserTimelineModel : PageModel
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            _authorService.CurrentPage = pageQuery;
-            Cheeps = await _authorService.GetAuthorCheeps(author);
-            TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
+            service.CurrentPage = pageQuery;
+            Cheeps = await service.GetAuthorCheeps(author);
+            TotalAuthorPages = await service.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {
