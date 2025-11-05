@@ -18,14 +18,19 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ChirpDbContext>();
 
-builder.Services.AddAuthentication(options =>
-        { })
-    .AddGitHub(options =>
-    {
-        options.ClientId = builder.Configuration["authentication:github:clientId"] ?? string.Empty;
-        options.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? string.Empty;
-        options.CallbackPath = "/signin-github";
-    });
+//Ensure we have github secrets
+if (builder.Configuration["authentication:github:clientId"] != null && builder.Configuration["authentication:github:clientSecret"] != null)
+{
+    builder.Services.AddAuthentication(options =>
+            { })
+        .AddGitHub(options =>
+        {
+            options.ClientId = builder.Configuration["authentication:github:clientId"] ?? string.Empty;
+            options.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? string.Empty;
+            options.CallbackPath = "/signin-github";
+        });
+}
+
 
 builder.Services.ConfigureApplicationCookie(options =>
 {
