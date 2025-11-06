@@ -69,7 +69,7 @@ public class CheepRepository : ICheepRepository
     /// </exception>
     public async Task CreateCheep(CheepDTO newCheep)
     {
-        var command = await _dbContext.Authors.SingleOrDefaultAsync(a => a.Name == newCheep.Author);
+        var command = await _dbContext.Authors.SingleOrDefaultAsync(a => a.Email == newCheep.Author);
         if (command == null)
         {
             throw new Exception("Author does not exist! Create a new author before you can write cheeps to timeline.");
@@ -77,19 +77,13 @@ public class CheepRepository : ICheepRepository
 
         var cheep = new Cheep()
         {
-            AuthorId = command.AuthorId, Author = command, Text = newCheep.Message, TimeStamp = DateTime.UtcNow,
+            AuthorId = command.AuthorId,
+            Author = command,
+            Text = newCheep.Message, 
+            TimeStamp = DateTime.UtcNow,
         };
         _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
     }
-
-    /// <summary>
-    /// Adds a new cheep to the database.
-    /// </summary>
-    /// <param name="cheep">The cheep to be added</param>
-    public async Task AddCheep(Cheep cheep)
-    {
-        _dbContext.Cheeps.Add(cheep);
-        await _dbContext.SaveChangesAsync();
-    }
 }
+

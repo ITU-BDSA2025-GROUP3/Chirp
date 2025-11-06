@@ -9,5 +9,4 @@ public interface ICheepRepository
     public Task<int> GetTotalCheeps();
     public Task<int> GetTotalCheepsFor(int authorId);
     public Task CreateCheep(CheepDTO newCheep);
-    public Task AddCheep(Cheep cheep);
 }

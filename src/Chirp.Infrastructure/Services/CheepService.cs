@@ -37,4 +37,17 @@ public class CheepService : ICheepService
         var total = await _cheepRepository.GetTotalCheeps();
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
+
+    public async Task AddNewCheep(String author, string message)
+    {
+        var cheepDTOs = new CheepDTO
+        {
+            Author = author,
+            Message = message,
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        };
+        await _cheepRepository.CreateCheep(cheepDTOs);
+    }
 }

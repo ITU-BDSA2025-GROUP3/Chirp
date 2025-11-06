@@ -1,22 +1,43 @@
 ﻿using Chirp.Core;
 using Chirp.Core.ServiceInterfaces;
-
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Chirp.Infrastructure;
-using Chirp.Infrastructure.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
 public class PublicModel : PageModel
 {
     private readonly ICheepService _service;
-    public required List<CheepDTO> Cheeps { get; set; }
-    public int TotalPages { get; private set; }
-    public int CurrentPage;
     public PublicModel(ICheepService service)
     {
         _service = service;
+    }
+    public required List<CheepDTO> Cheeps { get; set; }
+    public int TotalPages { get; private set; }
+    public int CurrentPage;
+    
+    [BindProperty]
+    [Required(ErrorMessage = "Please enter a Cheep!")]
+    [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
+    public string Message { get; set; } = string.Empty;
+    public async Task<ActionResult> OnPostAsync()
+    {
+        var author = User.Identity!.Name;
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+            return Page();
+        }
+        await _service.AddNewCheep(author!, Message);
+        return RedirectToPage();
+    }
+    private async Task LoadCheeps()
+    {
+        _service.CurrentPage = 1;
+        Cheeps = await _service.GetCheeps();
+        TotalPages = await _service.GetTotalCheeps();
+        CurrentPage = _service.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync()
