@@ -17,7 +17,7 @@ public class LoginTests : PageTest
 
     
         await Page.FillAsync("#Input_Email", "elie@itu.dk");
-        await Page.FillAsync("#Input_Password", "Test123!"); // <- skriv den rigtige adgangskode her
+        await Page.FillAsync("#Input_Password", "Test123!"); 
 
     
         await Page.ClickAsync("button[type=submit]");
