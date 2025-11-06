@@ -9,5 +9,13 @@ namespace Chirp.Tests.Chirp.PlaywrightTests;
 [TestFixture]
 public class LoginTests : PageTest
 {
-   
+    [Test]
+    public async Task UserCanLoginAndSeeTimeline()
+    {
+       
+        await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
+
+    
+      
+    }
 }
