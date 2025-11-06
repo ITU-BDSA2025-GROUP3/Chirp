@@ -30,6 +30,7 @@ public class PostCheepTests : PageTest
         await Page.ClickAsync("input[type=submit], button:has-text('Chirp!')");
 
         
-        
+        var cheepList = Page.Locator("#messagelist");
+        await Expect(cheepList).ToContainTextAsync(message);
     }
 }
