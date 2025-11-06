@@ -9,6 +9,9 @@ using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Chirp.Core.RepositoryInterfaces;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 using Chirp.Infrastructure;
@@ -30,13 +33,16 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
+        private readonly IAuthorRepository _authorRepository;
 
         public ExternalLoginModel(
             SignInManager<ApplicationUser> signInManager,
             UserManager<ApplicationUser> userManager,
             IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IAuthorRepository authorRepository
+            )
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -44,6 +50,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
+            _authorRepository = authorRepository;
         }
 
         /// <summary>
@@ -180,6 +187,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
+                    await _authorRepository.CreateAuthor($"{user.Firstname} {user.Surname}", Input.Email);
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {

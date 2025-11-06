@@ -147,7 +147,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 
                 if (result.Succeeded)
                 {
-                    await _authorRepository.CreateAuthor($"{Input.Firstname} {Input.Surname}", Input.Email);
+                    await _authorRepository.CreateAuthor($"{user.Firstname} {user.Surname}", Input.Email);
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
