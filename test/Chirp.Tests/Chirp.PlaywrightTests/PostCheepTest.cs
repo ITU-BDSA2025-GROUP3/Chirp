@@ -24,6 +24,12 @@ public class PostCheepTests : PageTest
 
         
         string message = "Playwright test cheep " + DateTime.Now.ToString("HHmmss");
+        await Page.FillAsync("textarea[name='text']", message);
+
        
+        await Page.ClickAsync("input[type=submit], button:has-text('Chirp!')");
+
+        
+        
     }
 }
