@@ -20,6 +20,12 @@ public class LoginTests : PageTest
         await Page.FillAsync("#Input_Password", "Test123!"); // <- skriv den rigtige adgangskode her
 
     
-       
+        await Page.ClickAsync("button[type=submit]");
+
+        
+        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
+
+      
+        
     }
 }
