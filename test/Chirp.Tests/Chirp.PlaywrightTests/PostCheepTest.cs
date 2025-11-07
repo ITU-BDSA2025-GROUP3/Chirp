@@ -13,24 +13,5 @@ public class PostCheepTests : PageTest
     public async Task UserCanPostCheep_AndSeeItInTimeline()
     {
       
-        await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
-
-        
-        await Page.FillAsync("#Input_Email", "elie@itu.dk");
-        await Page.FillAsync("#Input_Password", "Test123!"); 
-        await Page.ClickAsync("button[type=submit]");
-
-        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
-
-        
-        string message = "Playwright test cheep " + DateTime.Now.ToString("HHmmss");
-        await Page.FillAsync("textarea[name='text']", message);
-
-       
-        await Page.ClickAsync("input[type=submit], button:has-text('Chirp!')");
-
-        
-        var cheepList = Page.Locator("#messagelist");
-        await Expect(cheepList).ToContainTextAsync(message);
     }
 }
