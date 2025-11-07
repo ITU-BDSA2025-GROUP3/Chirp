@@ -20,6 +20,9 @@ public class LoginTests : PageTest
         await Page.FillAsync("#Input_Password", "Test123!"); 
 
     
-       
+        await Page.ClickAsync("button[type=submit]");
+
+        
+    
     }
 }
