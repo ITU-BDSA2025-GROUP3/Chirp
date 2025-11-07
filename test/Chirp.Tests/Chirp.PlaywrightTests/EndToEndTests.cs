@@ -23,6 +23,9 @@ public class LoginTests : PageTest
         await Page.ClickAsync("button[type=submit]");
 
         
-    
+        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
+
+      
+        await Expect(Page.Locator("h2")).ToContainTextAsync("Timeline");
     }
 }
