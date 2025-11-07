@@ -2,6 +2,7 @@ using Chirp.Core;
 using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure;
+using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
 
@@ -101,4 +102,10 @@ public class CheepServiceTests
             throw new NotImplementedException();
         }
     }
+
+    // Unit test for CheepService.GetTotalCheeps().
+   
+
+
+   
 }
