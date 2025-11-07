@@ -13,5 +13,10 @@ public class PostCheepTests : PageTest
     public async Task UserCanPostCheep_AndSeeItInTimeline()
     {
       
+        await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
+
+        
+        await Page.FillAsync("#Input_Email", "joe@itu.dk");
+       
     }
 }
