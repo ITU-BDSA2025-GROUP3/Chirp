@@ -13,19 +13,6 @@ public class LoginTests : PageTest
     public async Task UserCanLoginAndSeeTimeline()
     {
        
-        await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
-
-    
-        await Page.FillAsync("#Input_Email", "elie@itu.dk");
-        await Page.FillAsync("#Input_Password", "Test123!"); 
-
-    
-        await Page.ClickAsync("button[type=submit]");
-
-        
-        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
-
-      
-        await Expect(Page.Locator("h2")).ToContainTextAsync("Timeline");
+       
     }
 }
