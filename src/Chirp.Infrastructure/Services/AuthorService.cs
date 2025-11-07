@@ -23,7 +23,7 @@ public class AuthorService : IAuthorService
     {
         var authorId = await _authorRepository.GetAuthorIdFrom(author);
         if (authorId == 0) return new List<CheepDTO>();
-        var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, authorId);
+        var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, PAGE_SIZE, authorId);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             Author = cheep.Author.Name,
