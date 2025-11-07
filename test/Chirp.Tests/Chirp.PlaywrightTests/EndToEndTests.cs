@@ -13,6 +13,9 @@ public class LoginTests : PageTest
     public async Task UserCanLoginAndSeeTimeline()
     {
        
-       
+        await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
+
+    
+     
     }
 }
