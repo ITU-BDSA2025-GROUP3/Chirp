@@ -16,6 +16,10 @@ public class LoginTests : PageTest
         await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
 
     
-     
+        await Page.FillAsync("#Input_Email", "joe@itu.dk");
+        await Page.FillAsync("#Input_Password", "Test123!"); 
+
+    
+       
     }
 }
