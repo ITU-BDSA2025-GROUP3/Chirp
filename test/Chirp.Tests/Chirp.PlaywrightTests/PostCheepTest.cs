@@ -17,6 +17,16 @@ public class PostCheepTests : PageTest
 
         
         await Page.FillAsync("#Input_Email", "joe@itu.dk");
+        await Page.FillAsync("#Input_Password", "Test123!"); 
+        await Page.ClickAsync("button[type=submit]");
+
+        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
+
+        
+        string message = "Playwright test cheep " + DateTime.Now.ToString("HHmmss");
+        await Page.FillAsync("textarea[name='text']", message);
+
+       
        
     }
 }
