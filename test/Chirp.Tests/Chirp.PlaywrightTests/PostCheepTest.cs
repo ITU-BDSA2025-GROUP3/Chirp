@@ -27,6 +27,9 @@ public class PostCheepTests : PageTest
         await Page.FillAsync("textarea[name='text']", message);
 
        
-       
+        await Page.ClickAsync("input[type=submit], button:has-text('Chirp!')");
+
+        
+        
     }
 }
