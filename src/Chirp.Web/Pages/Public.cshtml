@@ -1,4 +1,5 @@
 ﻿@page "/"
+@using Chirp.Core.DomainModel
 @model Chirp.Web.Pages.PublicModel
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
 @{
@@ -14,7 +15,7 @@
             <h3>What's on your mind @(User.Identity.Name)?</h3>
             <form method="post">
                 <input style="float: left" type="text" asp-for="Message">
-                <input type="submit">
+                <button type="submit" style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">Submit</button>
                 <span asp-validation-for="Message" style="color: red; display: inline-flex"></span>
             </form>
         </div>
@@ -25,7 +26,11 @@
         <ul id="messagelist" class="cheeps">
             @foreach (var cheep in Model.Cheeps)
             {
-                <li>
+                <li style="display: inline-flex;
+                    flex-direction: row;
+                    justify-content: space-between;
+                    align-items: center;
+                    width: 98%;">
                     <p>
                         <strong>
                             <a href="/@cheep.Author">@cheep.Author</a>
@@ -33,6 +38,22 @@
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp</small>
                     </p>
+                    @if (User.Identity!.IsAuthenticated)
+                    {
+                        @* TODO fix author with follower comparison *@
+                        @if (User.Identity.Name != cheep.Author)
+                        {
+                            // TODO remove button UI once followed check is implemented
+                            <a type="button" asp-page-handler="Follow" asp-for="Follower">Follow</a>
+                            @* @if (!followed) *@
+                            @* { *@
+                            @* <button type="button" asp-page-handler="Follow" asp-for="Follower">Follow</button> *@
+                            @* }else *@
+                            @* { *@
+                            @* <button type="button" asp-page-handler="Unfollow" asp-for="Follower">Unfollow</button> *@
+                            @* } *@
+                        }
+                    }
                 </li>
             }
         </ul>

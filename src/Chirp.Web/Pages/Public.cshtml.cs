@@ -4,14 +4,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
+using Chirp.Core.RepositoryInterfaces;
+
 namespace Chirp.Web.Pages;
 
 public class PublicModel : PageModel
 {
-    private readonly ICheepService _service;
-    public PublicModel(ICheepService service)
+    private readonly ICheepService _cheepService;
+    private readonly IAuthorService _authorService;
+    public PublicModel(ICheepService cheepService, IAuthorService authorService)
     {
-        _service = service;
+        _cheepService = cheepService;
+        _authorService = authorService;
     }
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalPages { get; private set; }
@@ -29,15 +33,38 @@ public class PublicModel : PageModel
             await LoadCheeps();
             return Page();
         }
-        await _service.AddNewCheep(author!, Message);
+        await _cheepService.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     private async Task LoadCheeps()
     {
-        _service.CurrentPage = 1;
-        Cheeps = await _service.GetCheeps();
-        TotalPages = await _service.GetTotalCheeps();
-        CurrentPage = _service.CurrentPage;
+        _cheepService.CurrentPage = 1;
+        Cheeps = await _cheepService.GetCheeps();
+        TotalPages = await _cheepService.GetTotalCheeps();
+        CurrentPage = _cheepService.CurrentPage;
+    }
+
+    [BindProperty]
+    public string Follower { get; set; } = string.Empty;
+    public async void OnGetFollow()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+            throw new Exception();
+        }
+        var author = User.Identity!.Name;
+        _authorService.AddAuthorToFollowsList(Follower, author!);
+    }
+    public async void OnGetUnfollow()
+    {
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+            throw new Exception();
+        }
+        var author = User.Identity!.Name;
+        _authorService.RemoveAuthorFromFollowsList(Follower, author!);
     }
 
     public async Task<ActionResult> OnGetAsync()
@@ -47,9 +74,9 @@ public class PublicModel : PageModel
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             
-            _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetCheeps();
-            TotalPages = await _service.GetTotalCheeps();
+            _cheepService.CurrentPage = pageQuery;
+            Cheeps = await _cheepService.GetCheeps();
+            TotalPages = await _cheepService.GetTotalCheeps();
             CurrentPage = pageQuery;
         }
         catch (FormatException)

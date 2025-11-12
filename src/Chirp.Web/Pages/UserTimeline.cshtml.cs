@@ -6,8 +6,16 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel(IAuthorService cheepService, ICheepService authorService) : PageModel
+public class UserTimelineModel : PageModel
 {
+    private readonly ICheepService _cheepService;
+    private readonly IAuthorService _authorService;
+    public UserTimelineModel(ICheepService cheepService, IAuthorService authorService)
+    {
+        _cheepService = cheepService;
+        _authorService = authorService;
+    }
+    
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
@@ -25,16 +33,29 @@ public class UserTimelineModel(IAuthorService cheepService, ICheepService author
             await LoadAuthorCheeps(author!);
             return Page();
         }
-        await authorService.AddNewCheep(author!, Message);
+        await _cheepService.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     
     private async Task LoadAuthorCheeps(string author)
     {
-        cheepService.CurrentPage = 1;
-        Cheeps = await cheepService.GetAuthorCheeps(author);
-        TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
-        CurrentPage = cheepService.CurrentPage;
+        _authorService.CurrentPage = 1;
+        Cheeps = await _authorService.GetAuthorCheeps(author);
+        TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
+        CurrentPage = _authorService.CurrentPage;
+    }
+    
+    [BindProperty]
+    public string Follower { get; set; } = string.Empty;
+    public void OnGetFollow()
+    {
+        var author = User.Identity!.Name;
+        _authorService.AddAuthorToFollowsList(Follower, author!);
+    }
+    public void OnGetUnfollow()
+    {
+        var author = User.Identity!.Name;
+        _authorService.RemoveAuthorFromFollowsList(Follower, author!);
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -43,9 +64,9 @@ public class UserTimelineModel(IAuthorService cheepService, ICheepService author
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            cheepService.CurrentPage = pageQuery;
-            Cheeps = await cheepService.GetAuthorCheeps(author);
-            TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
+            _authorService.CurrentPage = pageQuery;
+            Cheeps = await _authorService.GetAuthorCheeps(author);
+            TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {
