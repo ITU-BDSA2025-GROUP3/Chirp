@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 
-using Chirp.Core.RepositoryInterfaces;
-
 namespace Chirp.Web.Pages;
 
 public class PublicModel : PageModel
@@ -18,6 +16,7 @@ public class PublicModel : PageModel
         _authorService = authorService;
     }
     public required List<CheepDTO> Cheeps { get; set; }
+    public List<AuthorDTO> Followers { get; private set; } = new();
     public int TotalPages { get; private set; }
     public int CurrentPage;
     
@@ -25,7 +24,7 @@ public class PublicModel : PageModel
     [Required(ErrorMessage = "Please enter a Cheep!")]
     [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
     public string Message { get; set; } = string.Empty;
-    public async Task<ActionResult> OnPostAsync()
+    public async Task<ActionResult> OnPostCheepAsync()
     {
         var author = User.Identity!.Name;
         if (!ModelState.IsValid)
@@ -40,31 +39,28 @@ public class PublicModel : PageModel
     {
         _cheepService.CurrentPage = 1;
         Cheeps = await _cheepService.GetCheeps();
+        Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
         TotalPages = await _cheepService.GetTotalCheeps();
         CurrentPage = _cheepService.CurrentPage;
     }
 
-    [BindProperty]
-    public string Follower { get; set; } = string.Empty;
-    public async void OnGetFollow()
+    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
     {
-        if (!ModelState.IsValid)
-        {
-            await LoadCheeps();
-            throw new Exception();
-        }
-        var author = User.Identity!.Name;
-        _authorService.AddAuthorToFollowsList(Follower, author!);
+        var follower = User.Identity!.Name;
+        await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
+        
+        var follows = await _authorService.GetFollowsList(follower!);
+        Console.WriteLine($"[{DateTime.Now}] {follower} now follows: {string.Join(",", follows.Select(a => a.Name))}");
+        return RedirectToPage();
     }
-    public async void OnGetUnfollow()
+    
+    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
     {
-        if (!ModelState.IsValid)
-        {
-            await LoadCheeps();
-            throw new Exception();
-        }
-        var author = User.Identity!.Name;
-        _authorService.RemoveAuthorFromFollowsList(Follower, author!);
+        var follower = User.Identity!.Name;
+        await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
+        
+        Console.WriteLine($"[{DateTime.Now}] {follower} now unfollows: {authorToUnfollow}");
+        return RedirectToPage();
     }
 
     public async Task<ActionResult> OnGetAsync()
@@ -76,6 +72,7 @@ public class PublicModel : PageModel
             
             _cheepService.CurrentPage = pageQuery;
             Cheeps = await _cheepService.GetCheeps();
+            Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
             TotalPages = await _cheepService.GetTotalCheeps();
             CurrentPage = pageQuery;
         }

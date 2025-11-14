@@ -17,6 +17,7 @@ public class UserTimelineModel : PageModel
     }
     
     public required List<CheepDTO> Cheeps { get; set; }
+    public List<AuthorDTO> Followers { get; private set; } = new();
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
     
@@ -24,9 +25,8 @@ public class UserTimelineModel : PageModel
     [Required(ErrorMessage = "Please enter a Cheep!")]
     [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
     public string Message { get; set; } = string.Empty;
-    public async Task<ActionResult> OnPostAsync()
+    public async Task<ActionResult> OnPostCheepAsync()
     {
-        // TODO replace hardcoded author string with user identity
         var author = User.Identity!.Name;
         if (!ModelState.IsValid)
         {
@@ -41,21 +41,28 @@ public class UserTimelineModel : PageModel
     {
         _authorService.CurrentPage = 1;
         Cheeps = await _authorService.GetAuthorCheeps(author);
+        Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
         TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
         CurrentPage = _authorService.CurrentPage;
     }
     
-    [BindProperty]
-    public string Follower { get; set; } = string.Empty;
-    public void OnGetFollow()
+    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
     {
-        var author = User.Identity!.Name;
-        _authorService.AddAuthorToFollowsList(Follower, author!);
+        var follower = User.Identity!.Name;
+        await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
+        
+        var follows = await _authorService.GetFollowsList(follower!);
+        Console.WriteLine($"[{DateTime.Now}] {follower} now follows: {string.Join(",", follows.Select(a => a.Name))}");
+        return RedirectToPage();
     }
-    public void OnGetUnfollow()
+    
+    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
     {
-        var author = User.Identity!.Name;
-        _authorService.RemoveAuthorFromFollowsList(Follower, author!);
+        var follower = User.Identity!.Name;
+        await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
+        
+        Console.WriteLine($"[{DateTime.Now}] {follower} now unfollows: {authorToUnfollow}");
+        return RedirectToPage();
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -66,6 +73,7 @@ public class UserTimelineModel : PageModel
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             _authorService.CurrentPage = pageQuery;
             Cheeps = await _authorService.GetAuthorCheeps(author);
+            Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
             TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)

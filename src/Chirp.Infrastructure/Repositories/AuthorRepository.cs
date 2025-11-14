@@ -33,8 +33,8 @@ public class AuthorRepository : IAuthorRepository
         var query = await _dbContext.Authors
             .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
             .Include(author => author.Follows)
-            .ToListAsync();
-        return query;
+            .FirstOrDefaultAsync();
+        return query?.Follows.ToList() ?? new List<Author>();
     }
 
     /// <summary>
@@ -46,15 +46,20 @@ public class AuthorRepository : IAuthorRepository
     {
         if (string.IsNullOrWhiteSpace(nameOfAuthorToAdd) || string.IsNullOrWhiteSpace(nameOfAuthorFollowing))
             throw new ArgumentException();
+        
         var authorToAdd = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorToAdd)
+            .Where(author => author.Name == nameOfAuthorToAdd || author.Email == nameOfAuthorToAdd)
             .Select(author => author)
             .FirstOrDefaultAsync();
         var authorToAddTo = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorFollowing)
+            .Where(author => author.Name == nameOfAuthorFollowing  || author.Email == nameOfAuthorFollowing)
             .Select(author => author)
             .FirstOrDefaultAsync();
-        authorToAddTo!.Follows.Add(authorToAdd!);
+        
+        if (authorToAdd == null || authorToAddTo == null)
+            throw new InvalidOperationException($"Author not found:{nameOfAuthorToAdd}&{nameOfAuthorFollowing}");
+        
+        authorToAddTo.Follows.Add(authorToAdd);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -67,15 +72,19 @@ public class AuthorRepository : IAuthorRepository
     {
         if (string.IsNullOrWhiteSpace(nameOfAuthorToRemove) || string.IsNullOrWhiteSpace(nameOfAuthorFollowing))
             throw new ArgumentException();
+        
         var authorToRemove = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorToRemove)
+            .Where(author => author.Name == nameOfAuthorToRemove || author.Email == nameOfAuthorToRemove)
             .Select(author => author)
             .FirstOrDefaultAsync();
         var authorToRemoveFrom = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorFollowing)
+            .Where(author => author.Name == nameOfAuthorFollowing || author.Email == nameOfAuthorFollowing)
             .Select(author => author)
             .FirstOrDefaultAsync();
-        authorToRemoveFrom!.Follows.Remove(authorToRemove!);
+        if (authorToRemove == null || authorToRemoveFrom == null)
+            throw new InvalidOperationException($"Author not found:{authorToRemove}&{authorToRemoveFrom}");
+        
+        authorToRemoveFrom.Follows.Remove(authorToRemove);
         await _dbContext.SaveChangesAsync();
     }
 

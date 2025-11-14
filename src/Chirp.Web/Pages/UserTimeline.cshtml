@@ -14,14 +14,17 @@
     {
         <div class="cheepbox">
             <h3>What's on your mind @(User.Identity.Name)?</h3>
-            <form method="post">
+            <form method="post" asp-page-handler="Cheep">
                 <input style="float: left" type="text" asp-for="Message">
-                <button type="submit" style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">Submit</button>
+                <button type="submit"
+                        style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">
+                    Submit
+                </button>
                 <span asp-validation-for="Message" style="color: red; display: inline-flex"></span>
             </form>
         </div>
     }
-    
+
     @if (Model.Cheeps.Any())
     {
         <ul id="messagelist" class="cheeps">
@@ -41,21 +44,21 @@
                     </p>
                     @if (User.Identity!.IsAuthenticated)
                     {
-                            @* TODO fix author with follower comparison *@
-                        @if (User.Identity.Name != cheep.Author)
+                    // TODO check if current user is message author, don't render follow/unfollow btn
+                        var isFollowing = Model.Followers.Any(f => f.Name == cheep.Author);
+                        if (isFollowing)
                         {
-                        // TODO remove button UI once followed check is implemented
-                            <button type="button" asp-page-handler="Follow" asp-for="Follower">Follow</button>
-                            @* @if (!followed) *@
-                            @* { *@
-                            @* <button type="button" asp-page-handler="Follow" asp-for="Follower">Follow</button> *@
-                            @* }else *@
-                            @* { *@
-                            @* <button type="button" asp-page-handler="Unfollow" asp-for="Follower">Unfollow</button> *@
-                            @* } *@
-                        }   
+                            <form method="post" asp-page-handler="Unfollow" asp-route-authorToUnfollow="@cheep.Author">
+                                <button type="submit">Unfollow</button>
+                            </form>
+                        }
+                        else
+                        {
+                            <form method="post" asp-page-handler="Follow" asp-route-authorToFollow="@cheep.Author">
+                                <button type="submit">Follow</button>
+                            </form>
+                        }
                     }
-                    
                 </li>
             }
         </ul>
@@ -64,7 +67,7 @@
     {
         <em>There are no cheeps so far.</em>
     }
-    
+
     @if (Model.TotalAuthorPages > 1)
     {
         <nav class="pagination">
