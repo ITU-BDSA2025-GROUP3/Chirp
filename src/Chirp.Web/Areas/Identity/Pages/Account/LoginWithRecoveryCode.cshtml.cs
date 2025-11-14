@@ -5,6 +5,9 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+
+using Chirp.Core.DomainModel;
+
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -15,13 +18,13 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 {
     public class LoginWithRecoveryCodeModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<Author> _signInManager;
+        private readonly UserManager<Author> _userManager;
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
 
         public LoginWithRecoveryCodeModel(
-            SignInManager<ApplicationUser> signInManager,
-            UserManager<ApplicationUser> userManager,
+            SignInManager<Author> signInManager,
+            UserManager<Author> userManager,
             ILogger<LoginWithRecoveryCodeModel> logger)
         {
             _signInManager = signInManager;

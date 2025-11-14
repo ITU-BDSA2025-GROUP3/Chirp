@@ -20,7 +20,7 @@ public class AuthorRepository : IAuthorRepository
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
-            .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
             .Select(author => author.AuthorId)
             .FirstOrDefaultAsync();
         return query;
@@ -37,10 +37,10 @@ public class AuthorRepository : IAuthorRepository
     /// </exception>
     public async Task CreateAuthor(string authorName, string authorEmail)
     {
-        var author = new Author
+        var author = new Core.DomainModel.Author
         {
             AuthorId = 0,
-            Name = authorName.Trim(), 
+            UserName = authorName.Trim(), 
             Email = authorEmail.Trim(), 
             Cheeps = new List<Cheep>()
         };

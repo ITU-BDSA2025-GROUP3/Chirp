@@ -11,6 +11,7 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 
 using Microsoft.AspNetCore.Authentication;
@@ -27,18 +28,18 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 {
     public class RegisterModel : PageModel
     {
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly IUserStore<ApplicationUser> _userStore;
-        private readonly IUserEmailStore<ApplicationUser> _emailStore;
+        private readonly SignInManager<Author> _signInManager;
+        private readonly UserManager<Author> _userManager;
+        private readonly IUserStore<Author> _userStore;
+        private readonly IUserEmailStore<Author> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
         private readonly IAuthorRepository _authorRepository;
 
         public RegisterModel(
-            UserManager<ApplicationUser> userManager,
-            IUserStore<ApplicationUser> userStore,
-            SignInManager<ApplicationUser> signInManager,
+            UserManager<Author> userManager,
+            IUserStore<Author> userStore,
+            SignInManager<Author> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender, 
             IAuthorRepository authorRepository)
@@ -82,14 +83,8 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             ///     Users first name
             /// </summary>
             [Required]
-            [Display(Name = "First name")]
-            public string Firstname { get; set; }
-            
-            /// <summary>
-            ///     Users Last name
-            /// </summary>
-            [Display(Name = "Last name")]
-            public string Surname { get; set; }
+            [Display(Name = "User name")]
+            public string UserName { get; set; }
             
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -136,18 +131,15 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 
                 //Set their name to their name
-                user.Firstname = Input.Firstname;
-                
-                //Users are not required to input their last name for now
-                user.Surname = Input.Surname ?? string.Empty;
+                user.UserName = Input.UserName;
 
-                await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
+                await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
                 var result = await _userManager.CreateAsync(user, Input.Password);
 
                 if (result.Succeeded)
                 {
-                    await _authorRepository.CreateAuthor($"{user.Firstname} {user.Surname}", Input.Email);
+                    //await _authorRepository.CreateAuthor($"{user.UserName}", Input.Email);
                     _logger.LogInformation("User created a new account with password.");
 
                     var userId = await _userManager.GetUserIdAsync(user);
@@ -182,27 +174,27 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private ApplicationUser CreateUser()
+        private Author CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<ApplicationUser>();
+                return Activator.CreateInstance<Author>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(Author)}'. " +
+                    $"Ensure that '{nameof(Author)}' is not an abstract class and has a parameterless constructor, or alternatively " +
                     $"override the register page in /Areas/Identity/Pages/Account/Register.cshtml");
             }
         }
 
-        private IUserEmailStore<ApplicationUser> GetEmailStore()
+        private IUserEmailStore<Author> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-            return (IUserEmailStore<ApplicationUser>)_userStore;
+            return (IUserEmailStore<Author>)_userStore;
         }
     }
 }

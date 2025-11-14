@@ -26,7 +26,7 @@ public class AuthorService : IAuthorService
         var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, PAGE_SIZE, authorId);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            Author = cheep.Author.Name,
+            UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()

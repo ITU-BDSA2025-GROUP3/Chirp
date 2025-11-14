@@ -57,8 +57,8 @@ public class SQLite : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
         
         Assert.Equal(0, Context.Cheeps.Count());
         
-        var a1 = new Author() { AuthorId = 1, Name = "Roger Histand", Email = "Roger+Histand@hotmail.com", Cheeps = new List<Cheep>() };
-        var a2 = new Author() { AuthorId = 2, Name = "Luanna Muro", Email = "Luanna-Muro@ku.dk", Cheeps = new List<Cheep>() };
+        var a1 = new Author() { AuthorId = 1, UserName = "Roger Histand", Email = "Roger+Histand@hotmail.com", Cheeps = new List<Cheep>() };
+        var a2 = new Author() { AuthorId = 2, UserName = "Luanna Muro", Email = "Luanna-Muro@ku.dk", Cheeps = new List<Cheep>() };
         
         Context.Authors.Add(a1);
         Context.Authors.Add(a2);
