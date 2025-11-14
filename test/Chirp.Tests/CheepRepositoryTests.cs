@@ -1,6 +1,7 @@
 ﻿using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
+using Chirp.Core;
 
 using Microsoft.Data.Sqlite;
 
@@ -24,7 +25,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         context.Database.EnsureCreatedAsync(); 
         return context;
     }
-
+    
     private static void SeedDatabase(ChirpDbContext context)
     {
 
@@ -123,5 +124,20 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         
         //assert
         Assert.Equal(expected, cheeps.Count);
+    }
+
+    [Fact]
+    public async Task CreateCheep_WithInvalidAuthor()
+    {
+        using var context = CreateFakeChirpDbContext();
+        // Arrange
+        var repository = new CheepRepository(context);
+        var dto = new CheepDTO{ Author = "invalidUser@email.com", Message = "I'm not a test", };
+        
+        // Act & assert
+        var exception = await Assert.ThrowsAsync<Exception>(() => repository.CreateCheep(dto));
+        
+        Assert.Contains("Author does not exist", exception.Message);
+    
     }
 }
