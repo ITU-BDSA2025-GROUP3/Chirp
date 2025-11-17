@@ -41,7 +41,7 @@ public class CheepRepository : ICheepRepository
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
 
         var query = await _dbContext.Cheeps
-            .Where(cheep => cheep.AuthorId == authorId)
+            .Where(cheep => cheep.IdOfAuthor == authorId)
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
             .Skip((page - 1) * pageSize)
@@ -57,7 +57,7 @@ public class CheepRepository : ICheepRepository
 
     public Task<int> GetTotalCheepsFor(int authorId)
     {
-        return _dbContext.Cheeps.CountAsync(cheep => cheep.AuthorId == authorId);
+        return _dbContext.Cheeps.CountAsync(cheep => cheep.IdOfAuthor == authorId);
     }
 
     /// <summary>
@@ -78,11 +78,12 @@ public class CheepRepository : ICheepRepository
 
         var cheep = new Cheep()
         {
-            AuthorId = command.AuthorId,
+            IdOfAuthor = command.AuthorId,
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
         };
+        command.Cheeps.Add(cheep);
         _dbContext.Cheeps.Add(cheep);
         await _dbContext.SaveChangesAsync();
     }

@@ -48,7 +48,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
                 {
                     Text = "test",
                     TimeStamp = new DateTime(timestampCounter++),
-                    AuthorId = author.AuthorId,
+                    IdOfAuthor = author.AuthorId,
                     Author = author
                 };
                 author.Cheeps.Add(cheep);
@@ -84,8 +84,8 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         using var context = CreateFakeChirpDbContext();
         var author1 = new Author { AuthorId = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>() };
         var author2 = new Author { AuthorId = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>() };
-        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), AuthorId = 1, Author = author1 };
-        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), AuthorId = 2, Author = author2 };
+        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
+        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), IdOfAuthor = 2, Author = author2 };
         author1.Cheeps.Add(cheep1);
         author2.Cheeps.Add(cheep2);
         context.Authors.Add(author1);

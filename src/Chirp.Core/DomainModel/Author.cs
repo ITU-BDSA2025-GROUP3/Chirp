@@ -10,7 +10,7 @@ public class Author : IdentityUser
     
     [Required]
     [StringLength(100)]
-    public new required string UserName { get; set; }
+    public override required string UserName { get; set; }
     
     [Required]
     [StringLength(100)]
