@@ -78,7 +78,7 @@ public class CheepRepository : ICheepRepository
 
         var cheep = new Cheep()
         {
-            IdOfAuthor = command.AuthorId,
+            IdOfAuthor = command.Id,
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,

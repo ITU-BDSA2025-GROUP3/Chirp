@@ -184,7 +184,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    await _authorRepository.CreateAuthor($"{user.UserName}", Input.Email);
+                    //await _authorRepository.CreateAuthor($"{user.UserName}", Input.Email);
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {

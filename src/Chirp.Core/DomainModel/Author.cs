@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Chirp.Core.DomainModel;
 
-public class Author : IdentityUser
+public class Author : IdentityUser<int>
 {
-    public required int AuthorId { get; set; }
+    //public int AuthorId { get; set; }
     
     [Required]
     [StringLength(100)]

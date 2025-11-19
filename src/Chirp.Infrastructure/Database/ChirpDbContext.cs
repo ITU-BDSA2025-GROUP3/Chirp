@@ -1,12 +1,13 @@
 using Chirp.Core.DomainModel;
 
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Infrastructure.Database;
 
 //Responsible for all database access
-public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<Author>(options)
+public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<Author, IdentityRole<int>, int>(options)
 {
     //private readonly string _connectionString; not in use?
     //private const int PAGE_SIZE = 32; // Fixed page size not in use?
@@ -22,7 +23,7 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Core.DomainModel.Author>()
             .HasIndex(c => c.Email)
-            .IsUnique();    
+            .IsUnique();
     }
 
     // method not in use??

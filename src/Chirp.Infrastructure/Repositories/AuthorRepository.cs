@@ -21,7 +21,7 @@ public class AuthorRepository : IAuthorRepository
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
             .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
-            .Select(author => author.AuthorId)
+            .Select(author => author.Id)
             .FirstOrDefaultAsync();
         return query;
     }
@@ -39,7 +39,6 @@ public class AuthorRepository : IAuthorRepository
     {
         var author = new Core.DomainModel.Author
         {
-            AuthorId = 0,
             UserName = authorName.Trim(), 
             Email = authorEmail.Trim(), 
             Cheeps = new List<Cheep>()
