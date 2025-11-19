@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 
 using Xunit.Abstractions;
 
+using System.Globalization;
+
 namespace Chirp.Tests;
 
 public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
@@ -139,5 +141,40 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         
         Assert.Contains("Author does not exist", exception.Message);
     
+    }
+
+    [Fact]
+    public async Task CreateCheep_SavesCheepToDatabase()
+    {
+        //Arrange
+        using var context = CreateFakeChirpDbContext();
+        DbInitializer.SeedDatabase(context);
+        
+        var repo = new CheepRepository(context);
+
+        var initialCount = context.Cheeps.Count();
+
+        var message = new string('a', 160);
+        var dto = new CheepDTO
+        {
+            Author = "Alice",
+            Message = message,
+            TimeStamp = new DataTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+        };
+        
+        //Act
+        await repo.CreateCheep(dto);
+        
+        //Assert
+        var finalCount = context.Cheeps.Count();
+        Assert.Equal(initialCount + 1, finalCount);
+
+        var savedCheep = context.Cheeps
+            .Single(c => c.Author.Name == "Alice" && c.Text == message);
+
+        Assert.Equal("Alice", savedCheep.Author.Name);
+        Assert.Equal(message, savedCheep.Text);
     }
 }
