@@ -138,7 +138,7 @@ public class CheepServiceTests
         var message = new string('a', 160);
         
         //Act
-        await sevice.AddNewCHEEP(author, message);
+        await service.AddNewCheep(author, message);
         
         //Assert
         var createdCheeps = repository.GetCreatedCheeps();
