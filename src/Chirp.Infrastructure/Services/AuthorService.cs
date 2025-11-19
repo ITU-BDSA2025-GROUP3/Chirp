@@ -43,4 +43,14 @@ public class AuthorService : IAuthorService
         var total = await _cheepRepository.GetTotalCheepsFor(authorId);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
+
+    public async Task<bool> AuthorExists(string email)
+    {
+        var id = await _authorRepository.GetAuthorIdFrom(email);
+        if (id == 0)
+        {
+            return false;
+        }
+        return true;
+    }
 }

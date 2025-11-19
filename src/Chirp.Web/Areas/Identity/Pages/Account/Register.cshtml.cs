@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
+using Chirp.Core.ServiceInterfaces;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
@@ -34,7 +35,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<Author> _emailStore;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
-        private readonly IAuthorRepository _authorRepository;
+        private readonly IAuthorService _authorService;
 
         public RegisterModel(
             UserManager<Author> userManager,
@@ -42,7 +43,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             SignInManager<Author> signInManager,
             ILogger<RegisterModel> logger,
             IEmailSender emailSender, 
-            IAuthorRepository authorRepository)
+            IAuthorService authorService)
         {
             _userManager = userManager;
             _userStore = userStore;
@@ -50,7 +51,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
-            _authorRepository = authorRepository;
+            _authorService = authorService;
         }
 
         /// <summary>
@@ -93,6 +94,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             [Required]
             [EmailAddress]
             [Display(Name = "Email")]
+            [UniqueEmailAddress]
             public string Email { get; set; }
 
             /// <summary>
