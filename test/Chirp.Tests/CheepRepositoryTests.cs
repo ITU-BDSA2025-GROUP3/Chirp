@@ -159,7 +159,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         {
             Author = "Alice",
             Message = message,
-            TimeStamp = new DataTimeOffset(DateTime.UtcNow)
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()
                 .ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
         };
