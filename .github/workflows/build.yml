@@ -46,5 +46,9 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 9.0.x
+          
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+        
       - name: Test
         run: dotnet test --no-build
