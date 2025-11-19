@@ -1,6 +1,7 @@
 ﻿using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
+using Chirp.Core;
 
 using Microsoft.Data.Sqlite;
 
@@ -8,6 +9,8 @@ using Moq;
 using Microsoft.EntityFrameworkCore;
 
 using Xunit.Abstractions;
+
+using System.Globalization;
 
 namespace Chirp.Tests;
 
@@ -24,7 +27,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         context.Database.EnsureCreatedAsync(); 
         return context;
     }
-
+    
     private static void SeedDatabase(ChirpDbContext context)
     {
 
@@ -123,5 +126,55 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         
         //assert
         Assert.Equal(expected, cheeps.Count);
+    }
+
+    [Fact]
+    public async Task CreateCheep_WithInvalidAuthor()
+    {
+        using var context = CreateFakeChirpDbContext();
+        // Arrange
+        var repository = new CheepRepository(context);
+        var dto = new CheepDTO{ Author = "invalidUser@email.com", Message = "I'm not a test", };
+        
+        // Act & assert
+        var exception = await Assert.ThrowsAsync<Exception>(() => repository.CreateCheep(dto));
+        
+        Assert.Contains("Author does not exist", exception.Message);
+    
+    }
+
+    [Fact]
+    public async Task CreateCheep_SavesCheepToDatabase()
+    {
+        //Arrange
+        using var context = CreateFakeChirpDbContext();
+        DbInitializer.SeedDatabase(context);
+        
+        var repo = new CheepRepository(context);
+
+        var initialCount = context.Cheeps.Count();
+
+        var message = new string('a', 160);
+        var dto = new CheepDTO
+        {
+            Author = "Alice",
+            Message = message,
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+        };
+        
+        //Act
+        await repo.CreateCheep(dto);
+        
+        //Assert
+        var finalCount = context.Cheeps.Count();
+        Assert.Equal(initialCount + 1, finalCount);
+
+        var savedCheep = context.Cheeps
+            .Single(c => c.Author.Name == "Alice" && c.Text == message);
+
+        Assert.Equal("Alice", savedCheep.Author.Name);
+        Assert.Equal(message, savedCheep.Text);
     }
 }

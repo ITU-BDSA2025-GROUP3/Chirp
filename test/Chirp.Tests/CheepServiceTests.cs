@@ -4,6 +4,7 @@ using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure;
 using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
+using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Tests;
 
@@ -84,6 +85,7 @@ public class CheepServiceTests
     {
         private readonly int _totalCheeps;
         private readonly Dictionary<int, int> _authorTotals;
+        private readonly List<CheepDTO> _createdCheeps = new();
 
         public FakeCheepRepository(int totalCheeps, Dictionary<int, int>? authorTotals)
         {
@@ -95,10 +97,72 @@ public class CheepServiceTests
         public Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId) => Task.FromResult(new List<Cheep>());
         public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
         public Task<int> GetTotalCheepsFor(int authorId) => Task.FromResult(_authorTotals.TryGetValue(authorId, out var total) ? total : 0);
-        public Task CreateCheep(CheepDTO newCheep) => throw new NotSupportedException();
+
+        public Task CreateCheep(CheepDTO newCheep)
+        {
+            _createdCheeps.Add(newCheep);
+            return Task.CompletedTask;
+        }
+        public List<CheepDTO> GetCreatedCheeps() => _createdCheeps;
         public Task AddCheep(Cheep cheep)
         {
             throw new NotImplementedException();
         }
+    }
+    
+    [Fact]
+    public async Task CreateCheep_WithValidAuthor()
+    {
+        // Arrange
+        var fakeCheepRepository = new FakeCheepRepository(1, new Dictionary<int, int>());
+        var service = new CheepService(fakeCheepRepository);
+        
+        // Act
+        await service.AddNewCheep("alice@alice.com", "Hey this is a test");
+        
+        // Assert
+        var createdCheeps = fakeCheepRepository.GetCreatedCheeps();
+        Assert.Single(createdCheeps);
+        Assert.Equal("alice@alice.com", createdCheeps[0].Author);
+        Assert.Equal("Hey this is a test", createdCheeps[0].Message);
+    }
+
+    [Fact]
+    public async Task AddNewCheep_WithValidLength()
+    {
+        //Arrange
+        var repository = new FakeCheepRepository(1, new Dictionary<int, int>());
+        var service = new CheepService(repository);
+
+        var author = "alice";
+        var message = new string('a', 160);
+        
+        //Act
+        await service.AddNewCheep(author, message);
+        
+        //Assert
+        var createdCheeps = repository.GetCreatedCheeps();
+        Assert.Single(createdCheeps);
+
+        var storedCheeps = createdCheeps[0];
+        Assert.Equal(author, storedCheeps.Author);
+        Assert.Equal(message, storedCheeps.Message);
+    }
+
+    [Fact]
+    public async Task AddNewCheep_WithTooLongMessage()
+    {
+        //Arrange
+        var repository = new FakeCheepRepository(1, new Dictionary<int, int>());
+        var service = new CheepService(repository);
+        
+        var author = "alice";
+        var message = new string('a', 161);
+        
+        //Act and Assert
+        await Assert.ThrowsAsync<ValidationException>(() => service.AddNewCheep(author, message));
+        
+        var createdCheeps = repository.GetCreatedCheeps();
+        Assert.Empty(createdCheeps);
     }
 }
