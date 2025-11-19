@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.ComponentModel.DataAnnotations;
 
 using Chirp.Core;
 using Chirp.Core.RepositoryInterfaces;
@@ -40,6 +41,13 @@ public class CheepService : ICheepService
 
     public async Task AddNewCheep(String author, string message)
     {
+        if (string.IsNullOrWhiteSpace(author))
+            throw new ValidationException("Author is required.");
+        if (string.IsNullOrWhiteSpace(message))
+            throw new ValidationException("Cheep cannot be empty.");
+        if (message.Length > 160)
+            throw new ValidationException("Cheeps cannot exceed 160 characters.");
+        
         var cheepDTOs = new CheepDTO
         {
             Author = author,
