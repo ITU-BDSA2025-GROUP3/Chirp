@@ -6,13 +6,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class PublicModel : PageModel
+public class PublicModel(ICheepService service) : PageModel
 {
-    private readonly ICheepService _service;
-    public PublicModel(ICheepService service)
-    {
-        _service = service;
-    }
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalPages { get; private set; }
     public int CurrentPage;
@@ -29,15 +24,15 @@ public class PublicModel : PageModel
             await LoadCheeps();
             return Page();
         }
-        await _service.AddNewCheep(author!, Message);
+        await service.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     private async Task LoadCheeps()
     {
-        _service.CurrentPage = 1;
-        Cheeps = await _service.GetCheeps();
-        TotalPages = await _service.GetTotalCheeps();
-        CurrentPage = _service.CurrentPage;
+        service.CurrentPage = 1;
+        Cheeps = await service.GetCheeps();
+        TotalPages = await service.GetTotalCheeps();
+        CurrentPage = service.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync()
@@ -47,9 +42,9 @@ public class PublicModel : PageModel
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
             
-            _service.CurrentPage = pageQuery;
-            Cheeps = await _service.GetCheeps();
-            TotalPages = await _service.GetTotalCheeps();
+            service.CurrentPage = pageQuery;
+            Cheeps = await service.GetCheeps();
+            TotalPages = await service.GetTotalCheeps();
             CurrentPage = pageQuery;
         }
         catch (FormatException)

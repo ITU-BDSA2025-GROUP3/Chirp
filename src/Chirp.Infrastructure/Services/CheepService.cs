@@ -24,7 +24,7 @@ public class CheepService : ICheepService
         var cheeps = await _cheepRepository.ReadCheeps(CurrentPage, PAGE_SIZE);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            Author = cheep.Author.Name,
+            UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
@@ -39,7 +39,7 @@ public class CheepService : ICheepService
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
-    public async Task AddNewCheep(String author, string message)
+    public async Task AddNewCheep(string author, string message)
     {
         if (string.IsNullOrWhiteSpace(author))
             throw new ValidationException("Author is required.");
@@ -50,7 +50,7 @@ public class CheepService : ICheepService
         
         var cheepDTOs = new CheepDTO
         {
-            Author = author,
+            UserName = author,
             Message = message,
             TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()

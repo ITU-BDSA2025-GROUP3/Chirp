@@ -4,6 +4,8 @@
 
 using System;
 using System.Threading.Tasks;
+
+using Chirp.Core.DomainModel;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +16,11 @@ namespace Chirp.Web.Areas.Identity.Pages.Account.Manage
 {
     public class Disable2faModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<Author> _userManager;
         private readonly ILogger<Disable2faModel> _logger;
 
         public Disable2faModel(
-            UserManager<ApplicationUser> userManager,
+            UserManager<Author> userManager,
             ILogger<Disable2faModel> logger)
         {
             _userManager = userManager;

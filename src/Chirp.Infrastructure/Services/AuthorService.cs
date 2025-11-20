@@ -26,7 +26,7 @@ public class AuthorService : IAuthorService
         var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, PAGE_SIZE, authorId);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            Author = cheep.Author.Name,
+            UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
@@ -42,5 +42,15 @@ public class AuthorService : IAuthorService
         
         var total = await _cheepRepository.GetTotalCheepsFor(authorId);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
+    }
+
+    public async Task<bool> AuthorExists(string email)
+    {
+        var id = await _authorRepository.GetAuthorIdFrom(email);
+        if (id == 0)
+        {
+            return false;
+        }
+        return true;
     }
 }

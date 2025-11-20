@@ -39,11 +39,11 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
 
         List<Author> authorList = [];
         List<Cheep> cheepList = [];
-        var authorIdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
+        var IdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
         var timestampCounter = 0;
         foreach (var name in cheepsPerAuthor)
         {
-            var author = new Author { AuthorId = authorIdCounter++, Name = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>() };
+            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>() };
             authorList.Add(author);
             for (int i = 0; i < name.Value; i++)
             {
@@ -51,7 +51,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
                 {
                     Text = "test",
                     TimeStamp = new DateTime(timestampCounter++),
-                    AuthorId = author.AuthorId,
+                    IdOfAuthor = author.Id,
                     Author = author
                 };
                 author.Cheeps.Add(cheep);
@@ -85,10 +85,10 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
-        var author1 = new Author { AuthorId = 1, Name = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>() };
-        var author2 = new Author { AuthorId = 2, Name = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>() };
-        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), AuthorId = 1, Author = author1 };
-        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), AuthorId = 2, Author = author2 };
+        var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>() };
+        var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>() };
+        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
+        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), IdOfAuthor = 2, Author = author2 };
         author1.Cheeps.Add(cheep1);
         author2.Cheeps.Add(cheep2);
         context.Authors.Add(author1);

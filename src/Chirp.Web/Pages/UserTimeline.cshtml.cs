@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class UserTimelineModel(IAuthorService cheepService, ICheepService authorService) : PageModel
+public class UserTimelineModel(IAuthorService authorService, ICheepService cheepService) : PageModel
 {
     public required List<CheepDTO> Cheeps { get; set; }
     public int TotalAuthorPages { get; private set; }
@@ -25,16 +25,16 @@ public class UserTimelineModel(IAuthorService cheepService, ICheepService author
             await LoadAuthorCheeps(author!);
             return Page();
         }
-        await authorService.AddNewCheep(author!, Message);
+        await cheepService.AddNewCheep(author!, Message);
         return RedirectToPage();
     }
     
     private async Task LoadAuthorCheeps(string author)
     {
-        cheepService.CurrentPage = 1;
-        Cheeps = await cheepService.GetAuthorCheeps(author);
-        TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
-        CurrentPage = cheepService.CurrentPage;
+        authorService.CurrentPage = 1;
+        Cheeps = await authorService.GetAuthorCheeps(author);
+        TotalAuthorPages = await authorService.GetTotalAuthorCheeps(author);
+        CurrentPage = authorService.CurrentPage;
     }
 
     public async Task<ActionResult> OnGetAsync(string author)
@@ -43,9 +43,9 @@ public class UserTimelineModel(IAuthorService cheepService, ICheepService author
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
-            cheepService.CurrentPage = pageQuery;
-            Cheeps = await cheepService.GetAuthorCheeps(author);
-            TotalAuthorPages = await cheepService.GetTotalAuthorCheeps(author);
+            authorService.CurrentPage = pageQuery;
+            Cheeps = await authorService.GetAuthorCheeps(author);
+            TotalAuthorPages = await authorService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {
