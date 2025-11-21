@@ -59,7 +59,7 @@ public class AuthorService : IAuthorService
        
         var follows = await _authorRepository.GetFollowedList(author);
         if (follows.Count == 0) return [];
-        var authorDTOs = follows.Select(author => new AuthorDTO { Name = author.Name }).ToList();
+        var authorDTOs = follows.Select(author => new AuthorDTO { Name = author.UserName }).ToList();
         return authorDTOs;
     }
 

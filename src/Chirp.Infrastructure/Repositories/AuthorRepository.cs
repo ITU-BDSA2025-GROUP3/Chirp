@@ -30,7 +30,7 @@ public class AuthorRepository : IAuthorRepository
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return new List<Author>();
         var query = await _dbContext.Authors
-            .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
             .Include(author => author.Follows)
             .FirstOrDefaultAsync();
         return query?.Follows.ToList() ?? new List<Author>();
@@ -47,11 +47,11 @@ public class AuthorRepository : IAuthorRepository
             throw new ArgumentException();
         
         var authorToAdd = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorToAdd || author.Email == nameOfAuthorToAdd)
+            .Where(author => author.UserName == nameOfAuthorToAdd || author.Email == nameOfAuthorToAdd)
             .Select(author => author)
             .FirstOrDefaultAsync();
         var authorToAddTo = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorFollowing  || author.Email == nameOfAuthorFollowing)
+            .Where(author => author.UserName == nameOfAuthorFollowing  || author.Email == nameOfAuthorFollowing)
             .Select(author => author)
             .FirstOrDefaultAsync();
         
@@ -73,11 +73,11 @@ public class AuthorRepository : IAuthorRepository
             throw new ArgumentException();
         
         var authorToRemove = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorToRemove || author.Email == nameOfAuthorToRemove)
+            .Where(author => author.UserName == nameOfAuthorToRemove || author.Email == nameOfAuthorToRemove)
             .Select(author => author)
             .FirstOrDefaultAsync();
         var authorToRemoveFrom = await _dbContext.Authors
-            .Where(author => author.Name == nameOfAuthorFollowing || author.Email == nameOfAuthorFollowing)
+            .Where(author => author.UserName == nameOfAuthorFollowing || author.Email == nameOfAuthorFollowing)
             .Select(author => author)
             .FirstOrDefaultAsync();
         if (authorToRemove == null || authorToRemoveFrom == null)

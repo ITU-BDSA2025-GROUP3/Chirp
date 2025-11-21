@@ -45,16 +45,16 @@
                     @if (User.Identity!.IsAuthenticated)
                     {
                     // TODO check if current user is message author, don't render follow/unfollow btn
-                        var isFollowing = Model.Followers.Any(f => f.Name == cheep.Author);
+                        var isFollowing = Model.Followers.Any(f => f.Name == cheep.UserName);
                         if (isFollowing)
                         {
-                            <form method="post" asp-page-handler="Unfollow" asp-route-authorToUnfollow="@cheep.Author">
+                            <form method="post" asp-page-handler="Unfollow" asp-route-authorToUnfollow="@cheep.UserName">
                                 <button type="submit">Unfollow</button>
                             </form>
                         }
                         else
                         {
-                            <form method="post" asp-page-handler="Follow" asp-route-authorToFollow="@cheep.Author">
+                            <form method="post" asp-page-handler="Follow" asp-route-authorToFollow="@cheep.UserName">
                                 <button type="submit">Follow</button>
                             </form>
                         }
