@@ -20,14 +20,14 @@ public class PostCheepTests : PageTest
         await Page.FillAsync("#Input_Password", "Test123!"); 
         await Page.ClickAsync("button[type=submit]");
 
-        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
+        await Expect(Page).ToHaveURLAsync("http://localhost:5273/");
 
         
         string message = "Playwright test cheep " + DateTime.Now.ToString("HHmmss");
-        await Page.FillAsync("textarea[name='text']", message);
+        await Page.FillAsync("#Message", message);
 
        
-        await Page.ClickAsync("input[type=submit], button:has-text('Chirp!')");
+        await Page.ClickAsync("input[type=submit], button:has-text('Send')");
 
         
         var cheepList = Page.Locator("#messagelist");

@@ -15,7 +15,8 @@ public class LoginTests : PageTest
        
         await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
 
-    
+        //Remember to change login to existing login in database!! 
+        //(Extremely poor code to give login details in plain text though)
         await Page.FillAsync("#Input_Email", "joe@itu.dk");
         await Page.FillAsync("#Input_Password", "Test123!"); 
 
@@ -23,7 +24,7 @@ public class LoginTests : PageTest
         await Page.ClickAsync("button[type=submit]");
 
         
-        await Expect(Page).ToHaveURLAsync(new Regex(".*Timeline.*", RegexOptions.IgnoreCase));
+        await Expect(Page).ToHaveURLAsync("http://localhost:5273/");
 
       
         await Expect(Page.Locator("h2")).ToContainTextAsync("Timeline");
