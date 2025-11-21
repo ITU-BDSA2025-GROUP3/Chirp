@@ -79,6 +79,20 @@ public class CheepServiceTests
         }
 
         public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
+        public Task<List<Author>> GetFollowedList(string authorName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddAuthorToFollows(string nameOfAuthorToAdd, string nameOfAuthorFollowing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAuthorFromFollows(string nameOfAuthorToRemove, string nameOfAuthorFollowing)
+        {
+            throw new NotImplementedException();
+        }
     }
     
     private sealed class FakeCheepRepository : ICheepRepository

@@ -42,7 +42,7 @@
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp</small>
                     </p>
-                    @if (User.Identity!.IsAuthenticated)
+                    @if (User.Identity!.IsAuthenticated && User.Identity.Name != cheep.UserName)
                     {
                     // TODO check if current user is message author, don't render follow/unfollow btn
                         var isFollowing = Model.Followers.Any(f => f.Name == cheep.UserName);
