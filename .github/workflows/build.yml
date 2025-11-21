@@ -38,10 +38,8 @@ jobs:
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
-      run: dotnet build
-    - name: Playwright browsers installation
-      run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install
-  
+      run: dotnet build --no-restore
+      
   test:
     name: Test
     needs: build
@@ -55,10 +53,16 @@ jobs:
         uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 8.0.x
+
+      - name: Build & Install
+        run: dotnet build
           
       - name: Start Web App    
         run: dotnet run --project "src/Chirp.Web" &
-          
+      
+      - name: Ensure browsers are installed
+        run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install
+        
       - name: Wait for host
         run: npx wait-on http://localhost:5273 --timeout 30000
         
