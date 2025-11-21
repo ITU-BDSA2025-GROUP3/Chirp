@@ -27,7 +27,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         context.Database.EnsureCreatedAsync(); 
         return context;
     }
-    
+
     private static void SeedDatabase(ChirpDbContext context)
     {
 
@@ -43,7 +43,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var timestampCounter = 0;
         foreach (var name in cheepsPerAuthor)
         {
-            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>() };
+            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
             authorList.Add(author);
             for (int i = 0; i < name.Value; i++)
             {
@@ -75,7 +75,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         DbInitializer.SeedDatabase(context);
         var repo = new CheepRepository(context);
         //act
-        var cheeps = await repo.ReadCheeps(page, pageSize);
+        var cheeps = await repo.ReadPublicCheeps(page, pageSize);
         //assert
         Assert.Equal(cheeps.Count, expected);
     }
@@ -85,8 +85,8 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
-        var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>() };
-        var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>() };
+        var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
+        var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
         var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
         var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), IdOfAuthor = 2, Author = author2 };
         author1.Cheeps.Add(cheep1);
@@ -99,7 +99,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = await repo.ReadCheeps(1, 1);
+        var cheeps = await repo.ReadPublicCheeps(1, 1);
         
         //assert
         Assert.Equal(cheep2, cheeps[0]); //the newest cheep must be the first in the list
@@ -122,7 +122,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = await repo.ReadCheeps(page, pageSize);
+        var cheeps = await repo.ReadPublicCheeps(page, pageSize);
         
         //assert
         Assert.Equal(expected, cheeps.Count);
