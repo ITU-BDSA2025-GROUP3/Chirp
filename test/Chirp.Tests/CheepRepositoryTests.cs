@@ -1,6 +1,7 @@
 ﻿using Chirp.Core.DomainModel;
 using Chirp.Infrastructure.Database;
 using Chirp.Infrastructure.Repositories;
+using Chirp.Core;
 
 using Microsoft.Data.Sqlite;
 
@@ -8,6 +9,8 @@ using Moq;
 using Microsoft.EntityFrameworkCore;
 
 using Xunit.Abstractions;
+
+using System.Globalization;
 
 namespace Chirp.Tests;
 
@@ -36,11 +39,11 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
 
         List<Author> authorList = [];
         List<Cheep> cheepList = [];
-        var authorIdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
+        var IdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
         var timestampCounter = 0;
         foreach (var name in cheepsPerAuthor)
         {
-            var author = new Author { AuthorId = authorIdCounter++, Name = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
+            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
             authorList.Add(author);
             for (int i = 0; i < name.Value; i++)
             {
@@ -48,7 +51,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
                 {
                     Text = "test",
                     TimeStamp = new DateTime(timestampCounter++),
-                    AuthorId = author.AuthorId,
+                    IdOfAuthor = author.Id,
                     Author = author
                 };
                 author.Cheeps.Add(cheep);
@@ -82,10 +85,10 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
-        var author1 = new Author { AuthorId = 1, Name = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
-        var author2 = new Author { AuthorId = 2, Name = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
-        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), AuthorId = 1, Author = author1 };
-        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), AuthorId = 2, Author = author2 };
+        var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
+        var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
+        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
+        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), IdOfAuthor = 2, Author = author2 };
         author1.Cheeps.Add(cheep1);
         author2.Cheeps.Add(cheep2);
         context.Authors.Add(author1);
@@ -123,5 +126,55 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         
         //assert
         Assert.Equal(expected, cheeps.Count);
+    }
+
+    [Fact]
+    public async Task CreateCheep_WithInvalidAuthor()
+    {
+        using var context = CreateFakeChirpDbContext();
+        // Arrange
+        var repository = new CheepRepository(context);
+        var dto = new CheepDTO{ Author = "invalidUser@email.com", Message = "I'm not a test", };
+        
+        // Act & assert
+        var exception = await Assert.ThrowsAsync<Exception>(() => repository.CreateCheep(dto));
+        
+        Assert.Contains("Author does not exist", exception.Message);
+    
+    }
+
+    [Fact]
+    public async Task CreateCheep_SavesCheepToDatabase()
+    {
+        //Arrange
+        using var context = CreateFakeChirpDbContext();
+        DbInitializer.SeedDatabase(context);
+        
+        var repo = new CheepRepository(context);
+
+        var initialCount = context.Cheeps.Count();
+
+        var message = new string('a', 160);
+        var dto = new CheepDTO
+        {
+            Author = "Alice",
+            Message = message,
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yyyy HH:mm:ss", CultureInfo.InvariantCulture)
+        };
+        
+        //Act
+        await repo.CreateCheep(dto);
+        
+        //Assert
+        var finalCount = context.Cheeps.Count();
+        Assert.Equal(initialCount + 1, finalCount);
+
+        var savedCheep = context.Cheeps
+            .Single(c => c.Author.Name == "Alice" && c.Text == message);
+
+        Assert.Equal("Alice", savedCheep.Author.Name);
+        Assert.Equal(message, savedCheep.Text);
     }
 }

@@ -11,7 +11,6 @@ namespace Chirp.Infrastructure.Repositories;
 public class AuthorRepository : IAuthorRepository
 {
     private readonly ChirpDbContext _dbContext;
-
     public AuthorRepository(ChirpDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -21,8 +20,8 @@ public class AuthorRepository : IAuthorRepository
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
-            .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
-            .Select(author => author.AuthorId)
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author.Id)
             .FirstOrDefaultAsync();
         return query;
     }
@@ -99,11 +98,10 @@ public class AuthorRepository : IAuthorRepository
     /// </exception>
     public async Task CreateAuthor(string authorName, string authorEmail)
     {
-        var author = new Author
+        var author = new Core.DomainModel.Author
         {
-            AuthorId = 0, //TODO why does this work?
-            Name = authorName.Trim(),
-            Email = authorEmail.Trim(),
+            UserName = authorName.Trim(), 
+            Email = authorEmail.Trim(), 
             Cheeps = new List<Cheep>(),
             Follows = new List<Author>()
         };
@@ -111,3 +109,4 @@ public class AuthorRepository : IAuthorRepository
         await _dbContext.SaveChangesAsync();
     }
 }
+

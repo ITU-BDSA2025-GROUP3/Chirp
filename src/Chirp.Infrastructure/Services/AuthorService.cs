@@ -9,21 +9,16 @@ namespace Chirp.Infrastructure.Services;
 public class AuthorService : IAuthorService
 {
     private const int PAGE_SIZE = 32;
-
     //Sets confirguable database path
     private readonly IAuthorRepository _authorRepository;
-
     private readonly ICheepRepository _cheepRepository;
-
     //Set or get the currentPage to be viewed
     public int CurrentPage { get; set; } = 1;
-
     public AuthorService(IAuthorRepository authorRepository, ICheepRepository cheepRepository)
     {
         _authorRepository = authorRepository;
         _cheepRepository = cheepRepository;
     }
-
     public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
     {
         var authorId = await _authorRepository.GetAuthorIdFrom(author);
@@ -31,7 +26,7 @@ public class AuthorService : IAuthorService
         var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, PAGE_SIZE, authorId);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            Author = cheep.Author.Name,
+            UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
@@ -39,14 +34,24 @@ public class AuthorService : IAuthorService
         }).ToList();
         return cheepDTOs;
     }
-
+    
     public async Task<int> GetTotalAuthorCheeps(string author)
     {
         var authorId = await _authorRepository.GetAuthorIdFrom(author);
         if (authorId == 0) return 1;
-
+        
         var total = await _cheepRepository.GetTotalCheepsFor(authorId);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
+    }
+
+    public async Task<bool> AuthorExists(string email)
+    {
+        var id = await _authorRepository.GetAuthorIdFrom(email);
+        if (id == 0)
+        {
+            return false;
+        }
+        return true;
     }
 
     public async Task<List<AuthorDTO>> GetFollowsList(string author)

@@ -6,7 +6,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Web.Pages;
 
-public class PublicModel : PageModel
+public class PublicModel(ICheepService service) : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;

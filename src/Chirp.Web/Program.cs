@@ -1,3 +1,4 @@
+using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Core.ServiceInterfaces;
 using Chirp.Infrastructure;
@@ -16,8 +17,8 @@ builder.Services.AddDbContext<ChirpDbContext>(options => options.UseSqlite(conne
 IDENTITY CONFIGURATIONS
 */
 
-builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
-        options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<Author>(options =>
+        options.SignIn.RequireConfirmedAccount = false)
     .AddEntityFrameworkStores<ChirpDbContext>();
 
 //Ensure we have github secrets
