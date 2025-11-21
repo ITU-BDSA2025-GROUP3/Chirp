@@ -35,6 +35,18 @@ public class AuthorService : IAuthorService
         return cheepDTOs;
     }
     
+    // public async Task <AuthorDTO> GetAuthor(string author)
+    // {
+    //     var _author = await _authorRepository.
+    //     var authorId = await _authorRepository.GetAuthorIdFrom(author);
+    //     if (authorId == 0) return new AuthorDTO
+    //     {
+    //         UserName = author.UserName,
+    //         Email = Email.Email,
+    //             
+    //     }
+    // }
+    
     public async Task<int> GetTotalAuthorCheeps(string author)
     {
         var authorId = await _authorRepository.GetAuthorIdFrom(author);
