@@ -13,6 +13,7 @@ using System.Threading.Tasks;
 
 using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
+using Chirp.Core.ServiceInterfaces;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
@@ -37,7 +38,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
         private readonly IUserEmailStore<Author> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
-        private readonly IAuthorRepository _authorRepository;
+        private readonly IAuthorService _authorService;
 
         public ExternalLoginModel(
             SignInManager<Author> signInManager,
@@ -45,8 +46,8 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             IUserStore<Author> userStore,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IAuthorRepository authorRepository
-        )
+            IAuthorService authorService
+            )
         {
             _signInManager = signInManager;
             _userManager = userManager;
@@ -54,7 +55,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
-            _authorRepository = authorRepository;
+            _authorService = authorService;
         }
 
         /// <summary>
@@ -89,6 +90,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
         /// </summary>
         public class InputModel
         {
+            
             /// <summary>
             ///     Users first name
             /// </summary>

@@ -4,9 +4,9 @@ namespace Chirp.Core.RepositoryInterfaces;
 
 public interface ICheepRepository
 {
-    public Task<List<Cheep>> ReadCheeps(int page, int pageSize);
-    public Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId);
-    public Task<int> GetTotalCheeps();
-    public Task<int> GetTotalCheepsFor(int authorId);
+    public Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize);
+    public Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, List<int> authorIds);
+    public Task<int> GetTotalPublicCheeps();
+    public Task<int> GetTotalTimelineCheeps(List<int> authorIds);
     public Task CreateCheep(CheepDTO newCheep);
 }

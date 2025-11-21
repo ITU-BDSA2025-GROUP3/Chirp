@@ -10,7 +10,6 @@ public class CheepService : ICheepService
 {
     private const int PAGE_SIZE = 32;
     //Sets confirguable databse path
-    // private readonly ChirpDbContext _chirpDbContext;
     private readonly ICheepRepository _cheepRepository;
     //Set or get the currentPage to be viewed
     public int CurrentPage { get; set; } = 1;
@@ -21,7 +20,7 @@ public class CheepService : ICheepService
     
     public async Task<List<CheepDTO>> GetCheeps()
     {
-        var cheeps = await _cheepRepository.ReadCheeps(CurrentPage, PAGE_SIZE);
+        var cheeps = await _cheepRepository.ReadPublicCheeps(CurrentPage, PAGE_SIZE);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             UserName = cheep.Author.UserName,
@@ -35,7 +34,7 @@ public class CheepService : ICheepService
     
     public async Task<int> GetTotalCheeps()
     {
-        var total = await _cheepRepository.GetTotalCheeps();
+        var total = await _cheepRepository.GetTotalPublicCheeps();
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 

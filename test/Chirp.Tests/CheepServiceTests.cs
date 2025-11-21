@@ -1,8 +1,6 @@
 using Chirp.Core;
 using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
-using Chirp.Infrastructure;
-using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
 using System.ComponentModel.DataAnnotations;
 
@@ -68,7 +66,7 @@ public class CheepServiceTests
             _authorIds = authorIds ?? new Dictionary<string, int>();
         }
 
-        public Task<int> GetAuthorIdFrom(string authorNameOrEmail)
+        public Task<int> GetAuthorID(string authorNameOrEmail)
         {
             if (string.IsNullOrWhiteSpace(authorNameOrEmail))
             {
@@ -78,7 +76,26 @@ public class CheepServiceTests
             return Task.FromResult(_authorIds.TryGetValue(key, out var id) ? id : 0);
         }
 
-        public Task CreateAuthor(string authorName, string authorEmail) => throw new NotSupportedException();
+        public Task<List<int>> GetAuthorIDs(int authorId)
+        {
+            if (authorId == 0) return Task.FromResult(new List<int>());
+            return Task.FromResult(new List<int> { authorId });
+        }
+
+        public Task<List<Author>> GetFollowedList(string authorName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddAuthorToFollows(string nameOfAuthorToAdd, string nameOfAuthorFollowing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveAuthorFromFollows(string nameOfAuthorToRemove, string nameOfAuthorFollowing)
+        {
+            throw new NotImplementedException();
+        }
     }
     
     private sealed class FakeCheepRepository : ICheepRepository
@@ -93,10 +110,10 @@ public class CheepServiceTests
             _authorTotals = authorTotals ?? new Dictionary<int, int>();
         }
 
-        public Task<List<Cheep>> ReadCheeps(int page, int pageSize) => Task.FromResult(new List<Cheep>());
-        public Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId) => Task.FromResult(new List<Cheep>());
-        public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
-        public Task<int> GetTotalCheepsFor(int authorId) => Task.FromResult(_authorTotals.TryGetValue(authorId, out var total) ? total : 0);
+        public Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, List<int> authorIds) => Task.FromResult(new List<Cheep>());
+        public Task<int> GetTotalPublicCheeps() => Task.FromResult(_totalCheeps);
+        public Task<int> GetTotalTimelineCheeps(List<int> authorIds) => Task.FromResult(_authorTotals.TryGetValue(authorIds.FirstOrDefault(), out var total) ? total : 0);
 
         public Task CreateCheep(CheepDTO newCheep)
         {

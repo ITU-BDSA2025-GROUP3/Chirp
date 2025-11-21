@@ -1,5 +1,4 @@
 using System.Globalization;
-
 using Chirp.Core;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Core.ServiceInterfaces;
@@ -21,9 +20,11 @@ public class AuthorService : IAuthorService
     }
     public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
     {
-        var authorId = await _authorRepository.GetAuthorIdFrom(author);
+        var authorId = await _authorRepository.GetAuthorID(author);
         if (authorId == 0) return new List<CheepDTO>();
-        var cheeps = await _cheepRepository.ReadCheepsFrom(CurrentPage, PAGE_SIZE, authorId);
+        var authorIds = await _authorRepository.GetAuthorIDs(authorId);
+        
+        var cheeps = await _cheepRepository.ReadTimelineCheeps(CurrentPage, PAGE_SIZE, authorIds);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             UserName = cheep.Author.UserName,
@@ -37,20 +38,40 @@ public class AuthorService : IAuthorService
     
     public async Task<int> GetTotalAuthorCheeps(string author)
     {
-        var authorId = await _authorRepository.GetAuthorIdFrom(author);
+        var authorId = await _authorRepository.GetAuthorID(author);
         if (authorId == 0) return 1;
+        var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
-        var total = await _cheepRepository.GetTotalCheepsFor(authorId);
+        var total = await _cheepRepository.GetTotalTimelineCheeps(authorIds);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
     public async Task<bool> AuthorExists(string email)
     {
-        var id = await _authorRepository.GetAuthorIdFrom(email);
+        var id = await _authorRepository.GetAuthorID(email);
         if (id == 0)
         {
             return false;
         }
         return true;
+    }
+
+    public async Task<List<AuthorDTO>> GetFollowsList(string author)
+    {
+       
+        var follows = await _authorRepository.GetFollowedList(author);
+        if (follows.Count == 0) return [];
+        var authorDTOs = follows.Select(author => new AuthorDTO { Name = author.UserName }).ToList();
+        return authorDTOs;
+    }
+
+    public async Task RemoveAuthorFromFollowsList(string authorToRemove, string fromAuthor)
+    {
+        await _authorRepository.RemoveAuthorFromFollows(authorToRemove, fromAuthor);
+    }
+
+    public async Task AddAuthorToFollowsList(string authorToAdd, string toAuthor)
+    {
+        await _authorRepository.AddAuthorToFollows(authorToAdd, toAuthor);
     }
 }
