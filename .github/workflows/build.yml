@@ -61,8 +61,7 @@ jobs:
         run: dotnet run --project "src/Chirp.Web" &
       
       - name: Ensure browsers are installed
-        run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install --with-deps
-      
+        run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install      
       - name: Wait for host
         run: npx wait-on http://localhost:5273 --timeout 30000
         
