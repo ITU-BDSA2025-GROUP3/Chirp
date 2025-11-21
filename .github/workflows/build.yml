@@ -9,7 +9,9 @@ on:
     - main
     - fix/*
     - feature/*
+    - feauture/*
     - Feature/*
+    - Feauture/*
     - release/*
     - test/*
   pull_request:
@@ -17,7 +19,9 @@ on:
     - main
     - fix/*
     - feature/*
+    - feauture/*
     - Feature/*
+    - Feauture/*
     - release/*
     - test/*
 
