@@ -1,4 +1,3 @@
-using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Database;
 
@@ -16,7 +15,7 @@ public class AuthorRepository : IAuthorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<int> GetAuthorIdFrom(string authorNameOrEmail)
+    public async Task<int> GetAuthorID(string authorNameOrEmail)
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
@@ -24,6 +23,17 @@ public class AuthorRepository : IAuthorRepository
             .Select(author => author.Id)
             .FirstOrDefaultAsync();
         return query;
+    }
+
+    public async Task<List<int>> GetAuthorIDs(int authorId)
+    {
+        var authorIds = await _dbContext.Authors
+            .Where(author => author.Id == authorId)
+            .SelectMany(author => author.Follows.Select(followed => followed.Id))
+            .ToListAsync();
+        authorIds.Add(authorId);
+        authorIds = authorIds.Distinct().ToList();
+        return authorIds;
     }
 
     public async Task<List<Author>> GetFollowedList(string authorNameOrEmail)
@@ -84,28 +94,6 @@ public class AuthorRepository : IAuthorRepository
             throw new InvalidOperationException($"Author not found:{authorToRemove}&{authorToRemoveFrom}");
         
         authorToRemoveFrom.Follows.Remove(authorToRemove);
-        await _dbContext.SaveChangesAsync();
-    }
-
-    /// <summary>
-    /// creates new author, checks if the author already exists in the database, if not then create new author
-    /// </summary>
-    /// <param name="authorName">Name of the author, checks database existence on this param as it is unique</param>
-    /// <param name="authorEmail">Email of the author</param>
-    /// <returns></returns>
-    /// <exception cref="Exception"> Is thrown if the user already exists as an author in the database,
-    /// in the future will be redirected to loggin page or automagically log in user. 
-    /// </exception>
-    public async Task CreateAuthor(string authorName, string authorEmail)
-    {
-        var author = new Core.DomainModel.Author
-        {
-            UserName = authorName.Trim(), 
-            Email = authorEmail.Trim(), 
-            Cheeps = new List<Cheep>(),
-            Follows = new List<Author>()
-        };
-        _dbContext.Authors.Add(author);
         await _dbContext.SaveChangesAsync();
     }
 }

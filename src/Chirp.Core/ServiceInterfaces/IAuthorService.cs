@@ -8,8 +8,5 @@ public interface IAuthorService
     public Task<List<AuthorDTO>> GetFollowsList(string author);
     public Task RemoveAuthorFromFollowsList(string authorToRemove, string fromAuthor);
     public Task AddAuthorToFollowsList(string authorToAdd, string toAuthor);
-
-    public Task CreateAuthor(string name, string email);
-    
     public Task<bool> AuthorExists(string author);
 }

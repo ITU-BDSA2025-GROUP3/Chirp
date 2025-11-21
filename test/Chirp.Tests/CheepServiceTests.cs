@@ -1,8 +1,6 @@
 using Chirp.Core;
 using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
-using Chirp.Infrastructure;
-using Chirp.Infrastructure.Repositories;
 using Chirp.Infrastructure.Services;
 using System.ComponentModel.DataAnnotations;
 
@@ -107,8 +105,8 @@ public class CheepServiceTests
             _authorTotals = authorTotals ?? new Dictionary<int, int>();
         }
 
-        public Task<List<Cheep>> ReadCheeps(int page, int pageSize) => Task.FromResult(new List<Cheep>());
-        public Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize) => Task.FromResult(new List<Cheep>());
+        public Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, int authorId) => Task.FromResult(new List<Cheep>());
         public Task<int> GetTotalCheeps() => Task.FromResult(_totalCheeps);
         public Task<int> GetTotalCheepsFor(int authorId) => Task.FromResult(_authorTotals.TryGetValue(authorId, out var total) ? total : 0);
 

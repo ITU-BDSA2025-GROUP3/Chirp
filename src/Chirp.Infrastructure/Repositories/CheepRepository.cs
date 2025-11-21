@@ -16,7 +16,7 @@ public class CheepRepository : ICheepRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<Cheep>> ReadCheeps(int page, int pageSize)
+    public async Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize)
     {
         var query = await _dbContext.Cheeps
             .Include(cheep => cheep.Author)
@@ -26,27 +26,27 @@ public class CheepRepository : ICheepRepository
             .ToListAsync();
         return query;
     }
-
-
+    
     /// <summary>
     /// Returns cheeps on a specified page.
     /// </summary>
     /// <param name="page">The page to return cheeps from</param>
     /// <param name="pageSize"></param>
-    /// <param name="authorId"></param>
+    /// <param name="authorIds"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<Cheep>> ReadCheepsFrom(int page, int pageSize, int authorId)
+    public async Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, List<int> authorIds)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
-
+        
         var query = await _dbContext.Cheeps
-            .Where(cheep => cheep.IdOfAuthor == authorId)
+            .Where(cheep => authorIds.Contains(cheep.IdOfAuthor))
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
         return query;
     }
 

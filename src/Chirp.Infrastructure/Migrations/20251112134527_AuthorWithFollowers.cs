@@ -15,22 +15,6 @@ namespace Chirp.Infrastructure.Migrations
                 table: "Authors",
                 type: "INTEGER",
                 nullable: true);
-
-            migrationBuilder.AddColumn<string>(
-                name: "Firstname",
-                table: "AspNetUsers",
-                type: "TEXT",
-                maxLength: 100,
-                nullable: false,
-                defaultValue: "");
-
-            migrationBuilder.AddColumn<string>(
-                name: "Surname",
-                table: "AspNetUsers",
-                type: "TEXT",
-                maxLength: 100,
-                nullable: true);
-
             migrationBuilder.CreateIndex(
                 name: "IX_Authors_AuthorId1",
                 table: "Authors",
@@ -58,14 +42,6 @@ namespace Chirp.Infrastructure.Migrations
             migrationBuilder.DropColumn(
                 name: "AuthorId1",
                 table: "Authors");
-
-            migrationBuilder.DropColumn(
-                name: "Firstname",
-                table: "AspNetUsers");
-
-            migrationBuilder.DropColumn(
-                name: "Surname",
-                table: "AspNetUsers");
         }
     }
 }
