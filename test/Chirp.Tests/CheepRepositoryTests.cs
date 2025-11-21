@@ -68,20 +68,20 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     [InlineData(2, 32, 32)]
     [InlineData(3, 32, 32)]
     [InlineData(100, 32, 0)]
-    public void ReadCheepsFromPageTestNumberOfCheeps(int page, int pageSize, int expected)
+    public async Task ReadCheepsFromPageTestNumberOfCheeps(int page, int pageSize, int expected)
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
         DbInitializer.SeedDatabase(context);
         var repo = new CheepRepository(context);
         //act
-        var cheeps = repo.ReadCheeps(page, pageSize).Result.ToList();
+        var cheeps = await repo.ReadCheeps(page, pageSize);
         //assert
         Assert.Equal(cheeps.Count, expected);
     }
 
     [Fact]
-    public void ReadCheepsFromPageTest()
+    public async Task ReadCheepsFromPageTest()
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
@@ -99,7 +99,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = repo.ReadCheeps(1, 1).Result.ToList();
+        var cheeps = await repo.ReadCheeps(1, 1);
         
         //assert
         Assert.Equal(cheep2, cheeps[0]); //the newest cheep must be the first in the list
@@ -114,7 +114,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     [InlineData(3, 5, 5)]
     [InlineData(4, 5, 2)]
     [InlineData(5, 5, 0)]
-    public void ReadCheepsFromPageTest2(int page, int pageSize, int expected)
+    public async Task ReadCheepsFromPageTest2(int page, int pageSize, int expected)
     {
         //arrange
         using var context = CreateFakeChirpDbContext();
@@ -122,7 +122,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = repo.ReadCheeps(page, pageSize).Result;
+        var cheeps = await repo.ReadCheeps(page, pageSize);
         
         //assert
         Assert.Equal(expected, cheeps.Count);
@@ -134,7 +134,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         using var context = CreateFakeChirpDbContext();
         // Arrange
         var repository = new CheepRepository(context);
-        var dto = new CheepDTO{ Author = "invalidUser@email.com", Message = "I'm not a test", };
+        var dto = new CheepDTO{ UserName = "invalidUser@email.com", Message = "I'm not a test", };
         
         // Act & assert
         var exception = await Assert.ThrowsAsync<Exception>(() => repository.CreateCheep(dto));
@@ -147,8 +147,8 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     public async Task CreateCheep_SavesCheepToDatabase()
     {
         //Arrange
-        using var context = CreateFakeChirpDbContext();
-        DbInitializer.SeedDatabase(context);
+        await using var context = CreateFakeChirpDbContext();
+        SeedDatabase(context);
         
         var repo = new CheepRepository(context);
 
@@ -157,7 +157,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var message = new string('a', 160);
         var dto = new CheepDTO
         {
-            Author = "Alice",
+            UserName = "Alice",
             Message = message,
             TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()
@@ -171,10 +171,10 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var finalCount = context.Cheeps.Count();
         Assert.Equal(initialCount + 1, finalCount);
 
-        var savedCheep = context.Cheeps
-            .Single(c => c.Author.Name == "Alice" && c.Text == message);
+        var savedCheep = context.Cheeps.Include(cheep => cheep.Author)
+            .Single(c => c.Author.UserName == "Alice" && c.Text == message);
 
-        Assert.Equal("Alice", savedCheep.Author.Name);
+        Assert.Equal("Alice", savedCheep.Author.UserName);
         Assert.Equal(message, savedCheep.Text);
     }
 }
