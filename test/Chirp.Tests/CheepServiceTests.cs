@@ -123,7 +123,7 @@ public class CheepServiceTests
         // Assert
         var createdCheeps = fakeCheepRepository.GetCreatedCheeps();
         Assert.Single(createdCheeps);
-        Assert.Equal("alice@alice.com", createdCheeps[0].Author);
+        Assert.Equal("alice@alice.com", createdCheeps[0].UserName);
         Assert.Equal("Hey this is a test", createdCheeps[0].Message);
     }
 
@@ -145,7 +145,7 @@ public class CheepServiceTests
         Assert.Single(createdCheeps);
 
         var storedCheeps = createdCheeps[0];
-        Assert.Equal(author, storedCheeps.Author);
+        Assert.Equal(author, storedCheeps.UserName);
         Assert.Equal(message, storedCheeps.Message);
     }
 
