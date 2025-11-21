@@ -18,7 +18,7 @@ IDENTITY CONFIGURATIONS
 */
 
 builder.Services.AddDefaultIdentity<Author>(options =>
-        options.SignIn.RequireConfirmedAccount = false)
+        options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ChirpDbContext>();
 
 //Ensure we have github secrets
