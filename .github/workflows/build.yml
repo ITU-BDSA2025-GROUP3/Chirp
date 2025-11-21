@@ -54,7 +54,7 @@ jobs:
           dotnet-version: 8.0.x
           
       - name: Start Web App    
-        run: dotnet run -- project "src/Chirp.Web"
+        run: dotnet run -- project "Chirp/src/Chirp.Web"
           
       - name: Install Playwright Browsers
         run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install --with-deps
