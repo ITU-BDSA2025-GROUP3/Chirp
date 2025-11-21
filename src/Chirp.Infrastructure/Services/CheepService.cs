@@ -34,7 +34,7 @@ public class CheepService : ICheepService
     
     public async Task<int> GetTotalCheeps()
     {
-        var total = await _cheepRepository.GetTotalCheeps();
+        var total = await _cheepRepository.GetTotalPublicCheeps();
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 

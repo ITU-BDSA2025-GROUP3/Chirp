@@ -46,18 +46,17 @@ public class CheepRepository : ICheepRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-
         return query;
     }
 
-    public Task<int> GetTotalCheeps()
+    public Task<int> GetTotalPublicCheeps()
     {
         return _dbContext.Cheeps.CountAsync();
     }
 
-    public Task<int> GetTotalCheepsFor(int authorId)
+    public Task<int> GetTotalTimelineCheeps(List<int> authorIds)
     {
-        return _dbContext.Cheeps.CountAsync(cheep => cheep.IdOfAuthor == authorId);
+        return _dbContext.Cheeps.CountAsync(cheep => authorIds.Contains(cheep.IdOfAuthor));
     }
 
     /// <summary>

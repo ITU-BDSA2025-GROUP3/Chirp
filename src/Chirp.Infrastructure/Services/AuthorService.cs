@@ -40,8 +40,9 @@ public class AuthorService : IAuthorService
     {
         var authorId = await _authorRepository.GetAuthorID(author);
         if (authorId == 0) return 1;
+        var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
-        var total = await _cheepRepository.GetTotalCheepsFor(authorId);
+        var total = await _cheepRepository.GetTotalTimelineCheeps(authorIds);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
