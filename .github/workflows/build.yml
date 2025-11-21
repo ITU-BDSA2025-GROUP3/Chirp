@@ -27,7 +27,8 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04 #Due to the playwright version we currently have we need to use 22.04
+    #in the future use ubuntu-latest and change this workflow to be a seperate workflow ONLY for playwright tests.
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
