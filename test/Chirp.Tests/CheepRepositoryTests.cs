@@ -75,7 +75,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         DbInitializer.SeedDatabase(context);
         var repo = new CheepRepository(context);
         //act
-        var cheeps = await repo.ReadCheeps(page, pageSize);
+        var cheeps = await repo.ReadPublicCheeps(page, pageSize);
         //assert
         Assert.Equal(cheeps.Count, expected);
     }
@@ -99,7 +99,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = await repo.ReadCheeps(1, 1);
+        var cheeps = await repo.ReadPublicCheeps(1, 1);
         
         //assert
         Assert.Equal(cheep2, cheeps[0]); //the newest cheep must be the first in the list
@@ -122,7 +122,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         var repo = new CheepRepository(context);
         
         //act
-        var cheeps = await repo.ReadCheeps(page, pageSize);
+        var cheeps = await repo.ReadPublicCheeps(page, pageSize);
         
         //assert
         Assert.Equal(expected, cheeps.Count);
