@@ -1,6 +1,20 @@
-namespace Chirp.Web.Pages;
+@page "/{userInformation}"
+@model Chirp.Web.Pages.InformationModel
+@addTagHelper
 
 public class Information_cshtml
 {
+@{
+    @{
+        ViewData["Title"] = "My Information";
+        Layout = "Shared/_Layout";
+        var currentUser = User.Identity!.Name;
+    }
     
+    
+
+}
+ 
+
+
 }
