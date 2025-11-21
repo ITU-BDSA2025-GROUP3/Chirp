@@ -53,8 +53,14 @@ jobs:
         with:
           dotnet-version: 8.0.x
           
+      - name: Start Web App    
+        run: dotnet run Chirp/src/Chirp.Web
+          
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install --with-deps
+      
+      - name: Wait for host
+        run: npx wait-on http://localhost:5273 --timeout 30000
         
       - name: Test
         run: dotnet test --no-build
