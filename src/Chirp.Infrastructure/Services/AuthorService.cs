@@ -47,9 +47,9 @@ public class AuthorService : IAuthorService
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
-    public async Task<bool> AuthorExists(string email)
+    public async Task<bool> AuthorExists(string usernameOrEmail)
     {
-        var id = await _authorRepository.GetAuthorId(email);
+        var id = await _authorRepository.GetAuthorId(usernameOrEmail);
         if (id == 0)
         {
             return false;
