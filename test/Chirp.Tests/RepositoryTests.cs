@@ -12,9 +12,11 @@ using Xunit.Abstractions;
 
 using System.Globalization;
 
+using NuGet.Packaging;
+
 namespace Chirp.Tests;
 
-public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
+public class RepositoryTests(ITestOutputHelper testOutputHelper)
 {
     private static ChirpDbContext CreateFakeChirpDbContext()
     {
@@ -28,9 +30,13 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         return context;
     }
 
+    /// <summary>
+    /// Seeds the database for use in testing.
+    /// DO NOT CHANGE CONTENTS AS TESTS DEPENDS ON THE EXACT CONTENTS AS IS
+    /// </summary>
+    /// <param name="context"></param>
     private static void SeedDatabase(ChirpDbContext context)
     {
-
         //create a dictionary of how many cheeps to create for each author - ease of access
         var cheepsPerAuthor = new Dictionary<String, int>
         {
@@ -39,11 +45,11 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
 
         List<Author> authorList = [];
         List<Cheep> cheepList = [];
-        var IdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
+        var idCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
         var timestampCounter = 0;
         foreach (var name in cheepsPerAuthor)
         {
-            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
+            var author = new Author { Id = idCounter++, UserName = name.Key, Email = $"{name.Key}@{name.Key}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
             authorList.Add(author);
             for (int i = 0; i < name.Value; i++)
             {
@@ -177,4 +183,62 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         Assert.Equal("Alice", savedCheep.Author.UserName);
         Assert.Equal(message, savedCheep.Text);
     }
+
+    /// <summary>
+    /// Tests that an author's information is deleted from places that references it in the database.
+    /// </summary>
+    /// <param name="author"></param>
+    /// <param name="expectedAuthors"></param>
+    /// <param name="expectedCheeps"></param>
+    [Theory]
+    [InlineData("Alice", 3, 7)]
+    [InlineData("Bob", 3, 12)]
+    [InlineData("Charlie", 3, 15)]
+    [InlineData("David", 3, 17)]
+    public async Task DeleteAuthorTest_Succeeds(string author, int expectedAuthors, int expectedCheeps)
+    {
+        //Arrange
+        await using var context = CreateFakeChirpDbContext();
+        SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+            //add followings
+        await authorRepo.AddAuthorToFollows("Bob", "Alice");
+        await authorRepo.AddAuthorToFollows("Charlie", "Alice");
+        await authorRepo.AddAuthorToFollows("Alice", "Bob");
+        await authorRepo.AddAuthorToFollows("Alice", "Charlie");
+        await authorRepo.AddAuthorToFollows("Bob", "Charlie");
+        await authorRepo.AddAuthorToFollows("David", "Charlie");
+        
+        //act
+        var exception = await Record.ExceptionAsync(() => authorRepo.DeleteAuthor(author));
+        var amountOfAuthors = context.Authors.Count();
+        var amountOfCheeps = await cheepRepo.GetTotalPublicCheeps();
+        
+        //assert
+        Assert.Null(exception);
+        Assert.Equal(expectedAuthors, amountOfAuthors);
+        Assert.Equal(expectedCheeps, amountOfCheeps);
+        
+        foreach (var author1 in context.Authors)
+        {
+            var follows = await authorRepo.GetFollowedList(author1.UserName);
+            Assert.DoesNotContain(follows, a => a.UserName == author);
+        }
+    }
+    
+    [Fact]
+    public async Task DeleteAuthorTest_Fails()
+    {
+        //Arrange
+        await using var context = CreateFakeChirpDbContext();
+        SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        
+        //act & assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => authorRepo.DeleteAuthor("ThisAuthorDoesNotExist"));
+        Assert.Equal(4, context.Authors.Count());
+        Assert.Equal(17, await cheepRepo.GetTotalPublicCheeps());
+    } 
 }

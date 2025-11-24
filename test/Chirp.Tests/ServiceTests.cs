@@ -66,7 +66,7 @@ public class CheepServiceTests
             _authorIds = authorIds ?? new Dictionary<string, int>();
         }
 
-        public Task<int> GetAuthorID(string authorNameOrEmail)
+        public Task<int> GetAuthorId(string authorNameOrEmail)
         {
             if (string.IsNullOrWhiteSpace(authorNameOrEmail))
             {
@@ -93,6 +93,11 @@ public class CheepServiceTests
         }
 
         public Task RemoveAuthorFromFollows(string nameOfAuthorToRemove, string nameOfAuthorFollowing)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task DeleteAuthor(string authorNameOrEmail)
         {
             throw new NotImplementedException();
         }

@@ -15,7 +15,7 @@ public class AuthorRepository : IAuthorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<int> GetAuthorID(string authorNameOrEmail)
+    public async Task<int> GetAuthorId(string authorNameOrEmail)
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
@@ -94,6 +94,20 @@ public class AuthorRepository : IAuthorRepository
             throw new InvalidOperationException($"Author not found:{authorToRemove}&{authorToRemoveFrom}");
         
         authorToRemoveFrom.Follows.Remove(authorToRemove);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task DeleteAuthor(string authorNameOrEmail)
+    {
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail))
+            throw new ArgumentException("authorNameOrEmail must not be null or whitespace!");
+
+        var authorToRemove = await _dbContext.Authors
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author)
+            .FirstAsync();
+        
+        _dbContext.Remove(authorToRemove);
         await _dbContext.SaveChangesAsync();
     }
 }

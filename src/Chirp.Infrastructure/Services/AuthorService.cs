@@ -20,7 +20,7 @@ public class AuthorService : IAuthorService
     }
     public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
     {
-        var authorId = await _authorRepository.GetAuthorID(author);
+        var authorId = await _authorRepository.GetAuthorId(author);
         if (authorId == 0) return new List<CheepDTO>();
         var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
@@ -38,7 +38,7 @@ public class AuthorService : IAuthorService
     
     public async Task<int> GetTotalAuthorCheeps(string author)
     {
-        var authorId = await _authorRepository.GetAuthorID(author);
+        var authorId = await _authorRepository.GetAuthorId(author);
         if (authorId == 0) return 1;
         var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
@@ -48,7 +48,7 @@ public class AuthorService : IAuthorService
 
     public async Task<bool> AuthorExists(string email)
     {
-        var id = await _authorRepository.GetAuthorID(email);
+        var id = await _authorRepository.GetAuthorId(email);
         if (id == 0)
         {
             return false;
@@ -73,5 +73,10 @@ public class AuthorService : IAuthorService
     public async Task AddAuthorToFollowsList(string authorToAdd, string toAuthor)
     {
         await _authorRepository.AddAuthorToFollows(authorToAdd, toAuthor);
+    }
+
+    public async Task DeleteAuthor(string authorNameOrEmail)
+    {
+        await _authorRepository.DeleteAuthor(authorNameOrEmail);
     }
 }
