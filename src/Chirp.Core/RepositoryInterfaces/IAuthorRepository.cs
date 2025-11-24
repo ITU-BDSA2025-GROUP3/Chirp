@@ -9,6 +9,6 @@ public interface IAuthorRepository
     public Task<List<Author>> GetFollowedList(string authorName);
     public Task AddAuthorToFollows(string nameOfAuthorToAdd, string nameOfAuthorFollowing);
     public Task RemoveAuthorFromFollows(string nameOfAuthorToRemove, string nameOfAuthorFollowing);
-    public Task DeleteAuthor(string authorNameOrEmail);
+    public Task<Author> DeleteAuthor(string authorNameOrEmail);
 
 }

@@ -1,5 +1,6 @@
 using System.Globalization;
 using Chirp.Core;
+using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Core.ServiceInterfaces;
 
@@ -75,8 +76,20 @@ public class AuthorService : IAuthorService
         await _authorRepository.AddAuthorToFollows(authorToAdd, toAuthor);
     }
 
-    public async Task DeleteAuthor(string authorNameOrEmail)
+    /// <summary>
+    /// Completely removes an Author from the Chirp Application and all references to it in the database.
+    /// It returns the AuthorDTO object just deleted for display purposes.
+    /// <b>WARNING:</b> This cannot be undone completely e.x other Authors will lose their references to this object!
+    /// </summary>
+    /// <param name="authorNameOrEmail"></param>
+    /// <returns>An AuthorDTO object representing the Author just deleted. For UI display purposes</returns>
+    public async Task<AuthorDTO> DeleteAuthor(string authorNameOrEmail)
     {
-        await _authorRepository.DeleteAuthor(authorNameOrEmail);
+        var author = await _authorRepository.DeleteAuthor(authorNameOrEmail);
+        return new AuthorDTO
+        {
+            Name = author.UserName,
+            Email = author.Email
+        };
     }
 }

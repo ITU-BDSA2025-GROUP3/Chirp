@@ -4,6 +4,10 @@ using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Services;
 using System.ComponentModel.DataAnnotations;
 
+using Chirp.Infrastructure.Repositories;
+
+using Microsoft.EntityFrameworkCore;
+
 namespace Chirp.Tests;
 
 public class CheepServiceTests
@@ -97,7 +101,7 @@ public class CheepServiceTests
             throw new NotImplementedException();
         }
 
-        public Task DeleteAuthor(string authorNameOrEmail)
+        public Task<Author> DeleteAuthor(string authorNameOrEmail)
         {
             throw new NotImplementedException();
         }
@@ -186,5 +190,47 @@ public class CheepServiceTests
         
         var createdCheeps = repository.GetCreatedCheeps();
         Assert.Empty(createdCheeps);
+    }
+
+    [Theory]
+    [InlineData("Alice", "Alice@Alice.com", 3, 7)]
+    [InlineData("Bob", "Bob@Bob.com", 3, 12)]
+    [InlineData("Charlie", "Charlie@Charlie.com", 3, 15)]
+    [InlineData("David", "David@David.com", 3, 17)]
+    public async Task DeleteAuthor(string username, string email, int expectedAuthors, int expectedCheeps)
+    {
+        //arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var cheepRepo = new CheepRepository(context);
+        var authorRepo = new AuthorRepository(context);
+        var authorService = new AuthorService(authorRepo, cheepRepo);
+        
+        await authorService.AddAuthorToFollowsList("Bob", "Alice");
+        await authorService.AddAuthorToFollowsList("Charlie", "Alice");
+        await authorService.AddAuthorToFollowsList("Alice", "Bob");
+        await authorService.AddAuthorToFollowsList("Alice", "Charlie");
+        await authorService.AddAuthorToFollowsList("Bob", "Charlie");
+        await authorService.AddAuthorToFollowsList("David", "Charlie");
+        
+        //act
+        Task<AuthorDTO> removedAuthor = null!;
+        var exception = await Record.ExceptionAsync(() => removedAuthor = authorService.DeleteAuthor(username));
+        var amountOfAuthors = context.Authors.Count();
+        var amountOfCheeps = context.Cheeps.Count();
+        
+        //assert
+        Assert.Null(exception);
+        Assert.Equal(expectedAuthors, amountOfAuthors);
+        Assert.Equal(expectedCheeps, amountOfCheeps);
+        var dto = await removedAuthor;
+        Assert.Equal(username, dto.Name);
+        Assert.Equal(email, dto.Email);
+        
+        foreach (var author1 in context.Authors)
+        {
+            var follows = await authorService.GetFollowsList(author1.UserName);
+            Assert.DoesNotContain(follows, a => a.Name == username);
+        }
     }
 }
