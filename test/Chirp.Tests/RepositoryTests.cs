@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
 using System.Globalization;
+using System.Runtime.InteropServices;
 
 using NuGet.Packaging;
 
@@ -142,9 +143,13 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
     /// <param name="expectedCheeps"></param>
     [Theory]
     [InlineData("Alice", 3, 7)]
+    [InlineData("Alice@Alice.com", 3, 7)]
     [InlineData("Bob", 3, 12)]
+    [InlineData("Bob@Bob.com", 3, 12)]
     [InlineData("Charlie", 3, 15)]
+    [InlineData("Charlie@Charlie.com", 3, 15)]
     [InlineData("David", 3, 17)]
+    [InlineData("David@David.com", 3, 17)]
     public async Task DeleteAuthorTest_Succeeds(string author, int expectedAuthors, int expectedCheeps)
     {
         //Arrange
@@ -160,7 +165,7 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
         await authorRepo.AddAuthorToFollows("Alice", "Charlie");
         await authorRepo.AddAuthorToFollows("Bob", "Charlie");
         await authorRepo.AddAuthorToFollows("David", "Charlie");
-        var authorToRemove = await context.Authors.Where(a => a.UserName == author).Select(a => a).FirstAsync();
+        var authorToRemove = await context.Authors.Where(a => a.UserName == author || a.Email == author).Select(a => a).FirstAsync();
         
         //act
         Task<Author> removedAuthor = null!;
@@ -181,8 +186,16 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
         }
     }
     
-    [Fact]
-    public async Task DeleteAuthorTest_Fails()
+    [Theory]
+    [InlineData("Aalice")]
+    [InlineData("alice")]
+    [InlineData("alice@alice.com")]
+    [InlineData("Alice@alice.com")]
+    [InlineData("Bob@b0b.com")]
+    [InlineData("B0b")]
+    [InlineData("Alice&Alice.com")]
+    [InlineData(".39m0f?3")]
+    public async Task DeleteAuthorTest_Fails(string authorToDelete)
     {
         //Arrange
         await using var context = Utility.CreateFakeChirpDbContext();
@@ -191,7 +204,7 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
         var cheepRepo = new CheepRepository(context);
         
         //act & assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => authorRepo.DeleteAuthor("ThisAuthorDoesNotExist"));
+        await Assert.ThrowsAsync<InvalidOperationException>(() => authorRepo.DeleteAuthor(authorToDelete));
         Assert.Equal(4, context.Authors.Count());
         Assert.Equal(17, await cheepRepo.GetTotalPublicCheeps());
     } 
