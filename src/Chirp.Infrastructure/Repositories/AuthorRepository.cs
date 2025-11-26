@@ -15,7 +15,7 @@ public class AuthorRepository : IAuthorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<int> GetAuthorID(string authorNameOrEmail)
+    public async Task<int> GetAuthorId(string authorNameOrEmail)
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
@@ -95,6 +95,28 @@ public class AuthorRepository : IAuthorRepository
         
         authorToRemoveFrom.Follows.Remove(authorToRemove);
         await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Completely removes an Author from the Chirp Application and all references to it in the database. It returns the Author object just deleted.
+    /// <b>WARNING:</b> This cannot be undone completely e.x other Authors will lose their references to this object!
+    /// </summary>
+    /// <param name="authorNameOrEmail">username or email of the Author</param>
+    /// <returns>The Deleted Author</returns>
+    /// <exception cref="ArgumentException">If the parameter is null or is whitespace</exception>
+    public async Task<Author> DeleteAuthor(string authorNameOrEmail)
+    {
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail))
+            throw new ArgumentException("authorNameOrEmail must not be null or whitespace!");
+
+        var authorToRemove = await _dbContext.Authors
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author)
+            .FirstAsync();
+        
+        _dbContext.Remove(authorToRemove);
+        await _dbContext.SaveChangesAsync();
+        return authorToRemove;
     }
 }
 

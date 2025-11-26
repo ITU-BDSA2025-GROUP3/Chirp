@@ -11,57 +11,14 @@ using Microsoft.EntityFrameworkCore;
 using Xunit.Abstractions;
 
 using System.Globalization;
+using System.Runtime.InteropServices;
+
+using NuGet.Packaging;
 
 namespace Chirp.Tests;
 
-public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
+public class RepositoryTests(ITestOutputHelper testOutputHelper)
 {
-    private static ChirpDbContext CreateFakeChirpDbContext()
-    {
-        var connection = new SqliteConnection("Filename=:memory:");
-        connection.Open();
-        var contextOptions = new DbContextOptionsBuilder<ChirpDbContext>().UseSqlite(connection).Options;
-        
-        var context = new ChirpDbContext(contextOptions);
-        context.Database.EnsureDeletedAsync(); 
-        context.Database.EnsureCreatedAsync(); 
-        return context;
-    }
-
-    private static void SeedDatabase(ChirpDbContext context)
-    {
-
-        //create a dictionary of how many cheeps to create for each author - ease of access
-        var cheepsPerAuthor = new Dictionary<String, int>
-        {
-            { "Alice", 10 }, { "Bob", 5 }, { "Charlie", 2 }, { "David", 0 }
-        };
-
-        List<Author> authorList = [];
-        List<Cheep> cheepList = [];
-        var IdCounter = 1; //must be at least "1" as EF-Core expects this, lest breaking the system
-        var timestampCounter = 0;
-        foreach (var name in cheepsPerAuthor)
-        {
-            var author = new Author { Id = IdCounter++, UserName = name.Key, Email = $"{name}@{name}.com", Cheeps = new  List<Cheep>(), Follows = new  List<Author>() };
-            authorList.Add(author);
-            for (int i = 0; i < name.Value; i++)
-            {
-                var cheep = new Cheep
-                {
-                    Text = "test",
-                    TimeStamp = new DateTime(timestampCounter++),
-                    IdOfAuthor = author.Id,
-                    Author = author
-                };
-                author.Cheeps.Add(cheep);
-                cheepList.Add(cheep);
-            }
-        }
-        context.Cheeps.AddRange(cheepList);
-        context.Authors.AddRange(authorList);
-        context.SaveChanges();
-    }
     
     [Theory]
     [InlineData(1, 32, 32)]
@@ -71,7 +28,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     public async Task ReadCheepsFromPageTestNumberOfCheeps(int page, int pageSize, int expected)
     {
         //arrange
-        using var context = CreateFakeChirpDbContext();
+        await using var context = Chirp.Tests.Utility.CreateFakeChirpDbContext();
         DbInitializer.SeedDatabase(context);
         var repo = new CheepRepository(context);
         //act
@@ -84,7 +41,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     public async Task ReadCheepsFromPageTest()
     {
         //arrange
-        using var context = CreateFakeChirpDbContext();
+        await using var context = Utility.CreateFakeChirpDbContext();
         var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
         var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
         var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
@@ -117,8 +74,8 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     public async Task ReadCheepsFromPageTest2(int page, int pageSize, int expected)
     {
         //arrange
-        using var context = CreateFakeChirpDbContext();
-        SeedDatabase(context); //using the mocked data of 17 cheeps and 4 authors
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context); //using the mocked data of 17 cheeps and 4 authors
         var repo = new CheepRepository(context);
         
         //act
@@ -131,7 +88,7 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     [Fact]
     public async Task CreateCheep_WithInvalidAuthor()
     {
-        using var context = CreateFakeChirpDbContext();
+        await using var context = Utility.CreateFakeChirpDbContext();
         // Arrange
         var repository = new CheepRepository(context);
         var dto = new CheepDTO{ UserName = "invalidUser@email.com", Message = "I'm not a test", };
@@ -147,8 +104,8 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
     public async Task CreateCheep_SavesCheepToDatabase()
     {
         //Arrange
-        await using var context = CreateFakeChirpDbContext();
-        SeedDatabase(context);
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
         
         var repo = new CheepRepository(context);
 
@@ -177,4 +134,78 @@ public class CheepRepositoryTests(ITestOutputHelper testOutputHelper)
         Assert.Equal("Alice", savedCheep.Author.UserName);
         Assert.Equal(message, savedCheep.Text);
     }
+
+    /// <summary>
+    /// Tests that an author's information is deleted from places that references it in the database.
+    /// </summary>
+    /// <param name="author"></param>
+    /// <param name="expectedAuthors"></param>
+    /// <param name="expectedCheeps"></param>
+    [Theory]
+    [InlineData("Alice", 3, 7)]
+    [InlineData("Alice@Alice.com", 3, 7)]
+    [InlineData("Bob", 3, 12)]
+    [InlineData("Bob@Bob.com", 3, 12)]
+    [InlineData("Charlie", 3, 15)]
+    [InlineData("Charlie@Charlie.com", 3, 15)]
+    [InlineData("David", 3, 17)]
+    [InlineData("David@David.com", 3, 17)]
+    public async Task DeleteAuthorTest_Succeeds(string author, int expectedAuthors, int expectedCheeps)
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+            //add followings
+        await authorRepo.AddAuthorToFollows("Bob", "Alice");
+        await authorRepo.AddAuthorToFollows("Charlie", "Alice");
+        await authorRepo.AddAuthorToFollows("Alice", "Bob");
+        await authorRepo.AddAuthorToFollows("Alice", "Charlie");
+        await authorRepo.AddAuthorToFollows("Bob", "Charlie");
+        await authorRepo.AddAuthorToFollows("David", "Charlie");
+        var authorToRemove = await context.Authors.Where(a => a.UserName == author || a.Email == author).Select(a => a).FirstAsync();
+        
+        //act
+        Task<Author> removedAuthor = null!;
+        var exception = await Record.ExceptionAsync(() => removedAuthor = authorRepo.DeleteAuthor(author));
+        var amountOfAuthors = context.Authors.Count();
+        var amountOfCheeps = context.Cheeps.Count();
+        
+        //assert
+        Assert.Null(exception);
+        Assert.Equal(expectedAuthors, amountOfAuthors);
+        Assert.Equal(expectedCheeps, amountOfCheeps);
+        Assert.Equal(authorToRemove, await removedAuthor);
+        
+        foreach (var author1 in context.Authors)
+        {
+            var follows = await authorRepo.GetFollowedList(author1.UserName);
+            Assert.DoesNotContain(follows, a => a.UserName == author);
+        }
+    }
+    
+    [Theory]
+    [InlineData("Aalice")]
+    [InlineData("alice")]
+    [InlineData("alice@alice.com")]
+    [InlineData("Alice@alice.com")]
+    [InlineData("Bob@b0b.com")]
+    [InlineData("B0b")]
+    [InlineData("Alice&Alice.com")]
+    [InlineData(".39m0f?3")]
+    public async Task DeleteAuthorTest_Fails(string authorToDelete)
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        
+        //act & assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() => authorRepo.DeleteAuthor(authorToDelete));
+        Assert.Equal(4, context.Authors.Count());
+        Assert.Equal(17, await cheepRepo.GetTotalPublicCheeps());
+    } 
 }
