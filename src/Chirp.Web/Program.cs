@@ -31,6 +31,8 @@ if (builder.Configuration["authentication:github:clientId"] != null && builder.C
             options.ClientId = builder.Configuration["authentication:github:clientId"] ?? string.Empty;
             options.ClientSecret = builder.Configuration["authentication:github:clientSecret"] ?? string.Empty;
             options.CallbackPath = "/signin-github";
+            options.Scope.Add("read:user");
+            options.Scope.Add("user:email");
         });
 }
 
