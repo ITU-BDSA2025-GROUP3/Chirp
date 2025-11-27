@@ -77,7 +77,7 @@ jobs:
           name: dotnet-chirp
           
       - name: Build playwright binaries
-        run: dotnet build test/Chirp.PlaywrightTests --no-restore --configuration Debug
+        run: dotnet build test/Chirp.PlaywrightTests --configuration Debug
           
       - name: Start Web App
         run: dotnet run --project "src/Chirp.Web" &
