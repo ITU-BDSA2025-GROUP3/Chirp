@@ -56,7 +56,7 @@ jobs:
           name: dotnet-chirp
           
       - name: Test
-        run: dotnet test --no-build
+        run: dotnet test test/Chirp.Tests --no-build
 
   playwright:
     name: Playwright tests
@@ -75,6 +75,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dotnet-chirp
+          
+      - name: Build playwright binaries
+        run: dotnet build test/Chirp.PlaywrightTests --no-restore --configuration Debug
           
       - name: Start Web App
         run: dotnet run --project "src/Chirp.Web" &
