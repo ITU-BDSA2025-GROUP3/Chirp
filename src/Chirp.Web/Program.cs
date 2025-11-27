@@ -33,6 +33,13 @@ if (builder.Configuration["authentication:github:clientId"] != null && builder.C
             options.CallbackPath = "/signin-github";
             options.Scope.Add("read:user");
             options.Scope.Add("user:email");
+            options.Events.OnRemoteFailure = context =>
+            {
+                //Redirect user back to register page on remote failure.
+                context.Response.Redirect("/Identity/Account/Register");
+                context.HandleResponse();
+                return Task.CompletedTask;
+            };
         });
 }
 
