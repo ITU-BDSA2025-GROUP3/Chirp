@@ -37,6 +37,17 @@ public class AuthorService : IAuthorService
         return cheepDTOs;
     }
     
+    public async Task <AuthorDTO> GetAuthor(string author)
+    {
+        var _author = await _authorRepository.GetAuthor(author);
+        return new AuthorDTO
+        {
+            Name = _author.UserName, 
+            Email = _author.Email,
+        };
+            
+    }
+    
     public async Task<int> GetTotalAuthorCheeps(string author)
     {
         var authorId = await _authorRepository.GetAuthorId(author);
@@ -91,5 +102,22 @@ public class AuthorService : IAuthorService
             Name = author.UserName,
             Email = author.Email
         };
+    }
+    
+    public async Task<List<CheepDTO>> GetMyCheeps(string author)
+    {
+        var authorId = await _authorRepository.GetAuthorId(author);
+        if (authorId == 0) return new List<CheepDTO>();
+        
+        var  authorIds = new List<int>{authorId};
+        var cheeps = await _cheepRepository.ReadTimelineCheeps(CurrentPage, PAGE_SIZE, authorIds);
+        
+        var cheepDTOs = cheeps.Select(cheep => new CheepDTO{
+        Message = cheep.Text,
+        TimeStamp = new DateTimeOffset(cheep.TimeStamp)
+            .ToLocalTime()
+            .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+        }).ToList();
+        return cheepDTOs;
     }
 }

@@ -1,3 +1,4 @@
+using Chirp.Core;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Database;
 
@@ -117,6 +118,16 @@ public class AuthorRepository : IAuthorRepository
         _dbContext.Remove(authorToRemove);
         await _dbContext.SaveChangesAsync();
         return authorToRemove;
+    }
+
+    public async Task<Author> GetAuthor(string  authorNameOrEmail)
+    {
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return null;
+        var query = await _dbContext.Authors
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author)
+            .FirstOrDefaultAsync();
+        return query;
     }
 }
 

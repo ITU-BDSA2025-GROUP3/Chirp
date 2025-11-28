@@ -1,0 +1,62 @@
+@page "/MyInformation"
+@model Chirp.Web.Pages.InformationModel
+@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+
+@{
+    ViewData["Title"] = "My Information";
+    Layout = "Shared/_Layout";
+    var routeName = HttpContext.GetRouteValue("author")?.ToString();
+    //var currentUser = User.Identity!.Name;
+}
+<div>
+    <h2> User Information</h2>
+    @if (Model.CurrentAuthor != null)
+    {
+        <div class="userInformation">
+            <p>Username: @Model.CurrentAuthor.Name </p>
+            <p>Email address: @Model.CurrentAuthor.Email</p>
+        </div>
+    }
+
+    <div class="MyFollowList">
+        <h2>My follow list</h2>
+        @if (Model.Followers == null || Model.Followers.Count == 0)
+        {
+            <p>You haven't followed anyone yet</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var f in Model.Followers)
+                {
+                    <li><a href="/@f.Name">@f.Name</a></li>
+                }
+            </ul>
+        }
+    </div>
+    
+    <div class="MyPreviousCheeps">
+      <h2>My previous cheeps</h2>
+      @if (Model.Cheeps == null || Model.Cheeps.Count == 0)
+      {
+          <p>You haven't posted any cheeps yet</p>
+      }
+      else
+      {
+          <ul>
+              @foreach (var c in Model.Cheeps)
+              {
+                  <li>@c.TimeStamp: @c.Message</li>
+              }
+          </ul>
+      }
+    </div>
+    
+    <div class="downloadButton">
+        <p>Click on the button below to download all you information:</p>
+        <a asp-page-handler="Download">
+            <button type="button">Download</button>
+        </a>
+    </div>
+</div>

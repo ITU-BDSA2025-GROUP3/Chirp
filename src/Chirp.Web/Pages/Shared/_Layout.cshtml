@@ -15,6 +15,7 @@
             <div>
                 <a href="/@(User.Identity.Name)">My Timeline</a> |
                 <a href="/">Public Timeline</a> |
+                <a asp-page="/Information">My information</a> |
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Logout">Logout [@(User.Identity.Name)]</a>
             </div>
         }
@@ -22,7 +23,7 @@
         {
             <div>
                 <a href="/">public timeline</a> |
-                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a>
+                <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Register</a> |
                 <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Login</a>
             </div>
         }
