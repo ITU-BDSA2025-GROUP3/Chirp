@@ -15,7 +15,40 @@ public class CheepRepository : ICheepRepository
     {
         _dbContext = dbContext;
     }
-
+    
+    // TODO query the backend for the cheep to append the comment to, need to alsop retrieve who the commenter author is
+    public async Task CreateComment(String nameOfAuthorCommenting, CheepDTO newComment, int CheepId)
+    {
+        // retrieve the ID of the cheep being commented on
+        var cheep = await _dbContext.Cheeps.SingleOrDefaultAsync(cheep => cheep.CheepId == CheepId);
+        // retrieve the author who is commenting
+        var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
+        // create a new comment with the content of the posted message
+        var comment = new Cheep()
+        {
+            IdOfAuthor = author.Id,
+            Author = author,
+            Text = "", 
+            TimeStamp = DateTime.UtcNow,
+        };
+        
+        cheep.Comments.Add(comment);
+        _dbContext.Cheeps.Add(comment);
+        await _dbContext.SaveChangesAsync();
+    }
+        
+    // TODO get from DB a list of cheep comments assoctiated with a specific post
+    public async Task<List<Cheep>> GetCommentsList(int page, int pageSize)
+    {
+        var query = await _dbContext.Cheeps
+            .Include(cheep => cheep.Author)
+            .OrderByDescending(cheep => cheep.TimeStamp)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+        return query;
+    }
+    
     public async Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize)
     {
         var query = await _dbContext.Cheeps
@@ -81,6 +114,7 @@ public class CheepRepository : ICheepRepository
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
+            Comments = new List<Cheep>(),
         };
         command.Cheeps.Add(cheep);
         _dbContext.Cheeps.Add(cheep);

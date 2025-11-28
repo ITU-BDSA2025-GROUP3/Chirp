@@ -16,6 +16,7 @@ public class PublicModel : PageModel
         _authorService = authorService;
     }
     public required List<CheepDTO> Cheeps { get; set; }
+    public required List<CheepDTO> Comments { get; set; }
     public List<AuthorDTO> Followers { get; private set; } = new();
     public int TotalPages { get; private set; }
     public int CurrentPage;
@@ -39,11 +40,46 @@ public class PublicModel : PageModel
     {
         _cheepService.CurrentPage = 1;
         Cheeps = await _cheepService.GetCheeps();
+        Comments = await _cheepService.GetComments();
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
         TotalPages = await _cheepService.GetTotalCheeps();
         CurrentPage = _cheepService.CurrentPage;
     }
-
+    
+    // TODO add comment and display under cheep commented on
+    public async Task<ActionResult> OnPostCommentFormAsync()
+    {
+        var author = User.Identity!.Name;
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+            return Page();
+        }
+        await _cheepService.AddNewComment(author!, Message, Cheeps);
+        return RedirectToPage();
+    }
+    
+    // TODO render comment form on click
+    public async Task<ActionResult> OnPostCommentBtnAsync(string authorToComment)
+    {
+        var user = User.Identity!.Name;
+        await _authorService.AddAuthorToFollowsList(authorToComment, user!);
+        
+        // var comments = await _authorService.GetFollowsList(user!);
+        // Console.WriteLine($"[{DateTime.Now}] {user} now follows: {string.Join(",", comments.Select(a => a.Name))}");
+        return RedirectToPage();
+    }
+    // TODO Render comment list on follows 
+    public async Task<ActionResult> OnPostCommentShowAsync(string authorToComment)
+    {
+        var user = User.Identity!.Name;
+        await _authorService.AddAuthorToFollowsList(authorToComment, user!);
+        
+        // var comments = await _authorService.GetFollowsList(user!);
+        // Console.WriteLine($"[{DateTime.Now}] {user} now follows: {string.Join(",", comments.Select(a => a.Name))}");
+        return RedirectToPage();
+    }
+    
     public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
     {
         var follower = User.Identity!.Name;

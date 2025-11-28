@@ -18,5 +18,5 @@ public class Cheep
     [Required]
     public required Author Author { get; set; }
     
-    
+    public required ICollection<Cheep> Comments { get; set; } =  new List<Cheep>();
 }

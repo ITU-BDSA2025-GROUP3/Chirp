@@ -40,10 +40,15 @@
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp</small>
                     </p>
-
+                    
                     @if (User.Identity!.IsAuthenticated && User.Identity.Name != cheep.UserName)
                     {
-                        // TODO check if current user is message author, don't render follow/unfollow btn
+                        <form method="post" asp-page-handler="CommentBtn" asp-route-authorToComment="@cheep.UserName" style="margin-right: 5px">
+                            <button type="submit">Open Comments</button>
+                        </form>
+                        <form method="post" asp-page-handler="ShowComments" asp-route-authorToComment="@cheep.UserName" style="margin-right: 5px">
+                            <button type="submit">Comment</button>
+                        </form>
                         
                         var isFollowing = Model.Followers.Any(f => f.Name == cheep.UserName);
                         if (isFollowing)
@@ -60,6 +65,40 @@
                         }
                     }
                 </li>
+                @* TODO Display only when user clicks comment button *@
+                @* @if (User.Identity!.IsAuthenticated) *@
+                @* { *@
+                @*     <div class="cheepbox"> *@
+                @*         <h3>What's on your mind @(User.Identity.Name)? (comment) </h3> *@
+                @*         <form method="post" asp-page-handler="CommentForm"> *@
+                @*             <input style="float: left" type="text" asp-for="Message"> *@
+                @*             <button type="submit" *@
+                @*                     style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0"> *@
+                @*                 Submit *@
+                @*             </button> *@
+                @*             <span asp-validation-for="Message" style="color: red; display: inline-flex"></span> *@
+                @*         </form> *@
+                @*     </div> *@
+                @* } *@
+                // TODO display all existing comments here when user clicks
+                @* if (Model.Comments.Any()) *@
+                @* { *@
+                @*     <ul id="messagelist" class="cheeps"> *@
+                @*         <li style="display: inline-flex; *@
+                @*         flex-direction: row; *@
+                @*         justify-content: space-between; *@
+                @*         align-items: center; *@
+                @*         width: 98%;"> *@
+                @*             <p> *@
+                @*                 <strong> *@
+                @*                     <a href="/@cheep.UserName">@cheep.UserName</a> *@
+                @*                 </strong> *@
+                @*                 @cheep.Message *@
+                @*                 <small>&mdash; @cheep.TimeStamp</small> *@
+                @*             </p> *@
+                @*         </li> *@
+                @*     </ul> *@
+                @* } *@
             }
         </ul>
     }
