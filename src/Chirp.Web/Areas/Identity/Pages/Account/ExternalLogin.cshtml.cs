@@ -1,6 +1,5 @@
 // Licensed to the .NET Foundation under one or more agreements.
 // The .NET Foundation licenses this file to you under the MIT license.
-
 #nullable disable
 
 using System;
@@ -11,15 +10,11 @@ using System.Text.Encodings.Web;
 using System.Threading;
 using System.Threading.Tasks;
 
-using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
-using Chirp.Core.ServiceInterfaces;
 
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
-
 using Chirp.Infrastructure;
-
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -32,21 +27,21 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ExternalLoginModel : PageModel
     {
-        private readonly SignInManager<Author> _signInManager;
-        private readonly UserManager<Author> _userManager;
-        private readonly IUserStore<Author> _userStore;
-        private readonly IUserEmailStore<Author> _emailStore;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IUserStore<ApplicationUser> _userStore;
+        private readonly IUserEmailStore<ApplicationUser> _emailStore;
         private readonly IEmailSender _emailSender;
         private readonly ILogger<ExternalLoginModel> _logger;
-        private readonly IAuthorService _authorService;
+        private readonly IAuthorRepository _authorRepository;
 
         public ExternalLoginModel(
-            SignInManager<Author> signInManager,
-            UserManager<Author> userManager,
-            IUserStore<Author> userStore,
+            SignInManager<ApplicationUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            IUserStore<ApplicationUser> userStore,
             ILogger<ExternalLoginModel> logger,
             IEmailSender emailSender,
-            IAuthorService authorService
+            IAuthorRepository authorRepository
             )
         {
             _signInManager = signInManager;
@@ -55,7 +50,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             _emailStore = GetEmailStore();
             _logger = logger;
             _emailSender = emailSender;
-            _authorService = authorService;
+            _authorRepository = authorRepository;
         }
 
         /// <summary>
@@ -95,9 +90,15 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             ///     Users first name
             /// </summary>
             [Required]
-            [Display(Name = "User name")]
-            public string UserName { get; set; }
-
+            [Display(Name = "First name")]
+            public string Firstname { get; set; }
+            
+            /// <summary>
+            ///     Users Last name
+            /// </summary>
+            [Display(Name = "Last name")]
+            public string Surname { get; set; }
+            
             /// <summary>
             ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
             ///     directly from your code. This API may change or be removed in future releases.
@@ -106,7 +107,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             [EmailAddress]
             public string Email { get; set; }
         }
-
+        
         public IActionResult OnGet() => RedirectToPage("./Login");
 
         public IActionResult OnPost(string provider, string returnUrl = null)
@@ -125,7 +126,6 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 ErrorMessage = $"Error from external provider: {remoteError}";
                 return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
             }
-
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
@@ -134,15 +134,12 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey,
-                isPersistent: false, bypassTwoFactor: true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor: true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
-                    info.LoginProvider);
+                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
-
             if (result.IsLockedOut)
             {
                 return RedirectToPage("./Lockout");
@@ -154,9 +151,11 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 ProviderDisplayName = info.ProviderDisplayName;
                 if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
                 {
-                    Input = new InputModel { Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
+                    Input = new InputModel
+                    {
+                        Email = info.Principal.FindFirstValue(ClaimTypes.Email)
+                    };
                 }
-
                 return Page();
             }
         }
@@ -175,10 +174,12 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             if (ModelState.IsValid)
             {
                 var user = CreateUser();
-
+                
                 //Set their name to their name
-                user.UserName = Input.UserName;
-
+                user.Firstname = Input.Firstname;
+                
+                //Users are not required to input their last name for now
+                user.Surname = Input.Surname ?? string.Empty;
 
                 await _userStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -186,7 +187,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user);
                 if (result.Succeeded)
                 {
-                    //await _authorRepository.CreateAuthor($"{user.UserName}", Input.Email);
+                    await _authorRepository.CreateAuthor($"{user.Firstname} {user.Surname}", Input.Email);
                     result = await _userManager.AddLoginAsync(user, info);
                     if (result.Succeeded)
                     {
@@ -214,7 +215,6 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                         return LocalRedirect(returnUrl);
                     }
                 }
-
                 foreach (var error in result.Errors)
                 {
                     ModelState.AddModelError(string.Empty, error.Description);
@@ -226,28 +226,27 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
             return Page();
         }
 
-        private Author CreateUser()
+        private ApplicationUser CreateUser()
         {
             try
             {
-                return Activator.CreateInstance<Author>();
+                return Activator.CreateInstance<ApplicationUser>();
             }
             catch
             {
-                throw new InvalidOperationException($"Can't create an instance of '{nameof(Author)}'. " +
-                                                    $"Ensure that '{nameof(Author)}' is not an abstract class and has a parameterless constructor, or alternatively " +
-                                                    $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
+                throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
+                    $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor, or alternatively " +
+                    $"override the external login page in /Areas/Identity/Pages/Account/ExternalLogin.cshtml");
             }
         }
 
-        private IUserEmailStore<Author> GetEmailStore()
+        private IUserEmailStore<ApplicationUser> GetEmailStore()
         {
             if (!_userManager.SupportsUserEmail)
             {
                 throw new NotSupportedException("The default UI requires a user store with email support.");
             }
-
-            return (IUserEmailStore<Author>)_userStore;
+            return (IUserEmailStore<ApplicationUser>)_userStore;
         }
     }
 }

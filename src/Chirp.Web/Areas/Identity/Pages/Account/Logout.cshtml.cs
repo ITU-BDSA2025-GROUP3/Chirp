@@ -4,9 +4,6 @@
 
 using System;
 using System.Threading.Tasks;
-
-using Chirp.Core.DomainModel;
-
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -18,10 +15,10 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 {
     public class LogoutModel : PageModel
     {
-        private readonly SignInManager<Author> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly ILogger<LogoutModel> _logger;
 
-        public LogoutModel(SignInManager<Author> signInManager, ILogger<LogoutModel> logger)
+        public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
         {
             _signInManager = signInManager;
             _logger = logger;

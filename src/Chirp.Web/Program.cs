@@ -1,4 +1,3 @@
-using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Core.ServiceInterfaces;
 using Chirp.Infrastructure;
@@ -17,7 +16,7 @@ builder.Services.AddDbContext<ChirpDbContext>(options => options.UseSqlite(conne
 IDENTITY CONFIGURATIONS
 */
 
-builder.Services.AddDefaultIdentity<Author>(options =>
+builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
         options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ChirpDbContext>();
 

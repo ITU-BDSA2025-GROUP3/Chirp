@@ -5,9 +5,6 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
-
-using Chirp.Core.DomainModel;
-
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -19,10 +16,10 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 {
     public class ConfirmEmailChangeModel : PageModel
     {
-        private readonly UserManager<Author> _userManager;
-        private readonly SignInManager<Author> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public ConfirmEmailChangeModel(UserManager<Author> userManager, SignInManager<Author> signInManager)
+        public ConfirmEmailChangeModel(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;

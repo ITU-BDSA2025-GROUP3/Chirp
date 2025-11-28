@@ -14,7 +14,7 @@ public class Cheep
     public required DateTime TimeStamp { get; set; }
     
     [Required]
-    public required int IdOfAuthor { get; set; }
+    public required int AuthorId { get; set; }
     [Required]
     public required Author Author { get; set; }
     

@@ -1,5 +1,4 @@
-@using Chirp.Core.DomainModel
-@inject SignInManager<Author> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager
 @{
     var hasExternalLogins = (await SignInManager.GetExternalAuthenticationSchemesAsync()).Any();
 }
