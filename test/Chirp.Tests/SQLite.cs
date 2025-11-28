@@ -57,8 +57,8 @@ public class SQLite : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
         
         Assert.Equal(0, Context.Cheeps.Count());
         
-        var a1 = new Author() { AuthorId = 1, Name = "Roger Histand", Email = "Roger+Histand@hotmail.com", Cheeps = new List<Cheep>() };
-        var a2 = new Author() { AuthorId = 2, Name = "Luanna Muro", Email = "Luanna-Muro@ku.dk", Cheeps = new List<Cheep>() };
+        var a1 = new Author() { Id = 1, UserName = "Roger Histand", Email = "Roger+Histand@hotmail.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
+        var a2 = new Author() { Id = 2, UserName = "Luanna Muro", Email = "Luanna-Muro@ku.dk", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
         
         Context.Authors.Add(a1);
         Context.Authors.Add(a2);
@@ -67,8 +67,8 @@ public class SQLite : IClassFixture<TestDatabaseFixture>, IAsyncLifetime
         //Ensure authors can be saved to the memory database
         Assert.Equal(2, Context.Authors.Count());
         
-        var c14 = new Cheep() { CheepId = 14, AuthorId = a1.AuthorId, Author = a1, Text = "You are here for at all?", TimeStamp = DateTime.Parse("2023-08-01 13:13:18") };
-        var c57 = new Cheep() { CheepId = 57, AuthorId = a2.AuthorId, Author = a2, Text = "See how that murderer could be from any trivial business not connected with her.", TimeStamp = DateTime.Parse("2023-08-01 13:13:21") };
+        var c14 = new Cheep() { CheepId = 14, IdOfAuthor = a1.Id, Author = a1, Text = "You are here for at all?", TimeStamp = DateTime.Parse("2023-08-01 13:13:18") };
+        var c57 = new Cheep() { CheepId = 57, IdOfAuthor = a2.Id, Author = a2, Text = "See how that murderer could be from any trivial business not connected with her.", TimeStamp = DateTime.Parse("2023-08-01 13:13:21") };
         
         //Ensure that cheeps can be saved to the memory database
         Context.Cheeps.Add(c14);

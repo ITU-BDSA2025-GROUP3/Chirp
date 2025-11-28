@@ -5,6 +5,9 @@
 using System;
 using System.Text;
 using System.Threading.Tasks;
+
+using Chirp.Core.DomainModel;
+
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -18,10 +21,10 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class RegisterConfirmationModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<Author> _userManager;
         private readonly IEmailSender _sender;
 
-        public RegisterConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender sender)
+        public RegisterConfirmationModel(UserManager<Author> userManager, IEmailSender sender)
         {
             _userManager = userManager;
             _sender = sender;
