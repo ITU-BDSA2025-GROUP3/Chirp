@@ -16,18 +16,17 @@ public class PostCheepTests : PageTest
         await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
 
         
-        await Page.FillAsync("#Input_Email", "joe@itu.dk");
-        await Page.FillAsync("#Input_Password", "Test123!"); 
+        await Page.FillAsync("#Input_UserName", "elisa");
+        await Page.FillAsync("#Input_Password", "Oreo-12345");
         await Page.ClickAsync("button[type=submit]");
 
         await Expect(Page).ToHaveURLAsync("http://localhost:5273/");
-
         
         string message = "Playwright test cheep " + DateTime.Now.ToString("HHmmss");
         await Page.FillAsync("#Message", message);
 
        
-        await Page.ClickAsync("input[type=submit], button:has-text('Send')");
+        await Page.ClickAsync("input[type=submit], button:has-text('Submit')");
 
         
         var cheepList = Page.Locator("#messagelist");
