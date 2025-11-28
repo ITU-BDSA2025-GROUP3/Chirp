@@ -133,7 +133,7 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 var user = CreateUser();
                 
                 //Set their name to their name
-                user.UserName = Input.UserName;
+                //user.UserName = Input.UserName;
 
                 await _userStore.SetUserNameAsync(user, Input.UserName, CancellationToken.None);
                 await _emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
