@@ -16,9 +16,10 @@ public class CheepRepository : ICheepRepository
         _dbContext = dbContext;
     }
 
-    public async Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize)
+    public async Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize, List<string> tags)
     {
         var query = await _dbContext.Cheeps
+            .Where(cheep => tags.Count == 0 || cheep.Tags.Any(tags.Contains))
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
             .Skip((page - 1) * pageSize)
@@ -26,21 +27,22 @@ public class CheepRepository : ICheepRepository
             .ToListAsync();
         return query;
     }
-    
+
     /// <summary>
-    /// Returns cheeps on a specified page.
+    /// Returns cheeps on a specified page, filtering by any tags if provided.
     /// </summary>
     /// <param name="page">The page to return cheeps from</param>
     /// <param name="pageSize"></param>
     /// <param name="authorIds"></param>
+    /// <param name="tags"> will interpret empty or null as any or none cheep tags are allowed, i.e. no filtering.</param>
     /// <returns></returns>
     /// <exception cref="ArgumentOutOfRangeException"> Is thrown if the page number is less than 1</exception>
-    public async Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, List<int> authorIds)
+    public async Task<List<Cheep>> ReadTimelineCheeps(int page, int pageSize, List<int> authorIds, List<string>? tags)
     {
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
         
         var query = await _dbContext.Cheeps
-            .Where(cheep => authorIds.Contains(cheep.IdOfAuthor))
+            .Where(cheep => authorIds.Contains(cheep.IdOfAuthor) && (tags == null || tags.Count == 0 || cheep.Tags.Any(tags.Contains)))
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
             .Skip((page - 1) * pageSize)
@@ -49,14 +51,16 @@ public class CheepRepository : ICheepRepository
         return query;
     }
 
-    public Task<int> GetTotalPublicCheeps()
+    public Task<int> GetTotalPublicCheeps(List<string>? tags)
     {
         return _dbContext.Cheeps.CountAsync();
     }
 
-    public Task<int> GetTotalTimelineCheeps(List<int> authorIds)
+    public Task<int> GetTotalTimelineCheeps(List<int> authorIds, List<string>? tags)
     {
-        return _dbContext.Cheeps.CountAsync(cheep => authorIds.Contains(cheep.IdOfAuthor));
+        return _dbContext.Cheeps
+            .CountAsync(cheep => authorIds.Contains(cheep.IdOfAuthor) 
+                                 && (tags == null || tags.Count == 0 || cheep.Tags.Any(tags.Contains)));
     }
 
     /// <summary>
@@ -81,6 +85,7 @@ public class CheepRepository : ICheepRepository
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
+            Tags = newCheep.Tags
         };
         command.Cheeps.Add(cheep);
         _dbContext.Cheeps.Add(cheep);

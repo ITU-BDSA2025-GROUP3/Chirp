@@ -18,27 +18,28 @@ public class CheepService : ICheepService
         _cheepRepository = cheepRepository;
     }
     
-    public async Task<List<CheepDTO>> GetCheeps()
+    public async Task<List<CheepDTO>> GetCheeps(List<string>? tags)
     {
-        var cheeps = await _cheepRepository.ReadPublicCheeps(CurrentPage, PAGE_SIZE);
+        var cheeps = await _cheepRepository.ReadPublicCheeps(CurrentPage, PAGE_SIZE, tags);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            Tags = cheep.Tags
         }).ToList();
         return cheepDTOs;
     }
     
-    public async Task<int> GetTotalCheeps()
+    public async Task<int> GetTotalCheeps(List<string>? tags)
     {
-        var total = await _cheepRepository.GetTotalPublicCheeps();
+        var total = await _cheepRepository.GetTotalPublicCheeps(tags!);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 
-    public async Task AddNewCheep(string author, string message)
+    public async Task AddNewCheep(string author, string message, List<string>? tags)
     {
         if (string.IsNullOrWhiteSpace(author))
             throw new ValidationException("Author is required.");
@@ -53,7 +54,8 @@ public class CheepService : ICheepService
             Message = message,
             TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            Tags = tags
         };
         await _cheepRepository.CreateCheep(cheepDTOs);
     }

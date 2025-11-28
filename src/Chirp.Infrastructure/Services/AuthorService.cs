@@ -19,31 +19,32 @@ public class AuthorService : IAuthorService
         _authorRepository = authorRepository;
         _cheepRepository = cheepRepository;
     }
-    public async Task<List<CheepDTO>> GetAuthorCheeps(string author)
+    public async Task<List<CheepDTO>> GetAuthorCheeps(string author, List<string>? tags)
     {
         var authorId = await _authorRepository.GetAuthorId(author);
         if (authorId == 0) return new List<CheepDTO>();
         var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
-        var cheeps = await _cheepRepository.ReadTimelineCheeps(CurrentPage, PAGE_SIZE, authorIds);
+        var cheeps = await _cheepRepository.ReadTimelineCheeps(CurrentPage, PAGE_SIZE, authorIds, tags);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
             UserName = cheep.Author.UserName,
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            Tags = cheep.Tags
         }).ToList();
         return cheepDTOs;
     }
     
-    public async Task<int> GetTotalAuthorCheeps(string author)
+    public async Task<int> GetTotalAuthorCheeps(string author, List<string>? tags)
     {
         var authorId = await _authorRepository.GetAuthorId(author);
         if (authorId == 0) return 1;
         var authorIds = await _authorRepository.GetAuthorIDs(authorId);
         
-        var total = await _cheepRepository.GetTotalTimelineCheeps(authorIds);
+        var total = await _cheepRepository.GetTotalTimelineCheeps(authorIds, tags!);
         return Math.Max(1, (total + PAGE_SIZE - 1) / PAGE_SIZE);
     }
 

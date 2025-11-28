@@ -3,6 +3,9 @@ using Chirp.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
+
+using Microsoft.AspNetCore.Razor.Language;
 
 namespace Chirp.Web.Pages;
 
@@ -10,6 +13,9 @@ public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
+    private const string TagRegexString = "(#\\w+)";
+    private static readonly Regex TagRegex = new(TagRegexString);
+
     public UserTimelineModel(ICheepService cheepService, IAuthorService authorService)
     {
         _cheepService = cheepService;
@@ -20,6 +26,17 @@ public class UserTimelineModel : PageModel
     public List<AuthorDTO> Followers { get; private set; } = new();
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
+
+    private List<string> CreateTags()
+    {
+        List<string> tags = [];
+        var matches = TagRegex.Matches(Message);
+        foreach (Match match in matches)
+        {
+            tags.Add(match.Value.Normalize());
+        }
+        return tags;
+    } 
     
     [BindProperty]
     [Required(ErrorMessage = "Please enter a Cheep!")]
@@ -33,16 +50,17 @@ public class UserTimelineModel : PageModel
             await LoadAuthorCheeps(author!);
             return Page();
         }
-        await _cheepService.AddNewCheep(author!, Message);
+        var tags = CreateTags();
+        await _cheepService.AddNewCheep(author!, Message, tags);
         return RedirectToPage();
     }
     
     private async Task LoadAuthorCheeps(string author)
     {
         _authorService.CurrentPage = 1;
-        Cheeps = await _authorService.GetAuthorCheeps(author);
+        Cheeps = await _authorService.GetAuthorCheeps(author, null);
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
-        TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
+        TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author, null);
         CurrentPage = _authorService.CurrentPage;
     }
     
@@ -71,10 +89,11 @@ public class UserTimelineModel : PageModel
         {
             int pageQuery = Request.Query.ContainsKey("page") ? Convert.ToInt32(Request.Query["page"]) : 1;
             if (pageQuery < 1) throw new ArgumentOutOfRangeException();
+            List<string?> tags = Request.Query.ContainsKey("tags") ? Request.Query["tag"].ToList()! : [];
             _authorService.CurrentPage = pageQuery;
-            Cheeps = await _authorService.GetAuthorCheeps(author);
+            Cheeps = await _authorService.GetAuthorCheeps(author, tags!);
             Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
-            TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
+            TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author, tags!);
             CurrentPage = pageQuery;
         }    catch (FormatException)
         {
