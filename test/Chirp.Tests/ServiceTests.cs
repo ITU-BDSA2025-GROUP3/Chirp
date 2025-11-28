@@ -105,6 +105,11 @@ public class CheepServiceTests
         {
             throw new NotImplementedException();
         }
+
+        public Task<Author?> GetAuthor(string authorNameOrEmail)
+        {
+            throw new NotImplementedException();
+        }
     }
     
     private sealed class FakeCheepRepository : ICheepRepository
