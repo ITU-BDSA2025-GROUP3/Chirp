@@ -1,4 +1,3 @@
-using Chirp.Core.DomainModel;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Database;
 
@@ -16,36 +15,108 @@ public class AuthorRepository : IAuthorRepository
         _dbContext = dbContext;
     }
 
-    public async Task<int> GetAuthorIdFrom(string authorNameOrEmail)
+    public async Task<int> GetAuthorId(string authorNameOrEmail)
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return 0;
         var query = await _dbContext.Authors
-            .Where(author => author.Name == authorNameOrEmail || author.Email == authorNameOrEmail)
-            .Select(author => author.AuthorId)
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author.Id)
             .FirstOrDefaultAsync();
         return query;
     }
 
-    /// <summary>
-    /// creates new author, checks if the author already exists in the database, if not then create new author
-    /// </summary>
-    /// <param name="authorName">Name of the author, checks database existence on this param as it is unique</param>
-    /// <param name="authorEmail">Email of the author</param>
-    /// <returns></returns>
-    /// <exception cref="Exception"> Is thrown if the user already exists as an author in the database,
-    /// in the future will be redirected to loggin page or automagically log in user. 
-    /// </exception>
-    public async Task CreateAuthor(string authorName, string authorEmail)
+    public async Task<List<int>> GetAuthorIDs(int authorId)
     {
-        var author = new Author
-        {
-            AuthorId = 0,
-            Name = authorName.Trim(), 
-            Email = authorEmail.Trim(), 
-            Cheeps = new List<Cheep>()
-        };
-        _dbContext.Authors.Add(author);
+        var authorIds = await _dbContext.Authors
+            .Where(author => author.Id == authorId)
+            .SelectMany(author => author.Follows.Select(followed => followed.Id))
+            .ToListAsync();
+        authorIds.Add(authorId);
+        authorIds = authorIds.Distinct().ToList();
+        return authorIds;
+    }
+
+    public async Task<List<Author>> GetFollowedList(string authorNameOrEmail)
+    {
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return new List<Author>();
+        var query = await _dbContext.Authors
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Include(author => author.Follows)
+            .FirstOrDefaultAsync();
+        return query?.Follows.ToList() ?? new List<Author>();
+    }
+
+    /// <summary>
+    /// Adds the author of the first argument to the list of authors the 2nd argument follows. 
+    /// </summary>
+    /// <param name="nameOfAuthorToAdd"></param>
+    /// <param name="nameOfAuthorFollowing"></param>
+    public async Task AddAuthorToFollows(string nameOfAuthorToAdd, string nameOfAuthorFollowing)
+    {
+        if (string.IsNullOrWhiteSpace(nameOfAuthorToAdd) || string.IsNullOrWhiteSpace(nameOfAuthorFollowing))
+            throw new ArgumentException();
+        
+        var authorToAdd = await _dbContext.Authors
+            .Where(author => author.UserName == nameOfAuthorToAdd || author.Email == nameOfAuthorToAdd)
+            .Select(author => author)
+            .FirstOrDefaultAsync();
+        var authorToAddTo = await _dbContext.Authors
+            .Where(author => author.UserName == nameOfAuthorFollowing  || author.Email == nameOfAuthorFollowing)
+            .Select(author => author)
+            .FirstOrDefaultAsync();
+        
+        if (authorToAdd == null || authorToAddTo == null)
+            throw new InvalidOperationException($"Author not found:{nameOfAuthorToAdd}&{nameOfAuthorFollowing}");
+        
+        authorToAddTo.Follows.Add(authorToAdd);
         await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Removes the author of the first argument to the list of authors the 2nd argument follows. 
+    /// </summary>
+    /// <param name="nameOfAuthorToRemove"></param>
+    /// <param name="nameOfAuthorFollowing"></param>
+    public async Task RemoveAuthorFromFollows(string nameOfAuthorToRemove, string nameOfAuthorFollowing)
+    {
+        if (string.IsNullOrWhiteSpace(nameOfAuthorToRemove) || string.IsNullOrWhiteSpace(nameOfAuthorFollowing))
+            throw new ArgumentException();
+        
+        var authorToRemove = await _dbContext.Authors
+            .Where(author => author.UserName == nameOfAuthorToRemove || author.Email == nameOfAuthorToRemove)
+            .Select(author => author)
+            .FirstOrDefaultAsync();
+        var authorToRemoveFrom = await _dbContext.Authors
+            .Where(author => author.UserName == nameOfAuthorFollowing || author.Email == nameOfAuthorFollowing)
+            .Select(author => author)
+            .FirstOrDefaultAsync();
+        if (authorToRemove == null || authorToRemoveFrom == null)
+            throw new InvalidOperationException($"Author not found:{authorToRemove}&{authorToRemoveFrom}");
+        
+        authorToRemoveFrom.Follows.Remove(authorToRemove);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    /// <summary>
+    /// Completely removes an Author from the Chirp Application and all references to it in the database. It returns the Author object just deleted.
+    /// <b>WARNING:</b> This cannot be undone completely e.x other Authors will lose their references to this object!
+    /// </summary>
+    /// <param name="authorNameOrEmail">username or email of the Author</param>
+    /// <returns>The Deleted Author</returns>
+    /// <exception cref="ArgumentException">If the parameter is null or is whitespace</exception>
+    public async Task<Author> DeleteAuthor(string authorNameOrEmail)
+    {
+        if (string.IsNullOrWhiteSpace(authorNameOrEmail))
+            throw new ArgumentException("authorNameOrEmail must not be null or whitespace!");
+
+        var authorToRemove = await _dbContext.Authors
+            .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
+            .Select(author => author)
+            .FirstAsync();
+        
+        _dbContext.Remove(authorToRemove);
+        await _dbContext.SaveChangesAsync();
+        return authorToRemove;
     }
 }
 
