@@ -19,8 +19,8 @@ public class LoginTests : PageTest
 
         //Remember to change login to existing login in database!! 
         //(Extremely poor code to give login details in plain text though)
-        await Page.FillAsync("#Input_UserName", "elisa");
-        await Page.FillAsync("#Input_Password", "Oreo-12345");
+        await Page.FillAsync("#Input_UserName", "joe");
+        await Page.FillAsync("#Input_Password", "Test123!");
 
     
         await Page.ClickAsync("button[type=Submit]");

@@ -16,8 +16,8 @@ public class PostCheepTests : PageTest
         await Page.GotoAsync("http://localhost:5273/Identity/Account/Login");
 
         
-        await Page.FillAsync("#Input_UserName", "elisa");
-        await Page.FillAsync("#Input_Password", "Oreo-12345");
+        await Page.FillAsync("#Input_UserName", "joe");
+        await Page.FillAsync("#Input_Password", "Test123!");
         await Page.ClickAsync("button[type=submit]");
 
         await Expect(Page).ToHaveURLAsync("http://localhost:5273/");
