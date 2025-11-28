@@ -1,3 +1,4 @@
+using System.IO.Compression;
 using System.Text;
 using Chirp.Core;
 using Chirp.Core.ServiceInterfaces;
@@ -5,7 +6,7 @@ using Chirp.Core.ServiceInterfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+
 
 namespace Chirp.Web.Pages;
 
@@ -55,11 +56,52 @@ public class InformationModel : PageModel
         var cheeps = await _authorService.GetMyCheeps(userName);
         Cheeps = cheeps.ToList();
     }
-    
-   // public async Task<IActionResult> OnGetDownloadAsync()
-   // {
-   //     var fileName = "myInformation.txt";
-   //     var fileURL = "";
-   // }
+
+    public async Task<IActionResult> OnGetDownloadAsync()
+    {
+        await getUserNameAndEmail();
+        await getFollowList();
+        await getCheepsList();
+
+        using var stream = new MemoryStream();
+
+        using (var zip = new ZipArchive(stream, ZipArchiveMode.Create, leaveOpen: true))
+        {
+            // Username and email text file
+            var userInfo = zip.CreateEntry("myInfo.txt");
+            using (var streamWriter = new StreamWriter(userInfo.Open(), Encoding.UTF8))
+                if (CurrentAuthor != null)
+                {
+                    streamWriter.WriteLine($"Name: {CurrentAuthor.Name}");
+                    streamWriter.WriteLine($"Email: {CurrentAuthor.Email}");
+                }
+                else
+                {
+                    streamWriter.WriteLine("There is no information found.");
+                }
+            // Users follow list
+            var userFollowList = zip.CreateEntry("myFollowList.txt");
+            using (var streamWriter = new StreamWriter(userFollowList.Open(), Encoding.UTF8))
+            {
+                foreach (var follower in Followers)
+                {
+                    streamWriter.WriteLine($"Name: {follower.Name}");
+                }
+            }
+
+            // Users previous cheeps text file
+            var userCheeps = zip.CreateEntry("previousCheeps.txt");
+            using (var streamWriter = new StreamWriter(userCheeps.Open(), Encoding.UTF8))
+            {
+                foreach (var cheep in Cheeps)
+                {
+                    streamWriter.WriteLine($"{cheep.TimeStamp}: {cheep.Message}");
+                }
+            }
+        }
+        var bytes = stream.ToArray();
+        var filename = "userData.zip";
+        return File(bytes, "application/zip", filename);
+    }
 }
 
