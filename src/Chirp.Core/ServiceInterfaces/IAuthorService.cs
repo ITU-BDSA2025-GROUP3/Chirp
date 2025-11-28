@@ -9,4 +9,6 @@ public interface IAuthorService
     public Task RemoveAuthorFromFollowsList(string authorToRemove, string fromAuthor);
     public Task AddAuthorToFollowsList(string authorToAdd, string toAuthor);
     public Task<bool> AuthorExists(string author);
+    public Task<AuthorDTO> GetAuthor(string author);
+    public Task<List<CheepDTO>> GetMyCheeps(string author);
 }

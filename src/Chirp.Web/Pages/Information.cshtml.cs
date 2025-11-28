@@ -36,8 +36,8 @@ public class InformationModel : PageModel
 
     public async Task getUserNameAndEmail()
     {
-        var userName = HttpContext.User.Identity.Name;
-       // CurrentAuthor = await _authorService.GetAuthor(userName);
+        var userNameOrEmail = HttpContext.User.Identity!.Name!; 
+        CurrentAuthor = await _authorService.GetAuthor(userNameOrEmail);
     }
     
     // link to other user this user is fowllowing
@@ -51,8 +51,8 @@ public class InformationModel : PageModel
     // all cheeps of the user should be listed
     public async Task getCheepsList()
     {
-        var userName = HttpContext.User.Identity.Name;
-        var cheeps = await _authorService.GetAuthorCheeps(userName);
+        var userName = HttpContext.User.Identity!.Name!;
+        var cheeps = await _authorService.GetMyCheeps(userName);
         Cheeps = cheeps.ToList();
     }
     

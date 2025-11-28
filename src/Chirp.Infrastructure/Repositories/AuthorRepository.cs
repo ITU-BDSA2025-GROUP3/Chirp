@@ -1,3 +1,4 @@
+using Chirp.Core;
 using Chirp.Core.RepositoryInterfaces;
 using Chirp.Infrastructure.Database;
 
@@ -106,7 +107,5 @@ public class AuthorRepository : IAuthorRepository
             .FirstOrDefaultAsync();
         return query;
     }
-    
-    
 }
 
