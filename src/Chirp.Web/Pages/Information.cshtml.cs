@@ -56,10 +56,10 @@ public class InformationModel : PageModel
         Cheeps = cheeps.ToList();
     }
     
-    // optional
-    /*public async Task<IActionResult> OnGetDownloadAsync()
-    {
-        return await Task.FromResult<IActionResult>(Page());
-    }*/
+   // public async Task<IActionResult> OnGetDownloadAsync()
+   // {
+   //     var fileName = "myInformation.txt";
+   //     var fileURL = "";
+   // }
 }
 
