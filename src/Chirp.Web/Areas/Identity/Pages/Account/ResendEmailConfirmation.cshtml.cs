@@ -7,6 +7,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+
+using Chirp.Core.DomainModel;
+
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -20,10 +23,10 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
     [AllowAnonymous]
     public class ResendEmailConfirmationModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<Author> _userManager;
         private readonly IEmailSender _emailSender;
 
-        public ResendEmailConfirmationModel(UserManager<ApplicationUser> userManager, IEmailSender emailSender)
+        public ResendEmailConfirmationModel(UserManager<Author> userManager, IEmailSender emailSender)
         {
             _userManager = userManager;
             _emailSender = emailSender;

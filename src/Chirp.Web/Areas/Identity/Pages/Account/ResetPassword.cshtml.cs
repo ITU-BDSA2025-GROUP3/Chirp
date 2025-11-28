@@ -6,6 +6,9 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Threading.Tasks;
+
+using Chirp.Core.DomainModel;
+
 using Microsoft.AspNetCore.Authorization;
 using Chirp.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -17,9 +20,9 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
 {
     public class ResetPasswordModel : PageModel
     {
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<Author> _userManager;
 
-        public ResetPasswordModel(UserManager<ApplicationUser> userManager)
+        public ResetPasswordModel(UserManager<Author> userManager)
         {
             _userManager = userManager;
         }
