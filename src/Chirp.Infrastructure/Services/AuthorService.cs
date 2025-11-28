@@ -106,7 +106,7 @@ public class AuthorService : IAuthorService
     
     public async Task<List<CheepDTO>> GetMyCheeps(string author)
     {
-        var authorId = await _authorRepository.GetAuthorID(author);
+        var authorId = await _authorRepository.GetAuthorId(author);
         if (authorId == 0) return new List<CheepDTO>();
         
         var  authorIds = new List<int>{authorId};
