@@ -44,9 +44,9 @@ public class CommentRepository : ICommentRepository
     /// </returns>
     public async Task<List<Comment>> GetCommentsList()
     {
-        var query = await _dbContext.Comments
-            .Include(comment => comment.Author)
-            .OrderByDescending(comment => comment.TimeStamp)
+        var query = await _dbContext.Cheeps
+            .Include(cheep => cheep.Author)
+            .OrderByDescending(cheep => cheep.TimeStamp)
             .ToListAsync();
         return query;
     }
