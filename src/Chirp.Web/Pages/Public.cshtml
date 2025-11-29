@@ -43,8 +43,9 @@
 
                     @if (User.Identity!.IsAuthenticated && User.Identity.Name != cheep.UserName)
                     {
-                        <form method="post" asp-page-handler="ShowComments" asp-route-cheepId="@cheep.CheepId" style="margin-right: 5px">
-                            <button type="submit">Comment</button>
+                        <form method="post" asp-page-handler="ToggleComments" asp-route-cheepId="@cheep.CheepId" style="margin-right: 5px">
+                            <input type="hidden" asp-for="CommentTargetId" value="@Model.CommentTargetId"/>
+                            <button type="submit">@(Model.CommentTargetId == cheep.CheepId ? "Close" : "Comment")</button>
                         </form>
                         
                         var isFollowing = Model.Followers.Any(f => f.Name == cheep.UserName);
@@ -62,7 +63,6 @@
                         }
                     }
                 </li>
-                @* TODO Display only when user clicks comment button *@
                 @if (Model.CommentTargetId == cheep.CheepId)
                 {
                     <div class="cheepbox">
@@ -88,7 +88,6 @@
                         </ul>
                     </div>
                 }
-                // TODO display all existing comments here when user clicks
             }
         </ul>
     }

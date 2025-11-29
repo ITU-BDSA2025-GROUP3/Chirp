@@ -54,8 +54,7 @@ public class PublicModel : PageModel
     [Required(ErrorMessage = "Please enter a Comment!")]
     [StringLength(160, ErrorMessage = "Comments cannot exceed 160 characters.")]
     public string Comment { get; set; } = string.Empty;
-
-    // TODO add comment and display under cheep commented on
+    
     public async Task<ActionResult> OnPostCommentFormAsync(int cheepId)
     {
         CommentTargetId = cheepId;
@@ -65,13 +64,9 @@ public class PublicModel : PageModel
         return Page();
     }
     
-    public async Task<ActionResult> OnPostShowCommentsAsync(int cheepId)
+    public async Task<ActionResult> OnPostToggleCommentsAsync(int cheepId)
     {
-        CommentTargetId = cheepId;
-        if (!ModelState.IsValid)
-        {
-            await LoadCheeps();
-        }
+        CommentTargetId = CommentTargetId == cheepId ? 0 : cheepId;
         await LoadCheeps();
         return Page();
     }
