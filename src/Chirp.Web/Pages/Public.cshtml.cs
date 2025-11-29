@@ -10,12 +10,10 @@ public class PublicModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
-    private readonly ICommentService _commentService;
-    public PublicModel(ICheepService cheepService, IAuthorService authorService, ICommentService commentService)
+    public PublicModel(ICheepService cheepService, IAuthorService authorService)
     {
         _cheepService = cheepService;
         _authorService = authorService;
-        _commentService = commentService;
     }
 
     public required List<CheepDTO> Cheeps { get; set; }
