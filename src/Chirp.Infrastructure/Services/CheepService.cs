@@ -39,7 +39,7 @@ public class CheepService : ICheepService
                 .ToLocalTime()
                 .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
         };
-        await _cheepRepository.CreateComment(author, comment, cheepId);
+        // await _cheepRepository.CreateComment(author, comment, cheepId);
     }
     
     // TODO this method needs to retrieve all comments associated to a specific cheep post,

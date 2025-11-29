@@ -32,7 +32,7 @@ public class CheepRepository : ICheepRepository
             TimeStamp = DateTime.UtcNow,
         };
         
-        cheep.Comments.Add(comment);
+        // cheep.Comments.Add(comment);
         _dbContext.Cheeps.Add(comment);
         await _dbContext.SaveChangesAsync();
     }
@@ -114,7 +114,6 @@ public class CheepRepository : ICheepRepository
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
-            Comments = new List<Cheep>(),
         };
         command.Cheeps.Add(cheep);
         _dbContext.Cheeps.Add(cheep);

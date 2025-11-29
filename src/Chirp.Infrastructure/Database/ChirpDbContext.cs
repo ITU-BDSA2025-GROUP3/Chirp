@@ -13,6 +13,7 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
     //private const int PAGE_SIZE = 32; // Fixed page size not in use?
     public DbSet<Cheep> Cheeps { get; set; }
     public DbSet<Core.DomainModel.Author> Authors { get; set; }
+    public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -23,6 +24,10 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<Core.DomainModel.Author>()
             .HasIndex(c => c.Email)
+            .IsUnique();
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Comment>()
+            .HasIndex(c => c.CommentId)
             .IsUnique();
     }
 
