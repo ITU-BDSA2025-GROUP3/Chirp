@@ -24,9 +24,5 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Chirp.Core\Chirp.Core.csproj" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Migrations\" />
-    </ItemGroup>
     
 </Project>
