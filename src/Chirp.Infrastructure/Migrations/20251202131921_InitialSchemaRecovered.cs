@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Chirp.Infrastructure.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:src/Chirp.Infrastructure/Migrations/20251202131921_InitialSchemaRecovered.cs
     public partial class InitialSchemaRecovered : Migration
+========
+    public partial class InitialCreate : Migration
+>>>>>>>> 344831b (Migrations were absolutely cooked again.):src/Chirp.Infrastructure/Migrations/20251129201521_InitialCreate.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -186,6 +190,29 @@ namespace Chirp.Infrastructure.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "Comments",
+                columns: table => new
+                {
+                    CommentId = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CheepId = table.Column<int>(type: "INTEGER", nullable: false),
+                    Message = table.Column<string>(type: "TEXT", maxLength: 160, nullable: false),
+                    TimeStamp = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    IdOfAuthor = table.Column<int>(type: "INTEGER", nullable: false),
+                    AuthorId = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Comments", x => x.CommentId);
+                    table.ForeignKey(
+                        name: "FK_Comments_AspNetUsers_AuthorId",
+                        column: x => x.AuthorId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
                 table: "AspNetRoleClaims",
@@ -244,6 +271,17 @@ namespace Chirp.Infrastructure.Migrations
                 name: "IX_Cheeps_AuthorId",
                 table: "Cheeps",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_AuthorId",
+                table: "Comments",
+                column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_CommentId",
+                table: "Comments",
+                column: "CommentId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -266,6 +304,9 @@ namespace Chirp.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Cheeps");
+
+            migrationBuilder.DropTable(
+                name: "Comments");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
