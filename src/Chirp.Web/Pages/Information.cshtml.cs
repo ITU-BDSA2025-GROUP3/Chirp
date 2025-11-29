@@ -103,10 +103,17 @@ public class InformationModel : PageModel
         var filename = "userData.zip";
         return File(bytes, "application/zip", filename);
     }
-    
-    public async Task OnForgetMeAsync()
+
+    public async Task<IActionResult> OnPostForgetMeAsync()
     {
+        //Get the username for deletion
         var userNameOrEmail = HttpContext.User.Identity!.Name!; 
+        //todo Sign the user out
+        //Delete the user
         await _authorService.DeleteAuthor(userNameOrEmail);
+        
+        //Return to home page after logged out
+        return LocalRedirect("/");
+        
     }
 }
