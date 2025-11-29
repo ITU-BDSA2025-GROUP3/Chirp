@@ -1,0 +1,46 @@
+using Chirp.Core;
+using Chirp.Core.DomainModel;
+using Chirp.Core.RepositoryInterfaces;
+using Chirp.Infrastructure.Database;
+
+using Microsoft.EntityFrameworkCore;
+
+namespace Chirp.Infrastructure.Repositories;
+
+public class CommentRepository : ICommentRepository
+{
+    private readonly ChirpDbContext _dbContext;
+
+    public CommentRepository(ChirpDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    
+    // TODO query the backend for the cheep to append the comment to, need to alsop retrieve who the commenter author is
+    public async Task CreateComment(String nameOfAuthorCommenting, CommentDTO newComment, int cheepId)
+    {
+        // retrieve the author who is commenting
+        var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
+        // create a new comment with the content of the posted message
+        var comment = new Comment()
+        {
+            IdOfAuthor = author.Id,
+            Author = author,
+            Message = newComment.Comment,
+            TimeStamp = DateTime.UtcNow,
+        };
+        
+        _dbContext.Comments.Add(comment);
+        await _dbContext.SaveChangesAsync();
+    }
+        
+    // TODO get from DB a list of cheep comments assoctiated with a specific post
+    public async Task<List<Cheep>> GetCommentsList(int CheepId)
+    {
+        var query = await _dbContext.Cheeps
+            .Include(cheep => cheep.Author)
+            .OrderByDescending(cheep => cheep.TimeStamp)
+            .ToListAsync();
+        return query;
+    }
+}

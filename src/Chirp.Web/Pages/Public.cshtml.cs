@@ -10,13 +10,15 @@ public class PublicModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
-    public PublicModel(ICheepService cheepService, IAuthorService authorService)
+    private readonly ICommentService _commentService;
+    public PublicModel(ICheepService cheepService, IAuthorService authorService, ICommentService commentService)
     {
         _cheepService = cheepService;
         _authorService = authorService;
+        _commentService = commentService;
     }
     public required List<CheepDTO> Cheeps { get; set; }
-    public required List<CheepDTO> Comments { get; set; }
+    public List<CommentDTO> Comments { get; set; } = new();
     public List<AuthorDTO> Followers { get; private set; } = new();
     public int TotalPages { get; private set; }
     public int CurrentPage;
@@ -40,14 +42,17 @@ public class PublicModel : PageModel
     {
         _cheepService.CurrentPage = 1;
         Cheeps = await _cheepService.GetCheeps();
-        Comments = await _cheepService.GetComments();
+        Comments = await _commentService.GetComments();
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
         TotalPages = await _cheepService.GetTotalCheeps();
         CurrentPage = _cheepService.CurrentPage;
     }
-    
+
+    [BindProperty] 
+    public int CommentTargetId { get; set; }
+
     // TODO add comment and display under cheep commented on
-    public async Task<ActionResult> OnPostCommentFormAsync()
+    public async Task<ActionResult> OnPostCommentFormAsync(int cheepId)
     {
         var author = User.Identity!.Name;
         if (!ModelState.IsValid)
@@ -55,29 +60,19 @@ public class PublicModel : PageModel
             await LoadCheeps();
             return Page();
         }
-        // await _cheepService.AddNewComment(author!, Message, Cheeps);
-        return RedirectToPage();
+        await _commentService.AddNewComment(author!, Message, cheepId);
+        return Page();
     }
     
     // TODO render comment form on click
-    public async Task<ActionResult> OnPostCommentBtnAsync(string authorToComment)
+    public async Task<ActionResult> OnPostShowCommentsAsync(int cheepId)
     {
-        var user = User.Identity!.Name;
-        await _authorService.AddAuthorToFollowsList(authorToComment, user!);
-        
-        // var comments = await _authorService.GetFollowsList(user!);
-        // Console.WriteLine($"[{DateTime.Now}] {user} now follows: {string.Join(",", comments.Select(a => a.Name))}");
-        return RedirectToPage();
-    }
-    // TODO Render comment list on follows 
-    public async Task<ActionResult> OnPostCommentShowAsync(string authorToComment)
-    {
-        var user = User.Identity!.Name;
-        await _authorService.AddAuthorToFollowsList(authorToComment, user!);
-        
-        // var comments = await _authorService.GetFollowsList(user!);
-        // Console.WriteLine($"[{DateTime.Now}] {user} now follows: {string.Join(",", comments.Select(a => a.Name))}");
-        return RedirectToPage();
+        CommentTargetId = cheepId;
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+        }
+        return Page();
     }
     
     public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
