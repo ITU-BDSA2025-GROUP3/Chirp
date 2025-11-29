@@ -17,7 +17,7 @@ public class CommentRepository : ICommentRepository
     }
     
     // TODO query the backend for the cheep to append the comment to, need to alsop retrieve who the commenter author is
-    public async Task CreateComment(String nameOfAuthorCommenting, CommentDTO newComment, int cheepId)
+    public async Task CreateComment(CommentDTO newComment)
     {
         // retrieve the author who is commenting
         var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
@@ -28,7 +28,7 @@ public class CommentRepository : ICommentRepository
             Author = author,
             Message = newComment.Comment,
             TimeStamp = DateTime.UtcNow,
-            CheepId = cheepId,
+            CheepId = newComment.CheepId,
         };
         
         _dbContext.Comments.Add(comment);
