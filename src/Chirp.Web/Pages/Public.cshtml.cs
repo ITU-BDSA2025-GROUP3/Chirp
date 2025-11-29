@@ -50,21 +50,21 @@ public class PublicModel : PageModel
 
     [BindProperty] 
     public int CommentTargetId { get; set; }
+    [BindProperty] 
+    [Required(ErrorMessage = "Please enter a Comment!")]
+    [StringLength(160, ErrorMessage = "Comments cannot exceed 160 characters.")]
+    public string Comment { get; set; } = string.Empty;
 
     // TODO add comment and display under cheep commented on
     public async Task<ActionResult> OnPostCommentFormAsync(int cheepId)
     {
+        CommentTargetId = cheepId;
         var author = User.Identity!.Name;
-        if (!ModelState.IsValid)
-        {
-            await LoadCheeps();
-            return Page();
-        }
-        await _commentService.AddNewComment(author!, Message, cheepId);
+        await _commentService.AddNewComment(author!, Comment, cheepId);
+        await LoadCheeps();
         return Page();
     }
     
-    // TODO render comment form on click
     public async Task<ActionResult> OnPostShowCommentsAsync(int cheepId)
     {
         CommentTargetId = cheepId;
@@ -72,6 +72,7 @@ public class PublicModel : PageModel
         {
             await LoadCheeps();
         }
+        await LoadCheeps();
         return Page();
     }
     
@@ -103,6 +104,7 @@ public class PublicModel : PageModel
             
             _cheepService.CurrentPage = pageQuery;
             Cheeps = await _cheepService.GetCheeps();
+            Comments = await _commentService.GetComments();
             Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
             TotalPages = await _cheepService.GetTotalCheeps();
             CurrentPage = pageQuery;

@@ -28,6 +28,7 @@ public class CommentRepository : ICommentRepository
             Author = author,
             Message = newComment.Comment,
             TimeStamp = DateTime.UtcNow,
+            CheepId = cheepId,
         };
         
         _dbContext.Comments.Add(comment);
@@ -35,11 +36,11 @@ public class CommentRepository : ICommentRepository
     }
         
     // TODO get from DB a list of cheep comments assoctiated with a specific post
-    public async Task<List<Cheep>> GetCommentsList(int CheepId)
+    public async Task<List<Comment>> GetCommentsList()
     {
-        var query = await _dbContext.Cheeps
-            .Include(cheep => cheep.Author)
-            .OrderByDescending(cheep => cheep.TimeStamp)
+        var query = await _dbContext.Comments
+            .Include(comment => comment.Author)
+            .OrderByDescending(comment => comment.TimeStamp)
             .ToListAsync();
         return query;
     }
