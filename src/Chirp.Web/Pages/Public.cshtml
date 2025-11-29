@@ -40,13 +40,10 @@
                         @cheep.Message
                         <small>&mdash; @cheep.TimeStamp</small>
                     </p>
-                    
+
                     @if (User.Identity!.IsAuthenticated && User.Identity.Name != cheep.UserName)
                     {
-                        <form method="post" asp-page-handler="CommentBtn" asp-route-authorToComment="@cheep.UserName" style="margin-right: 5px">
-                            <button type="submit">Open Comments</button>
-                        </form>
-                        <form method="post" asp-page-handler="ShowComments" asp-route-authorToComment="@cheep.UserName" style="margin-right: 5px">
+                        <form method="post" asp-page-handler="ShowComments" asp-route-cheepId="@cheep.CheepId" style="margin-right: 5px">
                             <button type="submit">Comment</button>
                         </form>
                         
@@ -66,39 +63,39 @@
                     }
                 </li>
                 @* TODO Display only when user clicks comment button *@
-                @* @if (User.Identity!.IsAuthenticated) *@
-                @* { *@
-                @*     <div class="cheepbox"> *@
-                @*         <h3>What's on your mind @(User.Identity.Name)? (comment) </h3> *@
-                @*         <form method="post" asp-page-handler="CommentForm"> *@
-                @*             <input style="float: left" type="text" asp-for="Message"> *@
-                @*             <button type="submit" *@
-                @*                     style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0"> *@
-                @*                 Submit *@
-                @*             </button> *@
-                @*             <span asp-validation-for="Message" style="color: red; display: inline-flex"></span> *@
-                @*         </form> *@
-                @*     </div> *@
-                @* } *@
+                @if (Model.CommentTargetId == cheep.CheepId)
+                {
+                    <div class="cheepbox">
+                        <h3>Comment for @cheep.UserName </h3>
+                        <form method="post" asp-page-handler="CommentForm" asp-route-cheepId="@cheep.CheepId">
+                            <input style="float: left" type="text" asp-for="CommentTargetId">
+                            <button type="submit"
+                                    style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">
+                                Submit
+                            </button>
+                            <span asp-validation-for="Message" style="color: red; display: inline-flex"></span>
+                        </form>
+                        <ul>
+                            @foreach (var comment in Model.Comments.Where(c => c.CheepId == cheep.CheepId))
+                            {
+                                <li style="display: inline-flex;
+                                flex-direction: row;
+                                justify-content: space-between;
+                                align-items: center;
+                                width: 98%;">
+                                    <p>
+                                        <strong>
+                                            <a href="/@comment.UserName">@comment.UserName</a>
+                                        </strong>
+                                        @comment.Comment
+                                        <small>&mdash; @comment.TimeStamp</small>
+                                    </p>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
                 // TODO display all existing comments here when user clicks
-                @* if (Model.Comments.Any()) *@
-                @* { *@
-                @*     <ul id="messagelist" class="cheeps"> *@
-                @*         <li style="display: inline-flex; *@
-                @*         flex-direction: row; *@
-                @*         justify-content: space-between; *@
-                @*         align-items: center; *@
-                @*         width: 98%;"> *@
-                @*             <p> *@
-                @*                 <strong> *@
-                @*                     <a href="/@cheep.UserName">@cheep.UserName</a> *@
-                @*                 </strong> *@
-                @*                 @cheep.Message *@
-                @*                 <small>&mdash; @cheep.TimeStamp</small> *@
-                @*             </p> *@
-                @*         </li> *@
-                @*     </ul> *@
-                @* } *@
             }
         </ul>
     }
