@@ -36,9 +36,10 @@ public class CommentService : ICommentService
             Comment = comment,
             TimeStamp = new DateTimeOffset(DateTime.UtcNow)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = cheepId
         };
-        await _commentRepository.CreateComment(author, commentDto, cheepId);
+        await _commentRepository.CreateComment(commentDto);
     }
     
     // TODO this method needs to retrieve all comments associated to a specific cheep post,

@@ -5,5 +5,5 @@ namespace Chirp.Core.RepositoryInterfaces;
 public interface ICommentRepository
 {
     public Task<List<Comment>> GetCommentsList();
-    public Task CreateComment(string nameOfAuthorCommenting, CommentDTO newComment, int cheepId);
+    public Task CreateComment(CommentDTO newComment);
 }
