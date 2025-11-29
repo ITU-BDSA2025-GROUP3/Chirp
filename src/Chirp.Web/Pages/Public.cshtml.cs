@@ -29,6 +29,7 @@ public class PublicModel : PageModel
     public string Message { get; set; } = string.Empty;
     public async Task<ActionResult> OnPostCheepAsync()
     {
+        ModelState.Remove(nameof(Comment));
         var author = User.Identity!.Name;
         if (!ModelState.IsValid)
         {
@@ -57,6 +58,13 @@ public class PublicModel : PageModel
     
     public async Task<ActionResult> OnPostCommentFormAsync(int cheepId)
     {
+        ModelState.Remove(nameof(Message));
+        if (!ModelState.IsValid)
+        {
+            await LoadCheeps();
+            return Page();
+        }
+
         CommentTargetId = cheepId;
         var author = User.Identity!.Name;
         await _commentService.AddNewComment(author!, Comment, cheepId);
