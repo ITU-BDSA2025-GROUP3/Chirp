@@ -18,6 +18,4 @@ public class Comment
     public required int IdOfAuthor { get; set; }
     [Required]
     public required Author Author { get; set; }
-    [Required]
-    public required string CommentText { get; set; }
 }

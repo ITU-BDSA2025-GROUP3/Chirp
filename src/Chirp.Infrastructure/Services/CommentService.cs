@@ -45,17 +45,17 @@ public class CommentService : ICommentService
     // and construct them into cheepDTO's to be used in the frontend
     public async Task<List<CommentDTO>> GetComments()
     {
-        // var cheepId = _commentRepository.
-        // var comments = await _commentRepository.GetCommentsList(cheepId);
-        // var comment = comments.Select(comment => new CommentDTO
-        // {
-        //     UserName = comment.Author.UserName,
-        //     Comment = comment.Text,
-        //     TimeStamp = new DateTimeOffset(comment.TimeStamp)
-        //         .ToLocalTime()
-        //         .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
-        // }).ToList();
+        var comments = await _commentRepository.GetCommentsList();
+        var commentDto = comments.Select(comment => new CommentDTO
+        {
+            UserName = comment.Author.UserName,
+            Comment = comment.Message,
+            TimeStamp = new DateTimeOffset(comment.TimeStamp)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = comment.CheepId
+        }).ToList();
 
-        return new List<CommentDTO>();
+        return commentDto;
     }
 }
