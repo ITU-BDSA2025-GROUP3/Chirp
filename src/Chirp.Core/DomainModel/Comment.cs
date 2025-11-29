@@ -1,14 +1,15 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Chirp.Core.DomainModel;
 
-public class Cheep
+public class Comment
 {
     public int CheepId { get; set; }
+    public int CommentId { get; set; }
     
     [Required]
     [StringLength(160)]
-    public required string Text { get; set; }
+    public required string Message { get; set; }
     
     [Required]
     public required DateTime TimeStamp { get; set; }

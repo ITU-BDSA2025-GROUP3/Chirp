@@ -55,7 +55,7 @@ public class PublicModel : PageModel
             await LoadCheeps();
             return Page();
         }
-        await _cheepService.AddNewComment(author!, Message, Cheeps);
+        // await _cheepService.AddNewComment(author!, Message, Cheeps);
         return RedirectToPage();
     }
     
