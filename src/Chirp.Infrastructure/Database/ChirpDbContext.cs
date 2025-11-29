@@ -25,6 +25,10 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
         modelBuilder.Entity<Author>()
             .HasIndex(c => c.Email)
             .IsUnique();
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Comment>()
+            .HasIndex(c => c.CommentId)
+            .IsUnique();
     }
 
     // method not in use??
