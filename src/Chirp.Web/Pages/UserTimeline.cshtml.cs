@@ -28,27 +28,26 @@ public class UserTimelineModel : PageModel
     [Required(ErrorMessage = "Please enter a Cheep!")]
     [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
     public string Message { get; set; } = string.Empty;
-    public async Task<ActionResult> OnPostCheepAsync()
+    public async Task<ActionResult> OnPostCheepAsync(int page)
     {
         ModelState.Remove(nameof(Comment));
-        var author = User.Identity!.Name;
         if (!ModelState.IsValid)
         {
-            await LoadAuthorCheeps(author!);
+            await LoadAuthorCheeps(User.Identity!.Name!, page);
             return Page();
         }
-        await _cheepService.AddNewCheep(author!, Message);
+        await _cheepService.AddNewCheep(User.Identity!.Name!, Message);
         return RedirectToPage();
     }
     
-    private async Task LoadAuthorCheeps(string author)
+    private async Task LoadAuthorCheeps(string author, int page)
     {
-        _authorService.CurrentPage = 1;
+        _authorService.CurrentPage = page;
         Cheeps = await _authorService.GetAuthorCheeps(author);
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
         Comments = await _commentService.GetComments();
         TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
-        CurrentPage = _authorService.CurrentPage;
+        CurrentPage = page;
     }
     
     [BindProperty] 
@@ -58,31 +57,29 @@ public class UserTimelineModel : PageModel
     [StringLength(160, ErrorMessage = "Comments cannot exceed 160 characters.")]
     public string Comment { get; set; } = string.Empty;
     
-    public async Task<ActionResult> OnPostCommentFormAsync(string author, int cheepId)
+    public async Task<ActionResult> OnPostCommentFormAsync(string author, int cheepId, int page)
     {
         ModelState.Remove(nameof(Message));
         if (!ModelState.IsValid)
         {
             CommentTargetId = cheepId;
-            await LoadAuthorCheeps(author);
-            return Page();
         }
         CommentTargetId = cheepId;
         ModelState.Clear();
         await _commentService.AddNewComment(User.Identity!.Name!, Comment, cheepId);
-        await LoadAuthorCheeps(author);
+        await LoadAuthorCheeps(author, page);
         return Page();
     }
     
-    public async Task<ActionResult> OnPostToggleCommentsAsync(string author, int cheepId)
+    public async Task<ActionResult> OnPostToggleCommentsAsync(string author, int cheepId, int page)
     {
         CommentTargetId = CommentTargetId == cheepId ? 0 : cheepId;
         ModelState.Clear();
-        await LoadAuthorCheeps(author);
+        await LoadAuthorCheeps(author, page);
         return Page();
     }
     
-    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
+    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow, int page)
     {
         var follower = User.Identity!.Name;
         await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
@@ -92,7 +89,7 @@ public class UserTimelineModel : PageModel
         return RedirectToPage();
     }
     
-    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
+    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow, int page)
     {
         var follower = User.Identity!.Name;
         await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
