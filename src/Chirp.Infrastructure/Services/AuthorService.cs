@@ -32,7 +32,8 @@ public class AuthorService : IAuthorService
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = cheep.CheepId
         }).ToList();
         return cheepDTOs;
     }
