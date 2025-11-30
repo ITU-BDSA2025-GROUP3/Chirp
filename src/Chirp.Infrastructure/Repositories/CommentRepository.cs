@@ -16,11 +16,13 @@ public class CommentRepository : ICommentRepository
         _dbContext = dbContext;
     }
     
+    /// <summary>
+    /// Creates a new comment object in the database, retrieves the author who is commenting and creates a new comment with the content of the posted message
+    /// </summary>
+    /// <param name="newComment">comment DTO object</param>
     public async Task CreateComment(CommentDTO newComment)
     {
-        // retrieve the author who is commenting
         var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
-        // create a new comment with the content of the posted message
         var comment = new Comment()
         {
             IdOfAuthor = author.Id,
@@ -34,6 +36,12 @@ public class CommentRepository : ICommentRepository
         await _dbContext.SaveChangesAsync();
     }
     
+    /// <summary>
+    /// Retrieves a list of all comments
+    /// </summary>
+    /// <returns>
+    /// A query of the resulting comments
+    /// </returns>
     public async Task<List<Comment>> GetCommentsList()
     {
         var query = await _dbContext.Comments

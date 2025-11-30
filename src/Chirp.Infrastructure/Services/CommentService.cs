@@ -24,9 +24,11 @@ public class CommentService : ICommentService
             throw new ValidationException("comment author is required.");
         if (string.IsNullOrWhiteSpace(comment))
             throw new ValidationException("comment cannot be empty.");
-        if (comment.Length > 160)
-            throw new ValidationException("comments cannot exceed 160 characters.");
-        
+        if (cheepId <= 0)
+        {
+            throw new ValidationException("cheepId is required.");
+        }
+
         var commentDto = new CommentDTO()
         {
             UserName = author,
