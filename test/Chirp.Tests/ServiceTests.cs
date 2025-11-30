@@ -239,43 +239,6 @@ public class CheepServiceTests
         }
     }
     
-    [Theory]
-    [InlineData("Alice", true)]
-    [InlineData("AAlice", false)]
-    [InlineData("alice", false)]
-    [InlineData("Alice@Alice.com", true)]
-    [InlineData("alice@Alice.com", false)]
-    [InlineData("Bob", true)]
-    [InlineData("B0b", false)]
-    [InlineData("boB", false)]
-    [InlineData("Bob@Bob.com", true)]
-    [InlineData("Bob@bob.com", false)]
-    [InlineData("Charlie", true)]
-    [InlineData("C#arlie", false)]
-    [InlineData("Charlie@Charlie.com", true)]
-    [InlineData("Charlie&Charlie.com", false)]
-    [InlineData("David", true)]
-    [InlineData("David@David.com", true)]
-    [InlineData("Da id@David.com", false)]
-    [InlineData("", false)]
-    [InlineData(" ", false)]
-    [InlineData("!39t.3#)42", false)]
-    public async Task AuthorExistsTest(string author, bool expectedValue)
-    {
-        //Arrange
-        await using var context = Utility.CreateFakeChirpDbContext();
-        Utility.SeedDatabase(context);
-        var authorRepo = new AuthorRepository(context);
-        var cheepRepo = new CheepRepository(context);
-        var authorService = new AuthorService(authorRepo, cheepRepo);
-        
-        //act
-        var actual = await authorService.AuthorExists(author);
-        
-        //assert
-        Assert.Equal(expectedValue, actual);
-    }
-
     [Fact]
     public async Task GetAuthor_CorrectNameEmail()
     {
@@ -319,6 +282,60 @@ public class CheepServiceTests
         //Assert
         Assert.Equal(aliceCheepsDb, cheeps.Count);
         Assert.All(cheeps, c => Assert.False(string.IsNullOrWhiteSpace(c.Message)));
-        Assert.All(cheaps, c => Assert.False(string.IsNullOrWhiteSpace(c.TimeStamp)));
+        Assert.All(cheeps, c => Assert.False(string.IsNullOrWhiteSpace(c.TimeStamp)));
+    }
+
+    [Fact]
+    public async Task GetCheeps_ReturnsEmptyListIfAuthorDoesNotExist()
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        var authorService = new AuthorService(authorRepo, cheepRepo);
+        
+        //Act
+        var cheeps = await authorService.GetMyCheeps("ThisUserDoesNotExist");
+        
+        //Assert
+        Assert.Empty(cheeps);
+    }
+    
+    [Theory]
+    [InlineData("Alice", true)]
+    [InlineData("AAlice", false)]
+    [InlineData("alice", false)]
+    [InlineData("Alice@Alice.com", true)]
+    [InlineData("alice@Alice.com", false)]
+    [InlineData("Bob", true)]
+    [InlineData("B0b", false)]
+    [InlineData("boB", false)]
+    [InlineData("Bob@Bob.com", true)]
+    [InlineData("Bob@bob.com", false)]
+    [InlineData("Charlie", true)]
+    [InlineData("C#arlie", false)]
+    [InlineData("Charlie@Charlie.com", true)]
+    [InlineData("Charlie&Charlie.com", false)]
+    [InlineData("David", true)]
+    [InlineData("David@David.com", true)]
+    [InlineData("Da id@David.com", false)]
+    [InlineData("", false)]
+    [InlineData(" ", false)]
+    [InlineData("!39t.3#)42", false)]
+    public async Task AuthorExistsTest(string author, bool expectedValue)
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        var authorService = new AuthorService(authorRepo, cheepRepo);
+        
+        //act
+        var actual = await authorService.AuthorExists(author);
+        
+        //assert
+        Assert.Equal(expectedValue, actual);
     }
 }
