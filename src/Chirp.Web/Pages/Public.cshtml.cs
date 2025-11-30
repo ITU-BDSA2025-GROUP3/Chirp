@@ -85,8 +85,8 @@ public class PublicModel : PageModel
         }
 
         CommentTargetId = cheepId;
-        var author = User.Identity!.Name;
-        await _commentService.AddNewComment(author!, Comment, cheepId);
+        ModelState.Clear();
+        await _commentService.AddNewComment(User.Identity!.Name!, Comment, cheepId);
         await LoadCheeps();
         return Page();
     }
@@ -94,6 +94,7 @@ public class PublicModel : PageModel
     public async Task<ActionResult> OnPostToggleCommentsAsync(int cheepId)
     {
         CommentTargetId = CommentTargetId == cheepId ? 0 : cheepId;
+        ModelState.Clear();
         await LoadCheeps();
         return Page();
     }
