@@ -18,6 +18,8 @@ public class CommentService : ICommentService
         _commentRepository = commentRepository;
     }
     
+    // TODO this method is called from the page model,
+    // TODO we need to retrieve the author commenting, the comment's message content, and the cheep being commented on
     public async Task AddNewComment(string author, string comment, int cheepId)
     {
         if (string.IsNullOrWhiteSpace(author))
@@ -41,6 +43,8 @@ public class CommentService : ICommentService
         await _commentRepository.CreateComment(commentDto);
     }
     
+    // TODO this method needs to retrieve all comments associated to a specific cheep post,
+    // and construct them into cheepDTO's to be used in the frontend
     public async Task<List<CommentDTO>> GetComments()
     {
         var comments = await _commentRepository.GetCommentsList();

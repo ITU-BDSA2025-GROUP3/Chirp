@@ -10,17 +10,14 @@ public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
-    private readonly ICommentService _commentService;
-    public UserTimelineModel(ICheepService cheepService, IAuthorService authorService, ICommentService commentService)
+    public UserTimelineModel(ICheepService cheepService, IAuthorService authorService)
     {
         _cheepService = cheepService;
         _authorService = authorService;
-        _commentService = commentService;
     }
     
     public required List<CheepDTO> Cheeps { get; set; }
     public List<AuthorDTO> Followers { get; private set; } = new();
-    public List<CommentDTO> Comments { get; set; } = new();
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
     
