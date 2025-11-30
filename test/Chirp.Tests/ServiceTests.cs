@@ -275,4 +275,50 @@ public class CheepServiceTests
         //assert
         Assert.Equal(expectedValue, actual);
     }
+
+    [Fact]
+    public async Task GetAuthor_CorrectNameEmail()
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        var authorService = new AuthorService(authorRepo, cheepRepo);
+        
+        //Act
+        var dto = await authorService.GetAuthor("Alice");
+        
+        //Assert
+        Assert.NotNull(dto);
+        Assert.Equal("Alice", dto.Name);
+        Assert.Equal("alice@alice.com", dto.Email);
+    }
+
+    [Fact]
+    public async Task GetMyCheeps_ReturnsForAuthor()
+    {
+        //Arrange
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var authorRepo = new AuthorRepository(context);
+        var cheepRepo = new CheepRepository(context);
+        var authorService = new AuthorService(authorRepo, cheepRepo)
+        {
+            CurrentPage = 1
+        };
+        
+        //Amount of cheeps Alice has in DB
+        var aliceCheepsDb = context.Cheeps
+            .Include(c => c.Author)
+            .Count(c => c.Author.UserName == "Alice");
+        
+        //Act
+        var cheeps = await authorService.GetMyCheeps("Alice");
+        
+        //Assert
+        Assert.Equal(aliceCheepsDb, cheeps.Count);
+        Assert.All(cheeps, c => Assert.False(string.IsNullOrWhiteSpace(c.Message)));
+        Assert.All(cheaps, c => Assert.False(string.IsNullOrWhiteSpace(c.TimeStamp)));
+    }
 }
