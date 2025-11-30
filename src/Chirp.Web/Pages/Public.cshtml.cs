@@ -18,8 +18,8 @@ public class PublicModel : PageModel
         _commentService = commentService;
     }
     public required List<CheepDTO> Cheeps { get; set; }
-    public List<CommentDTO> Comments { get; set; } = new();
     public List<AuthorDTO> Followers { get; private set; } = new();
+    public List<CommentDTO> Comments { get; set; } = new();
     public int TotalPages { get; private set; }
     public int CurrentPage;
     
@@ -43,12 +43,31 @@ public class PublicModel : PageModel
     {
         _cheepService.CurrentPage = 1;
         Cheeps = await _cheepService.GetCheeps();
-        Comments = await _commentService.GetComments();
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
+        Comments = await _commentService.GetComments();
         TotalPages = await _cheepService.GetTotalCheeps();
         CurrentPage = _cheepService.CurrentPage;
     }
-
+    
+    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
+    {
+        var follower = User.Identity!.Name;
+        await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
+        
+        var follows = await _authorService.GetFollowsList(follower!);
+        Console.WriteLine($"[{DateTime.Now}] {follower} now follows: {string.Join(",", follows.Select(a => a.Name))}");
+        return RedirectToPage();
+    }
+    
+    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
+    {
+        var follower = User.Identity!.Name;
+        await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
+        
+        Console.WriteLine($"[{DateTime.Now}] {follower} now unfollows: {authorToUnfollow}");
+        return RedirectToPage();
+    }
+    
     [BindProperty] 
     public int CommentTargetId { get; set; }
     [BindProperty] 
@@ -77,25 +96,6 @@ public class PublicModel : PageModel
         CommentTargetId = CommentTargetId == cheepId ? 0 : cheepId;
         await LoadCheeps();
         return Page();
-    }
-    
-    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
-    {
-        var follower = User.Identity!.Name;
-        await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
-        
-        var follows = await _authorService.GetFollowsList(follower!);
-        Console.WriteLine($"[{DateTime.Now}] {follower} now follows: {string.Join(",", follows.Select(a => a.Name))}");
-        return RedirectToPage();
-    }
-    
-    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
-    {
-        var follower = User.Identity!.Name;
-        await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
-        
-        Console.WriteLine($"[{DateTime.Now}] {follower} now unfollows: {authorToUnfollow}");
-        return RedirectToPage();
     }
 
     public async Task<ActionResult> OnGetAsync()

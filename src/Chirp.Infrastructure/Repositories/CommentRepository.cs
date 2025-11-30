@@ -16,7 +16,6 @@ public class CommentRepository : ICommentRepository
         _dbContext = dbContext;
     }
     
-    // TODO query the backend for the cheep to append the comment to, need to alsop retrieve who the commenter author is
     public async Task CreateComment(CommentDTO newComment)
     {
         // retrieve the author who is commenting
@@ -34,8 +33,7 @@ public class CommentRepository : ICommentRepository
         _dbContext.Comments.Add(comment);
         await _dbContext.SaveChangesAsync();
     }
-        
-    // TODO get from DB a list of cheep comments assoctiated with a specific post
+    
     public async Task<List<Comment>> GetCommentsList()
     {
         var query = await _dbContext.Comments
