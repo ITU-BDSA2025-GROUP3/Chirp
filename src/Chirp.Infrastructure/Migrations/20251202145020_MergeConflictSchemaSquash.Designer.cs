@@ -11,13 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Chirp.Infrastructure.Migrations
 {
     [DbContext(typeof(ChirpDbContext))]
-<<<<<<<< HEAD:src/Chirp.Infrastructure/Migrations/20251202131921_InitialSchemaRecovered.Designer.cs
-    [Migration("20251202131921_InitialSchemaRecovered")]
-    partial class InitialSchemaRecovered
-========
-    [Migration("20251129201521_InitialCreate")]
-    partial class InitialCreate
->>>>>>>> 344831b (Migrations were absolutely cooked again.):src/Chirp.Infrastructure/Migrations/20251129201521_InitialCreate.Designer.cs
+    [Migration("20251202145020_MergeConflictSchemaSquash")]
+    partial class MergeConflictSchemaSquash
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -156,9 +151,6 @@ namespace Chirp.Infrastructure.Migrations
                     b.HasKey("CommentId");
 
                     b.HasIndex("AuthorId");
-
-                    b.HasIndex("CommentId")
-                        .IsUnique();
 
                     b.ToTable("Comments");
                 });

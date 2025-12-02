@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Chirp.Infrastructure.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:src/Chirp.Infrastructure/Migrations/20251202131921_InitialSchemaRecovered.cs
-    public partial class InitialSchemaRecovered : Migration
-========
-    public partial class InitialCreate : Migration
->>>>>>>> 344831b (Migrations were absolutely cooked again.):src/Chirp.Infrastructure/Migrations/20251129201521_InitialCreate.cs
+    public partial class MergeConflictSchemaSquash : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -276,12 +272,6 @@ namespace Chirp.Infrastructure.Migrations
                 name: "IX_Comments_AuthorId",
                 table: "Comments",
                 column: "AuthorId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Comments_CommentId",
-                table: "Comments",
-                column: "CommentId",
-                unique: true);
         }
 
         /// <inheritdoc />
