@@ -272,6 +272,12 @@ namespace Chirp.Infrastructure.Migrations
                 name: "IX_Comments_AuthorId",
                 table: "Comments",
                 column: "AuthorId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Comments_CommentId",
+                table: "Comments",
+                column: "CommentId",
+                unique: true);
         }
 
         /// <inheritdoc />
