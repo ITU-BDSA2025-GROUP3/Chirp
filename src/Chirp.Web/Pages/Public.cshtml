@@ -77,29 +77,21 @@
                                     style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">
                                 Submit
                             </button>
-                            <span asp-validation-for="Message" style="color: red; display: inline-flex"></span>
+                            <span asp-validation-for="Comment" style="color: red; display: inline-flex"></span>
                         </form>
                         <ul>
                             @foreach (var comment in Model.Comments.Where(c => c.CheepId == cheep.CheepId))
                             {
-                                <li style="display: inline-flex;
-                                flex-direction: row;
-                                justify-content: space-between;
-                                align-items: center;
-                                width: 98%;">
-                                    <p>
-                                        <strong>
-                                            <a href="/@comment.UserName">@comment.UserName</a>
-                                        </strong>
-                                        @comment.Comment
-                                        <small>&mdash; @comment.TimeStamp</small>
-                                    </p>
+                                <li>
+                                    <strong>
+                                        <a href="/@comment.UserName">@comment.UserName</a>
+                                    </strong>
+                                    @comment.Comment <small>@comment.TimeStamp</small>
                                 </li>
                             }
                         </ul>
                     </div>
                 }
-                // TODO display all existing comments here when user clicks
             }
         </ul>
     }
