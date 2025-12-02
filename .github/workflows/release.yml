@@ -37,14 +37,53 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
 
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: 8.0.x
-    - name: Test
-      run: dotnet test --no-build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-chirp
+
+      - name: Test
+        run: dotnet test test/Chirp.Tests --no-build
+
+  playwright:
+    name: Playwright tests
+    runs-on: ubuntu-22.04
+    needs: build
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dotnet-chirp
+
+      - name: Build playwright binaries
+        run: dotnet build test/Chirp.PlaywrightTests --configuration Debug
+
+      - name: Start Web App
+        run: dotnet run --project "src/Chirp.Web" &
+
+      - name: Ensure browsers are installed
+        run: pwsh test/Chirp.PlaywrightTests/bin/Debug/net8.0/playwright.ps1 install
+
+      - name: Wait for host
+        run: npx wait-on http://localhost:5273 --timeout 30000
+
+      - name: Test
+        run: dotnet test test/Chirp.PlaywrightTests
 
   release:
     name: Release
