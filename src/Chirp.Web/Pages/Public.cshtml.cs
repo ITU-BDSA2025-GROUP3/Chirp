@@ -53,6 +53,7 @@ public class PublicModel : PageModel
     
     public async Task<ActionResult> OnPostFollowAsync(string authorToFollow, int page)
     {
+        ModelState.Remove(nameof(Message));
         var follower = User.Identity!.Name;
         await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
         
@@ -64,6 +65,7 @@ public class PublicModel : PageModel
     
     public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow, int page)
     {
+        ModelState.Remove(nameof(Message));
         var follower = User.Identity!.Name;
         await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
         
