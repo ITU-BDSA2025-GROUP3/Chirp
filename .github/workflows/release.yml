@@ -30,6 +30,14 @@ jobs:
     - name: Build
       run: dotnet build --no-restore
       
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: dotnet-chirp
+        path: |
+          ./src/**/bin/Release/
+          ./test/**/bin/Debug/
+      
   test:
     name: Test
     needs: build
