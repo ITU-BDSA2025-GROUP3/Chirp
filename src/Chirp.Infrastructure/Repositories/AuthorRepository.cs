@@ -112,8 +112,11 @@ public class AuthorRepository : IAuthorRepository
 
         var authorToRemove = await _dbContext.Authors
             .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
-            .Select(author => author)
+            .Select(author => author).Include(author => author.Follows)
             .FirstAsync();
+
+        //Remove all references to all people we follow
+        authorToRemove.Follows.Clear();
         
         _dbContext.Remove(authorToRemove);
         await _dbContext.SaveChangesAsync();
