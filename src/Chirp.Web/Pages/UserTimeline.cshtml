@@ -16,6 +16,7 @@
             <h3>What's on your mind @(User.Identity.Name)?</h3>
             <form method="post" asp-page-handler="Cheep">
                 <input style="float: left" type="text" asp-for="Message">
+                <input type="hidden" name="page" value="@Model.CurrentPage" />
                 <button type="submit"
                         style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">
                     Submit
@@ -44,22 +45,54 @@
                     </p>
                     @if (User.Identity!.IsAuthenticated && User.Identity.Name != cheep.UserName)
                     {
-                    // TODO check if current user is message author, don't render follow/unfollow btn
-                        var isFollowing = Model.Followers.Any(f => f.Name == cheep.UserName);
-                        if (isFollowing)
+                        <form method="post" asp-page-handler="ToggleComments" asp-route-cheepId="@cheep.CheepId" style="margin-right: 5px">
+                            <input type="hidden" asp-for="CommentTargetId"/>
+                            <input type="hidden" name="page" value="@Model.CurrentPage" />
+                            <button type="submit">@(Model.CommentTargetId == cheep.CheepId ? "Close" : "Comment")</button>
+                        </form>
+                        
+                        if (Model.Followers.Any(f => f.Name == cheep.UserName))
                         {
                             <form method="post" asp-page-handler="Unfollow" asp-route-authorToUnfollow="@cheep.UserName">
+                                <input type="hidden" name="page" value="@Model.CurrentPage" />
                                 <button type="submit">Unfollow</button>
                             </form>
                         }
                         else
                         {
                             <form method="post" asp-page-handler="Follow" asp-route-authorToFollow="@cheep.UserName">
+                                <input type="hidden" name="page" value="@Model.CurrentPage" />
                                 <button type="submit">Follow</button>
                             </form>
                         }
                     }
                 </li>
+                @if (Model.CommentTargetId == cheep.CheepId && User.Identity.Name != cheep.UserName)
+                {
+                    <div class="cheepbox">
+                        <h3>Comment for @cheep.UserName </h3>
+                        <form method="post" asp-page-handler="CommentForm" asp-route-cheepId="@cheep.CheepId">
+                            <input style="float: left" type="text" asp-for="Comment">
+                            <input type="hidden" name="page" value="@Model.CurrentPage" />
+                            <button type="submit"
+                                    style="height: 22px; width: 70px; margin-left: 5px;background-color: #571010;font-weight: bold;border: 1px solid #3b0707;font-size: 14px;font-family: 'Trebuchet MS', sans-serif;border-radius: 2px; padding: 0">
+                                Submit
+                            </button>
+                            <span asp-validation-for="Comment" style="color: red; display: inline-flex"></span>
+                        </form>
+                        <ul>
+                            @foreach (var comment in Model.Comments.Where(c => c.CheepId == cheep.CheepId))
+                            {
+                                <li>
+                                    <strong>
+                                        <a href="/@comment.UserName">@comment.UserName</a>
+                                    </strong>
+                                    @comment.Comment <small>@comment.TimeStamp</small>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
             }
         </ul>
     }

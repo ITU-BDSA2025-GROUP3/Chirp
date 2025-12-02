@@ -17,7 +17,7 @@ public class CheepService : ICheepService
     {
         _cheepRepository = cheepRepository;
     }
-    
+
     public async Task<List<CheepDTO>> GetCheeps()
     {
         var cheeps = await _cheepRepository.ReadPublicCheeps(CurrentPage, PAGE_SIZE);
@@ -27,7 +27,8 @@ public class CheepService : ICheepService
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
-                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = cheep.CheepId
         }).ToList();
         return cheepDTOs;
     }

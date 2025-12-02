@@ -15,7 +15,7 @@ public class CheepRepository : ICheepRepository
     {
         _dbContext = dbContext;
     }
-
+    
     public async Task<List<Cheep>> ReadPublicCheeps(int page, int pageSize)
     {
         var query = await _dbContext.Cheeps

@@ -10,14 +10,17 @@ public class UserTimelineModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
-    public UserTimelineModel(ICheepService cheepService, IAuthorService authorService)
+    private readonly ICommentService _commentService;
+    public UserTimelineModel(ICheepService cheepService, IAuthorService authorService, ICommentService commentService)
     {
         _cheepService = cheepService;
         _authorService = authorService;
+        _commentService = commentService;
     }
     
     public required List<CheepDTO> Cheeps { get; set; }
     public List<AuthorDTO> Followers { get; private set; } = new();
+    public List<CommentDTO> Comments { get; set; } = new();
     public int TotalAuthorPages { get; private set; }
     public int CurrentPage;
     
@@ -25,28 +28,58 @@ public class UserTimelineModel : PageModel
     [Required(ErrorMessage = "Please enter a Cheep!")]
     [StringLength(160, ErrorMessage = "Cheeps cannot exceed 160 characters.")]
     public string Message { get; set; } = string.Empty;
-    public async Task<ActionResult> OnPostCheepAsync()
+    public async Task<ActionResult> OnPostCheepAsync(int page)
     {
-        var author = User.Identity!.Name;
+        ModelState.Remove(nameof(Comment));
         if (!ModelState.IsValid)
         {
-            await LoadAuthorCheeps(author!);
+            await LoadAuthorCheeps(User.Identity!.Name!, page);
             return Page();
         }
-        await _cheepService.AddNewCheep(author!, Message);
+        await _cheepService.AddNewCheep(User.Identity!.Name!, Message);
         return RedirectToPage();
     }
     
-    private async Task LoadAuthorCheeps(string author)
+    private async Task LoadAuthorCheeps(string author, int page)
     {
-        _authorService.CurrentPage = 1;
+        _authorService.CurrentPage = page;
         Cheeps = await _authorService.GetAuthorCheeps(author);
         Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
+        Comments = await _commentService.GetComments();
         TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
-        CurrentPage = _authorService.CurrentPage;
+        CurrentPage = page;
     }
     
-    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow)
+    [BindProperty] 
+    public int CommentTargetId { get; set; }
+    [BindProperty] 
+    [Required(ErrorMessage = "Please enter a Comment!")]
+    [StringLength(160, ErrorMessage = "Comments cannot exceed 160 characters.")]
+    public string Comment { get; set; } = string.Empty;
+    
+    public async Task<ActionResult> OnPostCommentFormAsync(string author, int cheepId, int page)
+    {
+        ModelState.Remove(nameof(Message));
+        if (!ModelState.IsValid)
+        {
+            CommentTargetId = cheepId;
+        }
+        CommentTargetId = cheepId;
+        ModelState.Clear();
+        await _commentService.AddNewComment(User.Identity!.Name!, Comment, cheepId);
+        await LoadAuthorCheeps(author, page);
+        return Page();
+    }
+    
+    public async Task<ActionResult> OnPostToggleCommentsAsync(string author, int cheepId, int page)
+    {
+        CommentTargetId = CommentTargetId == cheepId ? 0 : cheepId;
+        ModelState.Clear();
+        await LoadAuthorCheeps(author, page);
+        return Page();
+    }
+    
+    public async Task<ActionResult> OnPostFollowAsync(string authorToFollow, int page)
     {
         var follower = User.Identity!.Name;
         await _authorService.AddAuthorToFollowsList(authorToFollow, follower!);
@@ -56,7 +89,7 @@ public class UserTimelineModel : PageModel
         return RedirectToPage();
     }
     
-    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow)
+    public async Task<ActionResult> OnPostUnfollowAsync(string authorToUnfollow, int page)
     {
         var follower = User.Identity!.Name;
         await _authorService.RemoveAuthorFromFollowsList(authorToUnfollow, follower!);
@@ -74,6 +107,7 @@ public class UserTimelineModel : PageModel
             _authorService.CurrentPage = pageQuery;
             Cheeps = await _authorService.GetAuthorCheeps(author);
             Followers = await _authorService.GetFollowsList(User.Identity!.Name!);
+            Comments = await _commentService.GetComments();
             TotalAuthorPages = await _authorService.GetTotalAuthorCheeps(author);
             CurrentPage = pageQuery;
         }    catch (FormatException)
