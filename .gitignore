@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 
 # database csv file
 *.csv
+
+# database temp files when server is running
+*.db-shm
+*.db-wal
