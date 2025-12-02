@@ -12,18 +12,22 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
     //private readonly string _connectionString; not in use?
     //private const int PAGE_SIZE = 32; // Fixed page size not in use?
     public DbSet<Cheep> Cheeps { get; set; }
-    public DbSet<Core.DomainModel.Author> Authors { get; set; }
+    public DbSet<Author> Authors { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Core.DomainModel.Author>()
+        modelBuilder.Entity<Author>()
             .HasIndex(c => c.UserName)
             .IsUnique();
         base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<Core.DomainModel.Author>()
+        modelBuilder.Entity<Author>()
             .HasIndex(c => c.Email)
             .IsUnique();
+        /*base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<Author>()
+            .HasOne(c => c.Follows)
+            .WithMany(c => )*/
     }
 
     // method not in use??

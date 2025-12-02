@@ -1,9 +1,11 @@
 using System.IO.Compression;
 using System.Text;
 using Chirp.Core;
+using Chirp.Core.DomainModel;
 using Chirp.Core.ServiceInterfaces;
 
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -15,11 +17,15 @@ public class InformationModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
-
-    public InformationModel(ICheepService cheepService, IAuthorService authorService)
+    private readonly SignInManager<Author> _signInManager;
+    private readonly ILogger<InformationModel> _logger;
+    
+    public InformationModel(ICheepService cheepService, IAuthorService authorService, SignInManager<Author> signInManager, ILogger<InformationModel> logger)
     {
         _cheepService = cheepService;
         _authorService = authorService;
+        _signInManager = signInManager;
+        _logger = logger;
     }
     
     
@@ -103,5 +109,22 @@ public class InformationModel : PageModel
         var filename = "userData.zip";
         return File(bytes, "application/zip", filename);
     }
-}
 
+    public async Task<IActionResult> OnPostForgetMeAsync()
+    {
+        //Get the username for deletion
+        var userNameOrEmail = HttpContext.User.Identity!.Name!; 
+        
+        //Sign out the user
+        await _signInManager.SignOutAsync();
+        
+        //Delete the user
+        await _authorService.DeleteAuthor(userNameOrEmail);
+        
+        _logger.LogInformation("User has been deleted!");
+        
+        //Return to home page after logged out
+        return LocalRedirect("/");
+        
+    }
+}

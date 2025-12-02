@@ -26,6 +26,9 @@ namespace Chirp.Infrastructure.Migrations
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("INTEGER");
 
+                    b.Property<int?>("AuthorId")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
                         .HasColumnType("TEXT");
@@ -73,6 +76,8 @@ namespace Chirp.Infrastructure.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AuthorId");
 
                     b.HasIndex("Email")
                         .IsUnique();
@@ -251,7 +256,7 @@ namespace Chirp.Infrastructure.Migrations
                 {
                     b.HasOne("Chirp.Core.DomainModel.Author", null)
                         .WithMany("Follows")
-                        .HasForeignKey("AuthorId1");
+                        .HasForeignKey("AuthorId");
                 });
 
             modelBuilder.Entity("Chirp.Core.DomainModel.Cheep", b =>
