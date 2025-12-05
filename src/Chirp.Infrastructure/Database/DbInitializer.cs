@@ -2,6 +2,9 @@
 
 namespace Chirp.Infrastructure.Database;
 
+/// <summary>
+/// Seeds the database with sample Authors and Cheeps
+/// </summary>
 public static class DbInitializer
 {
     public static void SeedDatabase(ChirpDbContext chirpContext)

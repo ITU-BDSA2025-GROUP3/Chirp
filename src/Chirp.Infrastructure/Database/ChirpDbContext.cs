@@ -6,13 +6,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Chirp.Infrastructure.Database;
 
-//Responsible for all database access
+/// <summary>
+/// ChirpDbContext is the Chirp Applications main database context, containing the Cheeps, Authors and Comments that makes up the data model of the application.
+/// ChirpDbContext uses the Author object for the ef core identity user.
+/// </summary>
+/// <param name="options"></param>
 public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : IdentityDbContext<Author, IdentityRole<int>, int>(options)
 {
-    //private readonly string _connectionString; not in use?
-    //private const int PAGE_SIZE = 32; // Fixed page size not in use?
     public DbSet<Cheep> Cheeps { get; set; }
-    public DbSet<Core.DomainModel.Author> Authors { get; set; }
+    public DbSet<Author> Authors { get; set; }
     public DbSet<Comment> Comments { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,14 +28,4 @@ public class ChirpDbContext(DbContextOptions<ChirpDbContext> options) : Identity
             .HasIndex(c => c.Email)
             .IsUnique();
     }
-
-    // method not in use??
-    /*private static string UnixTimeStampToDateTimeString(long unixTimeStamp)
-    {
-        // convert unix timestamp to human-readable date
-        return DateTimeOffset.FromUnixTimeSeconds(unixTimeStamp)
-            .ToLocalTime()
-            .ToString("MM/dd/yy H:mm:ss");
-    }*/
-
 }
