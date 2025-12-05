@@ -25,7 +25,6 @@ public class CommentRepository : ICommentRepository
         var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
         var comment = new Comment()
         {
-            IdOfAuthor = author.Id,
             Author = author,
             Message = newComment.Comment,
             TimeStamp = DateTime.UtcNow,

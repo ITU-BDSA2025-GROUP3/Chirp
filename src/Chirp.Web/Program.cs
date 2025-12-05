@@ -71,7 +71,10 @@ var app = builder.Build();
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<ChirpDbContext>();
-    db.Database.EnsureCreated();
+    
+    //Migrate the database to enusre using the newest migrations
+    db.Database.Migrate();
+    
     DbInitializer.SeedDatabase(db);
     Console.WriteLine($"[DEBUG] Cheeps in DB: {db.Cheeps.Count()}");
 }

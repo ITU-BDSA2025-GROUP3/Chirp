@@ -24,5 +24,12 @@
     <ItemGroup>
         <ProjectReference Include="..\..\src\Chirp.Core\Chirp.Core.csproj" />
     </ItemGroup>
+
+    <ItemGroup>
+      <Compile Remove="Migrations\20251202123019_RedundantAuthorFix.cs" />
+      <Compile Remove="Migrations\20251202123019_RedundantAuthorFix.Designer.cs" />
+      <Compile Remove="Migrations\20251112134527_IdentityCoreRefactor.cs" />
+      <Compile Remove="Migrations\20251112134527_IdentityCoreRefactor.Designer.cs" />
+    </ItemGroup>
     
 </Project>
