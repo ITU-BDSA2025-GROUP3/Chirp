@@ -1,3 +1,9 @@
+//NOTE:
+//These tests require a running Chirp.Web instance.
+//By default, they expect the app to be running at http://localhost:5273.
+//But if your app is running on a different port, set:
+//export CHIRP_BASE_URL="http://localhost:<your-port>"
+
 using System;
 using System.Threading.Tasks;
 using Microsoft.Playwright;
@@ -10,7 +16,8 @@ namespace Chirp.Tests.Chirp.PlaywrightTests;
 [TestFixture]
 public class UICheeps : PageTest
 {
-    private const string BaseUrl = "http://localhost:5273";
+    private static readonly string BaseUrl =
+    Environment.GetEnvironmentVariable("CHIRP_BASE_URL") ?? "http://localhost:5273";
     private const string UserName = "joe";
     private const string Password = "Test123!";
 
