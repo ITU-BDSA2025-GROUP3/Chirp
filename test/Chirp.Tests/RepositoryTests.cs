@@ -68,7 +68,6 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
             context.Comments.Add(new Comment
             {
                 Author = author,
-                IdOfAuthor = author.Id,
                 Message = $"Comment {i + 1}",
                 TimeStamp = baseTime.AddMinutes(i),
                 CheepId = cheepId
@@ -82,7 +81,7 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
         Assert.Equal(10, comments.Count);
         Assert.Equal("Comment 10", comments[0].Message);
         Assert.Equal("Comment 1", comments[9].Message);
-        Assert.All(comments, c => Assert.Equal(author.Id, c.IdOfAuthor));
+        Assert.All(comments, c => Assert.Equal(author.Id, c.Author.Id));
     }
     
     [Theory]
