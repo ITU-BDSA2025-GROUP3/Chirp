@@ -47,7 +47,6 @@ public static class Utility
                 {
                     Text = "test",
                     TimeStamp = new DateTime(timestampCounter++),
-                    IdOfAuthor = author.Id,
                     Author = author
                 };
                 author.Cheeps.Add(cheep);
