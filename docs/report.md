@@ -1,4 +1,4 @@
-
+---
 title: _Chirp!_ Project Report
 subtitle: ITU BDSA 2025 Group 03
 author:
@@ -9,7 +9,7 @@ author:
 - "Frederik Schmidt <—@itu.dk>"
 - "Yasmin Nielsen <—@itu.dk>"
   numbersections: true
-
+---
 
 # Design and Architecture of _Chirp!_
 
