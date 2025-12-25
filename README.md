@@ -20,3 +20,18 @@ The project depends on several other third party libraries and resources as deta
 
 - This project uses course-provided razor pages cshtml base and image assets. ITU-BDSA2025-GROUP3 does not claim ownership of these image
   assets. Razor pages have been modified by ITU-BDSA2025-GROUP3.
+
+============ **Extra notes** ============
+
+During the project there are several commits using a wrong co-author statemenet (See below for example). So there are quite a few commits missing proper co-authors on it.
+
+Error co-authors:
+```
+Co-authored-by:
+Name Surname email@example.com
+```
+
+Where it should've been:
+```
+Co-authored-by: Name Surname email@example.com
+```
