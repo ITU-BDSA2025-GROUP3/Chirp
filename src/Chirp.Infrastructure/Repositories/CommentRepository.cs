@@ -49,4 +49,25 @@ public class CommentRepository : ICommentRepository
             .ToListAsync();
         return query;
     }
+
+    public async Task<List<Comment>> GetCommentsListFromUser(String username)
+    {
+        Console.WriteLine("Username in here: " + username);
+        
+        
+        var query = await _dbContext.Comments
+            .Where(comment => comment.Author.UserName == username)
+            .Include(comment => comment.Author)
+            .OrderByDescending(comment => comment.TimeStamp)
+            .ToListAsync();
+
+        var queryTest = await _dbContext.Comments
+            .Where(comment => comment.Author.UserName == username)
+            .ToListAsync();
+        
+        Console.WriteLine("Amount of comments with author username: " + queryTest.Count);
+        
+        return query;
+    }
+    
 }
