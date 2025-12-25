@@ -43,7 +43,6 @@ public class CheepServiceTests
             context.Comments.Add(new Comment
             {
                 Author = author,
-                IdOfAuthor = author.Id,
                 Message = $"Comment {i + 1}",
                 TimeStamp = baseTime.AddMinutes(i),
                 CheepId = cheepId
@@ -303,7 +302,7 @@ public class CheepServiceTests
         //Assert
         Assert.NotNull(dto);
         Assert.Equal("Alice", dto.Name);
-        Assert.Equal("alice@alice.com", dto.Email);
+        Assert.Equal("Alice@Alice.com", dto.Email);
     }
 
     [Fact]
