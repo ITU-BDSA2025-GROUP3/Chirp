@@ -37,20 +37,37 @@
     </div>
     
     <div class="MyPreviousCheeps">
-      <h2>My previous cheeps</h2>
-      @if (Model.Cheeps == null || Model.Cheeps.Count == 0)
-      {
-          <p>You haven't posted any cheeps yet</p>
-      }
-      else
-      {
-          <ul>
-              @foreach (var c in Model.Cheeps)
-              {
-                  <li>@c.TimeStamp: @c.Message</li>
-              }
-          </ul>
-      }
+        <h2>My previous cheeps</h2>
+        @if (Model.Cheeps.Count == 0)
+        {
+            <p>You haven't posted any cheeps yet</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var c in Model.Cheeps)
+                {
+                    <li>@c.TimeStamp: @c.Message</li>
+                }
+            </ul>
+        }
+    </div>
+    
+    <div class="MyPreviousComments">
+        <h2>My previous comments</h2>
+        @if (Model.Comments.Count == 0)
+        {
+            <p>You haven't added any comments yet!</p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var c in Model.Comments)
+                {
+                    <li>@c.CheepId @c.TimeStamp: @c.Comment </li>
+                }
+            </ul>
+        }
     </div>
     
     <div class="downloadButton">
