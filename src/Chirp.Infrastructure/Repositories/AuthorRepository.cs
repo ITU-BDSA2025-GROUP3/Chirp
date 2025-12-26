@@ -123,12 +123,11 @@ public class AuthorRepository : IAuthorRepository
         return authorToRemove;
     }
 
-    public async Task<Author> GetAuthor(string  authorNameOrEmail)
+    public async Task<Author?> GetAuthor(string  authorNameOrEmail)
     {
         if (string.IsNullOrWhiteSpace(authorNameOrEmail)) return null;
         var query = await _dbContext.Authors
             .Where(author => author.UserName == authorNameOrEmail || author.Email == authorNameOrEmail)
-            .Select(author => author)
             .FirstOrDefaultAsync();
         return query;
     }
