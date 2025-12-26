@@ -16,9 +16,15 @@ public class UniqueEmailAddressAttribute :ValidationAttribute
     protected override ValidationResult? IsValid(
         object? value, ValidationContext validationContext)
     {
-        var _authorService = validationContext.GetService(typeof(IAuthorService))! as IAuthorService;
+        var email = value?.ToString();
+        if (string.IsNullOrWhiteSpace(email))
+            return ValidationResult.Success;
         
-        var exists = _authorService.AuthorExists((value!).ToString()!).Result;
+        var authorService = validationContext.GetService(typeof(IAuthorService)) as IAuthorService;
+        if (authorService is null)
+            return ValidationResult.Success;
+        
+        var exists = authorService.AuthorExists(email).Result;
         if (exists)
         {
             return new ValidationResult("Email is already registered!");
