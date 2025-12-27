@@ -23,7 +23,7 @@ public class CheepService : ICheepService
         var cheeps = await _cheepRepository.ReadPublicCheeps(CurrentPage, PAGE_SIZE);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            UserName = cheep.Author.UserName,
+            UserName = cheep.Author.UserName ?? "",
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()

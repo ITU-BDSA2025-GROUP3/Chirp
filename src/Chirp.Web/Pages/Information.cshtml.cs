@@ -32,7 +32,7 @@ public class InformationModel : PageModel
     
     
     public AuthorDTO? CurrentAuthor { get; set; }
-    public List<CheepDTO> Cheeps { get; set; }
+    public List<CheepDTO> Cheeps { get; set; } = new();
     
     public List<AuthorDTO> Followers { get; set; } = new();
     public List<CommentDTO> Comments { get; set; } = new();
@@ -54,7 +54,12 @@ public class InformationModel : PageModel
     // link to other user this user is fowllowing
     public async Task getFollowList()
     {
-        var userName = HttpContext.User.Identity.Name;
+        var userName = HttpContext.User.Identity?.Name;
+        if (string.IsNullOrWhiteSpace(userName))
+        {
+            Followers = new List<AuthorDTO>();
+            return;
+        }
         var list = await _authorService.GetFollowsList(userName);
         Followers = list.ToList();
     }
