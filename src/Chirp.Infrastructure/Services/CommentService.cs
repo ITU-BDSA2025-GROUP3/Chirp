@@ -60,4 +60,21 @@ public class CommentService : ICommentService
 
         return commentDto;
     }
+
+    public async Task<List<CommentDTO>> GetCommentsListFromUser(String username)
+    {
+        var comments = await _commentRepository.GetCommentsListFromUser(username);
+        var commentDto = comments.Select(comment => new CommentDTO
+        {
+            UserName = comment.Author.UserName,
+            Comment = comment.Message,
+            TimeStamp = new DateTimeOffset(comment.TimeStamp)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = comment.CheepId
+        }).ToList();
+        
+        return commentDto;
+    }
+    
 }

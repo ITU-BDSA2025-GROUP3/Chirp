@@ -17,13 +17,15 @@ public class InformationModel : PageModel
 {
     private readonly ICheepService _cheepService;
     private readonly IAuthorService _authorService;
+    private readonly ICommentService _commentService;
     private readonly SignInManager<Author> _signInManager;
     private readonly ILogger<InformationModel> _logger;
     
-    public InformationModel(ICheepService cheepService, IAuthorService authorService, SignInManager<Author> signInManager, ILogger<InformationModel> logger)
+    public InformationModel(ICheepService cheepService, IAuthorService authorService, ICommentService commentService, SignInManager<Author> signInManager, ILogger<InformationModel> logger)
     {
         _cheepService = cheepService;
         _authorService = authorService;
+        _commentService = commentService;
         _signInManager = signInManager;
         _logger = logger;
     }
@@ -33,12 +35,14 @@ public class InformationModel : PageModel
     public List<CheepDTO> Cheeps { get; set; } = new();
     
     public List<AuthorDTO> Followers { get; set; } = new();
+    public List<CommentDTO> Comments { get; set; } = new();
 
     public async Task OnGetAsync()
     {
         await getUserNameAndEmail();
         await getFollowList();
         await getCheepsList();
+        await getCommentsList();
     }
 
     public async Task getUserNameAndEmail()
@@ -68,11 +72,22 @@ public class InformationModel : PageModel
         Cheeps = cheeps.ToList();
     }
 
+    public async Task getCommentsList()
+    {
+        var userName = HttpContext.User.Identity!.Name!;
+        Console.WriteLine("User  with username: " +  userName);
+        var comments = await _commentService.GetCommentsListFromUser(userName);
+        Console.WriteLine("Comments: " + comments.Count);
+        Comments = comments.ToList();
+        
+    }
+
     public async Task<IActionResult> OnGetDownloadAsync()
     {
         await getUserNameAndEmail();
         await getFollowList();
         await getCheepsList();
+        await getCommentsList();
 
         using var stream = new MemoryStream();
 
@@ -109,6 +124,17 @@ public class InformationModel : PageModel
                     streamWriter.WriteLine($"{cheep.TimeStamp}: {cheep.Message}");
                 }
             }
+            
+            // Users previous comments text file
+            var userComments = zip.CreateEntry("previousComments.txt");
+            using (var streamWriter = new StreamWriter(userComments.Open(), Encoding.UTF8))
+            {
+                foreach (var comment in Comments)
+                {
+                    streamWriter.WriteLine($"{comment.CheepId} {comment.TimeStamp}: {comment.Comment}");
+                }
+            }
+            
         }
         var bytes = stream.ToArray();
         var filename = "userData.zip";

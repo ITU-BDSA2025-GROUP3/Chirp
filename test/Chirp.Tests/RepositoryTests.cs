@@ -19,6 +19,70 @@ namespace Chirp.Tests;
 
 public class RepositoryTests /*(ITestOutputHelper testOutputHelper)*/ /*unused*/
 {
+    [Fact]
+    public async Task CreateComment_savesCommentToDatabase()
+    {
+        // Arrange 
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var commentRepo =  new CommentRepository(context);
+        var initCommentCount = context.Comments.Count(); // should be 0
+
+        var commentDTO = new CommentDTO
+        {
+            UserName = "Alice",
+            Comment = "I'm a comment yo",
+            TimeStamp = new DateTimeOffset(DateTime.UtcNow)
+                .ToLocalTime()
+                .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture),
+            CheepId = 0,
+        };
+        
+        // Act
+        await commentRepo.CreateComment(commentDTO);
+        
+        // Assert
+        var finalCommentCount = context.Comments.Count(); // should now be 1
+        Assert.Equal(initCommentCount + 1, finalCommentCount);
+        
+        var savedComment = context.Comments.Include(comment => comment.Author)
+            .Single(comment => comment.Author.UserName == "Alice" && comment.Message == commentDTO.Comment);
+
+        Assert.Equal("Alice", savedComment.Author.UserName);
+        Assert.Equal(commentDTO.Comment, savedComment.Message);
+    }
+
+    [Fact]
+    public async Task GetCommentsList_getsAllComments()
+    {
+        // Arrange 
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var cheepId = context.Cheeps.Select(c => c.CheepId).First();
+        var author = await context.Authors.FirstAsync();
+        var baseTime = new DateTime(2002, 6, 6);
+        
+        // Act
+        for (var i = 0; i < 10; i++)
+        {
+            context.Comments.Add(new Comment
+            {
+                Author = author,
+                Message = $"Comment {i + 1}",
+                TimeStamp = baseTime.AddMinutes(i),
+                CheepId = cheepId
+            });
+        }
+        await context.SaveChangesAsync();
+
+        var repo = new CommentRepository(context);
+        var comments = await repo.GetCommentsList();
+
+        Assert.Equal(10, comments.Count);
+        Assert.Equal("Comment 10", comments[0].Message);
+        Assert.Equal("Comment 1", comments[9].Message);
+        Assert.All(comments, c => Assert.Equal(author.Id, c.Author.Id));
+    }
     
     [Theory]
     [InlineData(1, 32, 32)]
@@ -44,8 +108,8 @@ public class RepositoryTests /*(ITestOutputHelper testOutputHelper)*/ /*unused*/
         await using var context = Utility.CreateFakeChirpDbContext();
         var author1 = new Author { Id = 1, UserName = "Alice", Email = "Alice@Alice.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
         var author2 = new Author { Id = 2, UserName = "Bob", Email = "Bob@Bob.com", Cheeps = new List<Cheep>(), Follows = new  List<Author>() };
-        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), IdOfAuthor = 1, Author = author1 };
-        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), IdOfAuthor = 2, Author = author2 };
+        var cheep1 = new Cheep { Text = "Hello", TimeStamp = new DateTime(0), Author = author1 };
+        var cheep2 = new Cheep { Text = "Hello", TimeStamp = new DateTime(1), Author = author2 };
         author1.Cheeps.Add(cheep1);
         author2.Cheeps.Add(cheep2);
         context.Authors.Add(author1);

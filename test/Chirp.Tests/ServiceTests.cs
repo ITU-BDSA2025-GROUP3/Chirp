@@ -12,6 +12,53 @@ namespace Chirp.Tests;
 
 public class CheepServiceTests
 {
+    
+    [Fact]
+    public async Task AddNewComment_persistData()
+    {
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var cheepId = context.Cheeps.Select(c => c.CheepId).First();
+        var service = new CommentService(new CommentRepository(context));
+        
+        await service.AddNewComment("Alice", "Nice post :)", cheepId);
+        var stored = await context.Comments.Include(c => c.Author).SingleAsync();
+        
+        Assert.Equal("Nice post :)", stored.Message);
+        Assert.Equal(cheepId, stored.CheepId);
+        Assert.Equal("Alice", stored.Author.UserName);
+    }
+    
+    [Fact]
+    public async Task GetComments_ReturnsExpectedAmount()
+    {
+        await using var context = Utility.CreateFakeChirpDbContext();
+        Utility.SeedDatabase(context);
+        var cheepId = context.Cheeps.Select(c => c.CheepId).First();
+        var author = await context.Authors.FirstAsync();
+        
+        var baseTime = new DateTime(2002, 6, 6);
+        for (var i = 0; i < 10; i++)
+        {
+            context.Comments.Add(new Comment
+            {
+                Author = author,
+                Message = $"Comment {i + 1}",
+                TimeStamp = baseTime.AddMinutes(i),
+                CheepId = cheepId
+            });
+        }
+        await context.SaveChangesAsync();
+
+        var service = new CommentService(new CommentRepository(context));
+
+        var comments = await service.GetComments();
+
+        Assert.Equal(10, comments.Count);
+        Assert.Equal("Comment 10", comments[0].Comment); // assert latest comment is at the very top
+        Assert.Equal("Comment 1", comments[9].Comment); // assert first comment is at the bottom
+    }
+    
     [Theory]
     [InlineData(0, 1)]
     [InlineData(1, 1)]

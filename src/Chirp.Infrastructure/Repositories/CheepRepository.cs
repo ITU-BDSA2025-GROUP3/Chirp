@@ -40,7 +40,7 @@ public class CheepRepository : ICheepRepository
         if (page < 1) throw new ArgumentOutOfRangeException(nameof(page));
         
         var query = await _dbContext.Cheeps
-            .Where(cheep => authorIds.Contains(cheep.IdOfAuthor))
+            .Where(cheep => authorIds.Contains(cheep.Author.Id))
             .Include(cheep => cheep.Author)
             .OrderByDescending(cheep => cheep.TimeStamp)
             .Skip((page - 1) * pageSize)
@@ -56,7 +56,7 @@ public class CheepRepository : ICheepRepository
 
     public Task<int> GetTotalTimelineCheeps(List<int> authorIds)
     {
-        return _dbContext.Cheeps.CountAsync(cheep => authorIds.Contains(cheep.IdOfAuthor));
+        return _dbContext.Cheeps.CountAsync(cheep => authorIds.Contains(cheep.Author.Id));
     }
 
     /// <summary>
@@ -77,7 +77,6 @@ public class CheepRepository : ICheepRepository
 
         var cheep = new Cheep()
         {
-            IdOfAuthor = command.Id,
             Author = command,
             Text = newCheep.Message, 
             TimeStamp = DateTime.UtcNow,
