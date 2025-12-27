@@ -66,7 +66,7 @@ public class CommentService : ICommentService
         var comments = await _commentRepository.GetCommentsListFromUser(username);
         var commentDto = comments.Select(comment => new CommentDTO
         {
-            UserName = comment.Author.UserName,
+            UserName = comment.Author.UserName ?? "",
             Comment = comment.Message,
             TimeStamp = new DateTimeOffset(comment.TimeStamp)
                 .ToLocalTime()
