@@ -28,7 +28,7 @@ public class AuthorService : IAuthorService
         var cheeps = await _cheepRepository.ReadTimelineCheeps(CurrentPage, PAGE_SIZE, authorIds);
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO
         {
-            UserName = cheep.Author.UserName,
+            UserName = cheep.Author.UserName ?? "",
             Message = cheep.Text,
             TimeStamp = new DateTimeOffset(cheep.TimeStamp)
                 .ToLocalTime()
@@ -41,10 +41,15 @@ public class AuthorService : IAuthorService
     public async Task <AuthorDTO> GetAuthor(string author)
     {
         var _author = await _authorRepository.GetAuthor(author);
+        if (_author is null)
+        {
+            return new AuthorDTO { Name = "", Email = "" };
+        }
+        
         return new AuthorDTO
         {
-            Name = _author.UserName, 
-            Email = _author.Email,
+            Name = _author.UserName ?? "", 
+            Email = _author.Email ?? "",
         };
             
     }
@@ -74,7 +79,7 @@ public class AuthorService : IAuthorService
        
         var follows = await _authorRepository.GetFollowedList(author);
         if (follows.Count == 0) return [];
-        var authorDTOs = follows.Select(author => new AuthorDTO { Name = author.UserName }).ToList();
+        var authorDTOs = follows.Select(a => new AuthorDTO { Name = a.UserName ?? "" }).ToList();
         return authorDTOs;
     }
 
@@ -100,8 +105,8 @@ public class AuthorService : IAuthorService
         var author = await _authorRepository.DeleteAuthor(authorNameOrEmail);
         return new AuthorDTO
         {
-            Name = author.UserName,
-            Email = author.Email
+            Name = author.UserName ?? "",
+            Email = author.Email ?? ""
         };
     }
     
