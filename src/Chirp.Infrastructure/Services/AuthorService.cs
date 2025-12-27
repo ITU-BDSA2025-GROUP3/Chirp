@@ -120,7 +120,7 @@ public class AuthorService : IAuthorService
         
         var cheepDTOs = cheeps.Select(cheep => new CheepDTO{
         Message = cheep.Text,
-        TimeStamp = new DateTimeOffset(cheep.TimeStamp)
+        TimeStamp = cheep.TimeStamp
             .ToLocalTime()
             .ToString("MM/dd/yy H:mm:ss", CultureInfo.InvariantCulture)
         }).ToList();

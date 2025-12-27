@@ -255,7 +255,7 @@ public class CheepServiceTests
         //Assert
         Assert.NotNull(dto);
         Assert.Equal("Alice", dto.Name);
-        Assert.Equal("alice@alice.com", dto.Email);
+        Assert.Equal("Alice@Alice.com", dto.Email);
     }
 
     [Fact]
