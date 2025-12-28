@@ -17,7 +17,7 @@ using NuGet.Packaging;
 
 namespace Chirp.Tests;
 
-public class RepositoryTests(ITestOutputHelper testOutputHelper)
+public class RepositoryTests /*(ITestOutputHelper testOutputHelper)*/ /*unused*/
 {
     [Fact]
     public async Task CreateComment_savesCommentToDatabase()
@@ -245,7 +245,7 @@ public class RepositoryTests(ITestOutputHelper testOutputHelper)
         
         foreach (var author1 in context.Authors)
         {
-            var follows = await authorRepo.GetFollowedList(author1.UserName);
+            var follows = await authorRepo.GetFollowedList(author1.UserName!);
             Assert.DoesNotContain(follows, a => a.UserName == author);
         }
     }
