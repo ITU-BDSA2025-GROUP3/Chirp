@@ -72,7 +72,7 @@ public class UICheeps : PageTest
 
         var finalMatches = await Page.Locator($"li:has-text(\"{longCheep}\")").CountAsync();
 
-        Assert.AreEqual(initialMatches, finalMatches,
+        Assert.That(finalMatches, Is.EqualTo(initialMatches),
             "Cheeps longer than 160 characters should not be stored or shown in the timeline.");
     }
 }

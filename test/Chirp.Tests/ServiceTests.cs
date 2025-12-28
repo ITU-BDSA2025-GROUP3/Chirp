@@ -281,7 +281,7 @@ public class CheepServiceTests
         
         foreach (var author1 in context.Authors)
         {
-            var follows = await authorService.GetFollowsList(author1.UserName);
+            var follows = await authorService.GetFollowsList(author1.UserName!);
             Assert.DoesNotContain(follows, a => a.Name == username);
         }
     }

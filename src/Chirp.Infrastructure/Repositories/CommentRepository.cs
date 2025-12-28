@@ -23,6 +23,10 @@ public class CommentRepository : ICommentRepository
     public async Task CreateComment(CommentDTO newComment)
     {
         var author = await _dbContext.Users.SingleOrDefaultAsync(user => user.UserName == newComment.UserName);
+        if (author is null)
+        {
+            throw new InvalidOperationException($"Author '{newComment.UserName}' not found.");
+        }
         var comment = new Comment()
         {
             Author = author,
