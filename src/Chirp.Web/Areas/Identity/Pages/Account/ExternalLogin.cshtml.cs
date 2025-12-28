@@ -151,13 +151,21 @@ namespace Chirp.Web.Areas.Identity.Pages.Account
                 
             var username = info.Principal.FindFirstValue(ClaimTypes.Name);
             var email =  info.Principal.FindFirstValue(ClaimTypes.Email);
-
+            
             //create user with provided username and email from github
             if (username != null && email != null)
             {
+                //Ensure a user with that email hasn't been registered before
+                if (_authorService.AuthorExists(email).Result)
+                {
+                    ErrorMessage =  $"Email {email} is already registered";
+                    return RedirectToPage("./Login", new { ReturnUrl = returnUrl });
+                }
+                
                 //Create the new user
                 var user = CreateUser();
-                    
+                
+
                 //Set the username from auth to the user
                 await _userStore.SetUserNameAsync(user, username, CancellationToken.None);
                 //Set the email from auth to the user
