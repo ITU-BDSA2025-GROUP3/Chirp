@@ -22,7 +22,7 @@ SOFTWARE.
 
 ========= **Third party licenses** =========
 
-- This project depends on Microsoft.EntityFrameworkCore, Microsoft.Data.Sqlite, ASP.NET Core and .NET 9.0.9, each licensed under the MIT license. A copy of the
+- This project depends on Microsoft.EntityFrameworkCore, Microsoft.Data.Sqlite, ASP.NET Core and .NET 8, each licensed under the MIT license. A copy of the
 license can be found under the licenses folder.
 
 - The project depends on Xunit licensed under the Apache-2.0 license. A copy of the license can be found in the licenses folder.
