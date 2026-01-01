@@ -13,7 +13,7 @@ of this.
 The project depends on several other third party libraries and resources as detailed below:
 
 
-- This project depends on Microsoft.EntityFrameworkCore, Microsoft.Data.Sqlite, ASP.NET Core, Microsoft.Playwright and .NET 9.0.9, each licensed under the MIT license. A copy of the
+- This project depends on Microsoft.EntityFrameworkCore, Microsoft.Data.Sqlite, ASP.NET Core, Microsoft.Playwright and .NET 8, each licensed under the MIT license. A copy of the
   license can be found under the licenses folder.
 
 - The project depends on Xunit, Identity.Core and AspNet.Security.OAuth.GitHub each licensed under the Apache-2.0 license. A copy of the license can be found in the licenses folder
